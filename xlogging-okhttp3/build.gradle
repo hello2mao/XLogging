@@ -44,6 +44,6 @@ publish {
     groupId = 'com.hello2mao'         //compile引用时的第1部分groupId
     artifactId = 'xlogging'     //compile引用时的第2部分项目名
     publishVersion = '1.0.0'    //compile引用时的第3部分版本号
-    desc = 'This is a inspector for Android OkHttp clients'
+    desc = 'This is an inspector for Android OkHttp clients'
     website = 'https://github.com/hello2mao/XLogging'
 }
