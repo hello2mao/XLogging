@@ -8,9 +8,15 @@
     android:orientation="vertical"
     tools:context="com.hello2mao.xlogging.sample.MainActivity">
 
+    <ImageView
+        android:id="@+id/iv_pic"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
     <Button
         android:id="@+id/okhttp3_get"
-        android:text="Okhttp3 GET"
+        android:text="切换图片"
         android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

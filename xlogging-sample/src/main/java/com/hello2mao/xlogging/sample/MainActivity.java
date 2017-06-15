@@ -2,22 +2,30 @@ package com.hello2mao.xlogging.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
-import com.hello2mao.xlogging.okhttp3.XLoggingInterceptor;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
+import com.hello2mao.xlogging.sample.http.RetrofitHelper;
 
-import java.io.IOException;
+import java.util.Random;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    @BindView(R.id.iv_pic)
+    ImageView ivPic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+        showPic();
     }
 
     @OnClick(R.id.okhttp3_get)
@@ -32,37 +41,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.okhttp3_get:
-                okhttp3Get();
+                showPic();
                 break;
             default:
                 break;
         }
     }
 
-    private void okhttp3Get() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new XLoggingInterceptor())
-                .build();
-        Request request = new Request.Builder()
-                .url("http://news-at.zhihu.com/api/4/news/latest")
-                .method("GET", null)
-                .build();
+    private void showPic() {
+        // http://image.baidu.com/channel/listjson?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8
+        RetrofitHelper.getInstance().fetchBaiduImageInfo(0, 3, "美女", "全部", "校花", "utf8")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<BaiduImageBean>() {
+                    @Override
+                    public void call(BaiduImageBean baiduImageBean) {
+                        Glide.with(getApplicationContext())
+                                .load(baiduImageBean.getData().get(new Random().nextInt(3)).getImage_url())
+                                .crossFade()
+                                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                                .into(ivPic);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
+                    }
+                }, new Action0() {
+                    @Override
+                    public void call() {
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseBody = response.body().string();
-                    Log.d("test", "responseBody=" + responseBody);
-                } else {
-                    Log.e("test", "okhttp3Get failed");
-                }
-            }
-        });
+                    }
+                });
     }
 }

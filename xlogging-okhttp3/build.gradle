@@ -30,19 +30,16 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     testCompile 'junit:junit:4.12'
 
-
     // okhttp3
     provided 'com.squareup.okhttp3:okhttp:3.6.0'
     // gson
     compile 'com.google.code.gson:gson:2.7'
-    // ?
-    compile 'nl.qbusict:cupboard:2.2.0'
 }
 
 publish {
     userOrg = 'hello2mao'      //bintray注册的用户名
-    groupId = 'com.hello2mao'         //compile引用时的第1部分groupId
-    artifactId = 'xlogging'     //compile引用时的第2部分项目名
+    groupId = 'com.hello2mao'  //compile引用时的第1部分groupId
+    artifactId = 'xlogging'    //compile引用时的第2部分项目名
     publishVersion = '1.0.0'    //compile引用时的第3部分版本号
     desc = 'This is an inspector for Android OkHttp clients'
     website = 'https://github.com/hello2mao/XLogging'

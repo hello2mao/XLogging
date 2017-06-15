@@ -1,19 +1,12 @@
 package com.hello2mao.xlogging.okhttp3.internal.util;
 
-import android.content.Context;
-import android.text.TextUtils;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.hello2mao.xlogging.okhttp3.R;
-import com.hello2mao.xlogging.okhttp3.internal.data.HttpHeader;
-import com.hello2mao.xlogging.okhttp3.internal.data.HttpTransaction;
 
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 import java.util.Locale;
 
 import javax.xml.transform.OutputKeys;
@@ -24,17 +17,6 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 public class FormatUtils {
-
-    public static String formatHeaders(List<HttpHeader> httpHeaders, boolean withMarkup) {
-        String out = "";
-        if (httpHeaders != null) {
-            for (HttpHeader header : httpHeaders) {
-                out += ((withMarkup) ? "<b>" : "") + header.getName() + ": " + ((withMarkup) ? "</b>" : "") +
-                        header.getValue() + ((withMarkup) ? "<br />" : "\n");
-            }
-        }
-        return out;
-    }
 
     public static String formatByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
@@ -66,63 +48,6 @@ public class FormatUtils {
         } catch (Exception e) {
             return xml;
         }
-    }
-
-    public static String getShareText(Context context, HttpTransaction transaction) {
-        String text = "";
-        text += context.getString(R.string.chuck_url) + ": " + v(transaction.getUrl()) + "\n";
-        text += context.getString(R.string.chuck_method) + ": " + v(transaction.getMethod()) + "\n";
-        text += context.getString(R.string.chuck_protocol) + ": " + v(transaction.getProtocol()) + "\n";
-        text += context.getString(R.string.chuck_status) + ": " + v(transaction.getStatus().toString()) + "\n";
-        text += context.getString(R.string.chuck_response) + ": " + v(transaction.getResponseSummaryText()) + "\n";
-        text += context.getString(R.string.chuck_ssl) + ": " + v(context.getString(transaction.isSsl() ? R.string.chuck_yes : R.string.chuck_no)) + "\n";
-        text += "\n";
-        text += context.getString(R.string.chuck_request_time) + ": " + v(transaction.getRequestDateString()) + "\n";
-        text += context.getString(R.string.chuck_response_time) + ": " + v(transaction.getResponseDateString()) + "\n";
-        text += context.getString(R.string.chuck_duration) + ": " + v(transaction.getDurationString()) + "\n";
-        text += "\n";
-        text += context.getString(R.string.chuck_request_size) + ": " + v(transaction.getRequestSizeString()) + "\n";
-        text += context.getString(R.string.chuck_response_size) + ": " + v(transaction.getResponseSizeString()) + "\n";
-        text += context.getString(R.string.chuck_total_size) + ": " + v(transaction.getTotalSizeString()) + "\n";
-        text += "\n";
-        text += "---------- " + context.getString(R.string.chuck_request) + " ----------\n\n";
-        String headers = formatHeaders(transaction.getRequestHeaders(), false);
-        if (!TextUtils.isEmpty(headers)) {
-            text += headers + "\n";
-        }
-        text += (transaction.requestBodyIsPlainText()) ? v(transaction.getFormattedRequestBody()) :
-                context.getString(R.string.chuck_body_omitted);
-        text += "\n\n";
-        text += "---------- " + context.getString(R.string.chuck_response) + " ----------\n\n";
-        headers = formatHeaders(transaction.getResponseHeaders(), false);
-        if (!TextUtils.isEmpty(headers)) {
-            text += headers + "\n";
-        }
-        text += (transaction.responseBodyIsPlainText()) ? v(transaction.getFormattedResponseBody()) :
-                context.getString(R.string.chuck_body_omitted);
-        return text;
-    }
-
-    public static String getShareCurlCommand(HttpTransaction transaction) {
-        boolean compressed = false;
-        String curlCmd = "curl";
-        curlCmd += " -X " + transaction.getMethod();
-        List<HttpHeader> headers = transaction.getRequestHeaders();
-        for (int i = 0, count = headers.size(); i < count; i++) {
-            String name = headers.get(i).getName();
-            String value = headers.get(i).getValue();
-            if ("Accept-Encoding".equalsIgnoreCase(name) && "gzip".equalsIgnoreCase(value)) {
-                compressed = true;
-            }
-            curlCmd += " -H " + "\"" + name + ": " + value + "\"";
-        }
-        String requestBody = transaction.getRequestBody();
-        if (requestBody != null && requestBody.length() > 0) {
-            // try to keep to a single line and use a subshell to preserve any line breaks
-            curlCmd += " --data $'" + requestBody.replace("\n", "\\n") + "'";
-        }
-        curlCmd += ((compressed) ? " --compressed " : " ") + transaction.getUrl();
-        return curlCmd;
     }
 
     private static String v(String string) {

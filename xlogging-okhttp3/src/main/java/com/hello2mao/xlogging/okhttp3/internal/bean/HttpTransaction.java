@@ -1,19 +1,16 @@
-package com.hello2mao.xlogging.okhttp3.internal.data;
+package com.hello2mao.xlogging.okhttp3.internal.bean;
 
 
 import android.net.Uri;
 
-import com.google.gson.reflect.TypeToken;
 import com.hello2mao.xlogging.okhttp3.internal.util.FormatUtils;
-import com.hello2mao.xlogging.okhttp3.internal.util.JsonConvertor;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
-import nl.qbusict.cupboard.annotation.Index;
 import okhttp3.Headers;
 
 public class HttpTransaction {
@@ -24,40 +21,24 @@ public class HttpTransaction {
         Failed
     }
 
-    public static final String[] PARTIAL_PROJECTION = new String[] {
-            "_id",
-            "requestDate",
-            "tookMs",
-            "method",
-            "host",
-            "path",
-            "scheme",
-            "requestContentLength",
-            "responseCode",
-            "error",
-            "responseContentLength"
-    };
-
     private static final SimpleDateFormat TIME_ONLY_FMT = new SimpleDateFormat("HH:mm:ss", Locale.US);
 
-    private Long _id;
-    @Index
+    private String method;
+    private String protocol;
+    private String scheme;
+    private String host;
+    private String address;
+    private String path;
+    private int port;
+    private String query;
     private Date requestDate;
     private Date responseDate;
     private Long tookMs;
-
-    private String protocol;
-    private String method;
     private String url;
-    private String host;
-    private String path;
-    private String scheme;
-
     private Long requestContentLength;
     private String requestContentType;
-    private String requestHeaders;
+    private Map<String, String> requestHeaders;
     private String requestBody;
-    private boolean requestBodyIsPlainText = true;
 
     private Integer responseCode;
     private String responseMessage;
@@ -65,16 +46,41 @@ public class HttpTransaction {
 
     private Long responseContentLength;
     private String responseContentType;
-    private String responseHeaders;
+    private Map<String, String> responseHeaders;
     private String responseBody;
-    private boolean responseBodyIsPlainText = true;
 
-    public Long getId() {
-        return _id;
+    public String getAddress() {
+        return address;
     }
 
-    public void setId(long id) {
-        _id = id;
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    private boolean keepAlive = false;
+
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public Date getRequestDate() {
@@ -129,14 +135,6 @@ public class HttpTransaction {
         this.requestBody = requestBody;
     }
 
-    public boolean requestBodyIsPlainText() {
-        return requestBodyIsPlainText;
-    }
-
-    public void setRequestBodyIsPlainText(boolean requestBodyIsPlainText) {
-        this.requestBodyIsPlainText = requestBodyIsPlainText;
-    }
-
     public Long getRequestContentLength() {
         return requestContentLength;
     }
@@ -163,14 +161,6 @@ public class HttpTransaction {
 
     public void setResponseBody(String responseBody) {
         this.responseBody = responseBody;
-    }
-
-    public boolean responseBodyIsPlainText() {
-        return responseBodyIsPlainText;
-    }
-
-    public void setResponseBodyIsPlainText(boolean responseBodyIsPlainText) {
-        this.responseBodyIsPlainText = responseBodyIsPlainText;
     }
 
     public Integer getResponseCode() {
@@ -220,9 +210,11 @@ public class HttpTransaction {
     public void setUrl(String url) {
         this.url = url;
         Uri uri = Uri.parse(url);
-        host = uri.getHost();
-        path = uri.getPath() + ((uri.getQuery() != null) ? "?" + uri.getQuery() : "");
         scheme = uri.getScheme();
+        host = uri.getHost();
+        path = uri.getPath();
+        query = ((uri.getQuery() != null) ? "?" + uri.getQuery() : "");
+
     }
 
     public String getHost() {
@@ -238,37 +230,27 @@ public class HttpTransaction {
     }
 
     public void setRequestHeaders(Headers headers) {
-        setRequestHeaders(toHttpHeaderList(headers));
+        setRequestHeaders(toHttpHeaderMap(headers));
     }
 
-    public void setRequestHeaders(List<HttpHeader> headers) {
-        requestHeaders = JsonConvertor.getInstance().toJson(headers);
+    public void setRequestHeaders(Map<String, String> headers) {
+        requestHeaders = headers;
     }
 
-    public List<HttpHeader> getRequestHeaders() {
-        return JsonConvertor.getInstance().fromJson(requestHeaders,
-                new TypeToken<List<HttpHeader>>(){}.getType());
-    }
-
-    public String getRequestHeadersString(boolean withMarkup) {
-        return FormatUtils.formatHeaders(getRequestHeaders(), withMarkup);
+    public Map<String, String> getRequestHeaders() {
+        return requestHeaders;
     }
 
     public void setResponseHeaders(Headers headers) {
-        setResponseHeaders(toHttpHeaderList(headers));
+        setResponseHeaders(toHttpHeaderMap(headers));
     }
 
-    public void setResponseHeaders(List<HttpHeader> headers) {
-        responseHeaders = JsonConvertor.getInstance().toJson(headers);
+    public void setResponseHeaders(Map<String, String> headers) {
+        responseHeaders = headers;
     }
 
-    public List<HttpHeader> getResponseHeaders() {
-        return JsonConvertor.getInstance().fromJson(responseHeaders,
-                new TypeToken<List<HttpHeader>>(){}.getType());
-    }
-
-    public String getResponseHeadersString(boolean withMarkup) {
-        return FormatUtils.formatHeaders(getResponseHeaders(), withMarkup);
+    public Map<String, String> getResponseHeaders() {
+        return responseHeaders;
     }
 
     public Status getStatus() {
@@ -336,10 +318,13 @@ public class HttpTransaction {
         return scheme.toLowerCase().equals("https");
     }
 
-    private List<HttpHeader> toHttpHeaderList(Headers headers) {
-        List<HttpHeader> httpHeaders = new ArrayList<>();
+    private Map<String, String> toHttpHeaderMap(Headers headers) {
+        Map<String, String> httpHeaders = new HashMap<>();
         for (int i = 0, count = headers.size(); i < count; i++) {
-            httpHeaders.add(new HttpHeader(headers.name(i), headers.value(i)));
+            if (headers.name(i).equals("Connection") && headers.value(i).equals("Keep-Alive")) {
+                keepAlive = true;
+            }
+            httpHeaders.put(headers.name(i), headers.value(i));
         }
         return httpHeaders;
     }
@@ -356,34 +341,5 @@ public class HttpTransaction {
 
     private String formatBytes(long bytes) {
         return FormatUtils.formatByteCount(bytes, true);
-    }
-
-    @Override
-    public String toString() {
-        return "HttpTransaction{" +
-                "_id=" + _id +
-                ", requestDate=" + requestDate +
-                ", responseDate=" + responseDate +
-                ", tookMs=" + tookMs +
-                ", protocol='" + protocol + '\'' +
-                ", method='" + method + '\'' +
-                ", url='" + url + '\'' +
-                ", host='" + host + '\'' +
-                ", path='" + path + '\'' +
-                ", scheme='" + scheme + '\'' +
-                ", requestContentLength=" + requestContentLength +
-                ", requestContentType='" + requestContentType + '\'' +
-                ", requestHeaders='" + requestHeaders + '\'' +
-                ", requestBody='" + requestBody + '\'' +
-                ", requestBodyIsPlainText=" + requestBodyIsPlainText +
-                ", responseCode=" + responseCode +
-                ", responseMessage='" + responseMessage + '\'' +
-                ", error='" + error + '\'' +
-                ", responseContentLength=" + responseContentLength +
-                ", responseContentType='" + responseContentType + '\'' +
-                ", responseHeaders='" + responseHeaders + '\'' +
-                ", responseBody='" + responseBody + '\'' +
-                ", responseBodyIsPlainText=" + responseBodyIsPlainText +
-                '}';
     }
 }
