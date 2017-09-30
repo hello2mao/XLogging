@@ -1,9 +1,14 @@
 XLogging
 =====
 
-XLogging is an enhanced inspector for Android OkHttp clients. 
+XLogging is an enhanced network inspector for Android OkHttp/URLConnection/HttpClient. 
 
 ## Feature
+* Network Lib
+  * OkHttp
+  * URLConnection: TODO
+  * HttpClient: TODO
+
 * DNS
   * DNS lookup time
   * DNS lookup results

@@ -1,1 +1,1 @@
-include ':xlogging-sample', ':xlogging-okhttp'
+include ':xlogging-sample', ':xlogging'
