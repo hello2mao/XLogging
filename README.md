@@ -4,38 +4,38 @@ XLogging
 XLogging is an enhanced inspector for Android OkHttp clients. 
 
 ## Feature
-#### DNS
-* DNS lookup time
-* DNS lookup results
-* DNS lookup error
+* DNS
+  * DNS lookup time
+  * DNS lookup results
+  * DNS lookup error
 
-#### TCP
-* TCP connect time
-* TCP connect error
+* TCP
+  * TCP connect time
+  * TCP connect error
 
-#### SSL
-* TODO
+* SSL
+  * TODO
 
-#### HTTP
-* Http + Https
-* URL
-* Http header
-* Http methdod
-* Http body
-* Http status code
-* Http error
-* Http protocol
-* Http request+response
-* Http bytes send
-* Http bytes received
-* Http response time
+* HTTP
+  * Http + Https
+  * URL
+  * Http header
+  * Http methdod
+  * Http body
+  * Http status code
+  * Http error
+  * Http protocol
+  * Http request+response
+  * Http bytes send
+  * Http bytes received
+  * Http response time
 
 ## Quick Start
 Gradle:
 ```
 compile 'com.hello2mao:xlogging:1.1.0'
 ```
-Use:
+Usage:
 ```
 OkHttpClient.Builder builder = new OkHttpClient.Builder();
 OkHttpClient okHttpClient = XLogging.install(builder.build(), XLogging.Level.BODY);
