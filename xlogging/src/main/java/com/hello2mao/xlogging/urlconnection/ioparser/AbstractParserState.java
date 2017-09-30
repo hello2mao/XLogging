@@ -1,6 +1,8 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
+
 import junit.framework.Assert;
 
 public abstract class AbstractParserState {
@@ -10,7 +12,6 @@ public abstract class AbstractParserState {
     int charactersInMessage;
     long currentTimeStamp;
     protected CharBuffer buffer;
-    protected static final AgentLog LOG = AgentLogManager.getAgentLog();
 
     public AbstractParserState(AbstractParserState parser) {
         initialize(parser.handler, parser.charactersInMessage);

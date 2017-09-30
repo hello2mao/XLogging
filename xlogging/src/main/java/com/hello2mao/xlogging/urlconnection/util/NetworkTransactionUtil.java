@@ -5,7 +5,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.RequestMethodType;
@@ -15,7 +17,7 @@ import com.hello2mao.xlogging.urlconnection.RequestMethodType;
  * Created by xuaifang on 17/8/9.
  */
 public class NetworkTransactionUtil {
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
 
     public static void setNetWorkTransactionState(final MonitoredSocketInterface monitoredSocket,
                                                   final NetworkTransactionState networkTransactionState) {
@@ -40,7 +42,7 @@ public class NetworkTransactionUtil {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager == null) {
-            LOG.error("couldn't get connectivity manager");
+            Log.e(Constant.TAG, "couldn't get connectivity manager");
             return false;
         }
         final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

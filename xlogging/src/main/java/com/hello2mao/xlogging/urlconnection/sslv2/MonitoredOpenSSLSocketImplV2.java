@@ -1,17 +1,27 @@
 package com.hello2mao.xlogging.urlconnection.sslv2;
 
 
+import android.util.Log;
+
+import com.android.org.conscrypt.OpenSSLSocketImpl;
+import com.android.org.conscrypt.SSLParametersImpl;
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpResponseParsingInputStreamV1;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.LinkedList;
+import java.util.Queue;
 
 public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements MonitoredSocketInterface {
-    private static AgentLog LOG = AgentLogManager.getAgentLog();
+
     private int sslHandshakeTime;
     private final Queue<NetworkTransactionState> queue;
     private HttpResponseParsingInputStreamV1 inputStream;
@@ -52,7 +62,7 @@ public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements M
             long currentTimeMillis = System.currentTimeMillis();
             super.startHandshake();
             this.sslHandshakeTime = (int)(System.currentTimeMillis() - currentTimeMillis);
-            LOG.debug("sslHandshakeTime V2:" + sslHandshakeTime);
+            Log.d(Constant.TAG, "sslHandshakeTime V2:" + sslHandshakeTime);
         }
         catch (IOException ex) {
             // TODO
@@ -75,7 +85,7 @@ public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements M
         if (inputStream == null) {
             return null;
         }
-        LOG.debug("get InputStream in open SSL socket impl");
+        Log.d(Constant.TAG, "get InputStream in open SSL socket impl");
         return this.inputStream = new HttpResponseParsingInputStreamV1(this, inputStream);
     }
 
@@ -85,7 +95,7 @@ public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements M
         if (outputStream == null) {
             return null;
         }
-        LOG.debug("get OutputStream in open SSL socket impl");
+        Log.d(Constant.TAG, "get OutputStream in open SSL socket impl");
         return this.outputStream = new HttpRequestParsingOutputStreamV1(this, outputStream);
     }
 
@@ -108,7 +118,7 @@ public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements M
         } else {
             networkTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
-        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
+//        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
         networkTransactionState.setSslHandShakeTime(sslHandshakeTime);
         return networkTransactionState;
     }
@@ -121,7 +131,7 @@ public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements M
     @Override
     public NetworkTransactionState dequeueNetworkTransactionState() {
         synchronized (queue) {
-            LOG.debug("SSLSocketV2 start dequeuetransaction len:" + queue.size());
+            Log.d(Constant.TAG, "SSLSocketV2 start dequeuetransaction len:" + queue.size());
             return queue.poll();
         }
     }
@@ -130,7 +140,7 @@ public class MonitoredOpenSSLSocketImplV2 extends OpenSSLSocketImpl implements M
     public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
         synchronized (queue) {
             queue.add(networkTransactionState);
-            LOG.debug("SSLSocketV2 enqueuetransaction len:" + queue.size());
+            Log.d(Constant.TAG, "SSLSocketV2 enqueuetransaction len:" + queue.size());
         }
     }
 }

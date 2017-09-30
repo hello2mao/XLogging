@@ -2,9 +2,12 @@ package com.hello2mao.xlogging.urlconnection.iov2;
 
 
 import android.support.annotation.NonNull;
-import android.webkit.URLUtil;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
+import com.hello2mao.xlogging.urlconnection.NetworkMonitor;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.ioparser.AbstractParserState;
 import com.hello2mao.xlogging.urlconnection.ioparser.HttpParserHandler;
@@ -13,14 +16,19 @@ import com.hello2mao.xlogging.urlconnection.ioparser.NoopLineParser;
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 import com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil;
 import com.hello2mao.xlogging.urlconnection.util.NetworkTransactionUtil;
+import com.hello2mao.xlogging.util.URLUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import static com.hello2mao.xlogging.urlconnection
+        .iov1.HttpResponseParsingInputStreamV1.getIpAddress;
+import static com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil.setErrorCodeFromException;
+
 public class HttpResponseParsingInputStreamV2 extends InputStream implements HttpParserHandler {
 
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
     private int connectTime;
     private InputStream inputStream;
     private MonitoredSocketInterface monitoredSocket;
@@ -75,7 +83,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 
     @Override
     public int read() throws IOException {
-        LOG.debug("read character in InputStream");
+        Log.d(Constant.TAG, "read character in InputStream");
         int read;
         try {
             read = this.inputStream.read();
@@ -96,7 +104,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 
     @Override
     public int read(@NonNull byte[] buffer) throws IOException {
-        LOG.debug("read buffer in InputStream");
+        Log.d(Constant.TAG, "read buffer in InputStream");
         try {
             int read = inputStream.read(buffer);
             addBufferToParser(buffer, 0, read);
@@ -145,7 +153,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
     }
 
     private void unsafeLogError(Exception ex) {
-        LOG.debug("setErrorCode: " + ex.toString());
+        Log.d(Constant.TAG, "setErrorCode: " + ex.toString());
         final NetworkTransactionState networkTransactionState = this.getNetworkTransactionStateNN();
         if (networkTransactionState != null) {
             setErrorCodeFromException(networkTransactionState, ex);
@@ -207,14 +215,14 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 
     @Override
     public void finishedMessage(int charactersInMessage) {
-        LOG.debug("finishedMessage, charactersInMessage=" + charactersInMessage);
+        Log.d(Constant.TAG, "finishedMessage, charactersInMessage=" + charactersInMessage);
         finishedMessage(charactersInMessage, -1L);
     }
 
     @Override
     public void finishedMessage(final int bytesReceived, final long currentTime) {
         try {
-            LOG.debug("HttpResponseParsingInputStreamV2 finishedMessage2 start:"
+            Log.d(Constant.TAG, "HttpResponseParsingInputStreamV2 finishedMessage2 start:"
                     + networkTransactionState.toString() + " bytesReceived:" + bytesReceived
                     + "  currentTime:" + currentTime + " readCount:" + readCount);
 
@@ -249,21 +257,21 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 //                String networkLib = "";
                 if (TextUtils.isEmpty(this.networkTransactionState.getIpAddress())
                         && this.networkTransactionState.getUrlBuilder() != null) {
-                    LOG.debug("begin get ipAddress:" + System.currentTimeMillis());
+                    Log.d(Constant.TAG, "begin get ipAddress:" + System.currentTimeMillis());
                     final String ipAddress =
                             getIpAddress(URLUtil.getHost(this.networkTransactionState.getUrlBuilder().getHostname()));
-                    LOG.debug("end get ipAddress:" + System.currentTimeMillis() + ", ipAddress:" + ipAddress);
+                    Log.d(Constant.TAG, "end get ipAddress:" + System.currentTimeMillis() + ", ipAddress:" + ipAddress);
                     if (!TextUtils.isEmpty(ipAddress)) {
                         this.networkTransactionState.setAddress(ipAddress);
                     }
                 }
-                LOG.debug("inputV2 finished readCount is:" + readCount + " port:" + networkTransactionState.getPort());
+                Log.d(Constant.TAG, "inputV2 finished readCount is:" + readCount + " port:" + networkTransactionState.getPort());
                 final String ipAddress = this.networkTransactionState.getIpAddress();
                 final ConnectSocketData connectSocketData = NetworkMonitor.connectSocketMap.get(ipAddress);
                 if (this.readCount == 1) {
                     if (this.networkTransactionState.getPort() == 443) {
                         if (connectSocketData == null) {
-                            LOG.debug("no tcp event found in tcpConnectMap!" + ipAddress);
+                            Log.d(Constant.TAG, "no tcp event found in tcpConnectMap!" + ipAddress);
                             return;
                         }
                         connectSocketData.setHttp(true);
@@ -283,10 +291,10 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
                 // 不获取网络库类型，可删
 //                networkLib = networkTransactionState.getNetworkLibStr(connectSocketData);
                 // FIXME: URL过滤逻辑，未实现
-                this.networkTransactionState.setConnectType(
-                        NetworkTransactionUtil.getContentType(((AndroidAgentImpl) Agent.getImpl()).getContext()));
+//                this.networkTransactionState.setConnectType(
+//                        NetworkTransactionUtil.getContentType(((AndroidAgentImpl) Agent.getImpl()).getContext()));
                 int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.networkTransactionState.getSslHandShakeTime());
-                LOG.debug("network data V2 when finished:" + this.networkTransactionState.getUrl()
+                Log.d(Constant.TAG, "network data V2 when finished:" + this.networkTransactionState.getUrl()
                         + "\n statusCode:" + this.networkTransactionState.getStatusCode()
                         + "\n errorCode:" + this.networkTransactionState.getErrorCode()
                         + "\n startTime:" + this.networkTransactionState.getStartTime()
@@ -309,16 +317,16 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 //                        + "\n networkLib：" + networkLib
                 );
 
-                LOG.debug("finishedMessage2 end:" + networkTransactionState.toString()
+                Log.d(Constant.TAG, "finishedMessage2 end:" + networkTransactionState.toString()
                         + " bytesReceived:" + bytesReceived
                         + "  currentTime:" + currentTime);
-                NetworkDataCommon networkDataCommon =
-                        new NetworkDataCommon(networkTransactionState, dnsTime, connectTime, sslHandShakeTime);
-                NetworkDatasCommon.noticeNetworkDatasCommon(networkDataCommon);
+//                NetworkDataCommon networkDataCommon =
+//                        new NetworkDataCommon(networkTransactionState, dnsTime, connectTime, sslHandShakeTime);
+//                NetworkDatasCommon.noticeNetworkDatasCommon(networkDataCommon);
             }
         }
         catch (Exception ex) {
-            LOG.warning("HttpResponseParsingInputStreamV24 error:" + ex);
+//            LOG.warning("HttpResponseParsingInputStreamV24 error:" + ex);
         }
     }
 
@@ -331,7 +339,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
     public void contentTypeFound(String substring) {
         NetworkTransactionState currentNetworkTransactionState = getNetworkTransactionStateNN();
         if (currentNetworkTransactionState != null) {
-            LOG.debug("content-type found:" + substring);
+            Log.d(Constant.TAG, "content-type found:" + substring);
             final int index = substring.indexOf(";");
             if (index > 0 && index < substring.length()) {
                 substring = substring.substring(0, index);

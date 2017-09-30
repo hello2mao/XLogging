@@ -2,8 +2,9 @@ package com.hello2mao.xlogging.urlconnection.tcpv2;
 
 
 import android.text.TextUtils;
-import android.webkit.URLUtil;
+import android.util.Log;
 
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkMonitor;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
@@ -11,6 +12,8 @@ import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.iov2.HttpRequestParsingOutputStreamV2;
 import com.hello2mao.xlogging.urlconnection.iov2.HttpResponseParsingInputStreamV2;
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
+import com.hello2mao.xlogging.util.ReflectionUtil;
+import com.hello2mao.xlogging.util.URLUtil;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -27,10 +30,8 @@ import java.net.SocketImpl;
 import java.util.LinkedList;
 import java.util.Queue;
 
-
 public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocketInterface {
 
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
     private static final int ACCEPT_IDX = 0;
     private static final int AVAILABLE_IDX = 1;
     private static final int BIND_IDX = 2;
@@ -100,8 +101,8 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             methods[19] = SocketImpl.class.getDeclaredMethod("supportsUrgentData");
             ReflectionUtil.setAccessible(methods);
         } catch (Exception e) {
-            LOG.error("Caught error while MonitoredSocketImplV2 static field: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while MonitoredSocketImplV2 static field: ", e);
+
         }
     }
 
@@ -116,7 +117,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     private NetworkTransactionState createNetworkTransactionState(final boolean b) {
-        LOG.debug("MonitorSocketImplV2 createNewStats");
+        Log.d(Constant.TAG, "MonitorSocketImplV2 createNewStats");
         final NetworkTransactionState nbsTransactionState = new NetworkTransactionState();
         nbsTransactionState.setAddress((this.ipAddress == null) ? "" : this.ipAddress);
         nbsTransactionState.setPort(this.port);
@@ -126,7 +127,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         else {
             nbsTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
-        nbsTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
+//        nbsTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
         nbsTransactionState.setTcpHandShakeTime(this.connectTime);
         return nbsTransactionState;
     }
@@ -138,8 +139,8 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             this.localport = localportField.getInt(delegate);
             this.port = portField.getInt(delegate);
         } catch (IllegalArgumentException | IllegalAccessException e) {
-            LOG.error("Caught error while syncFromDelegate: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while syncFromDelegate: ", e);
+
         }
     }
 
@@ -188,8 +189,8 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         try {
             return (T) methods[index].invoke(delegate, params);
         } catch (Exception e) {
-            LOG.error("Caught error while MonitoredSocketImplV2 invoke: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while MonitoredSocketImplV2 invoke: ", e);
+
         } finally {
             syncFromDelegate();
         }
@@ -215,13 +216,13 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             connectSocketData.setConnectTime(connectTime);
             NetworkMonitor.addConnectSocket(connectSocketData);
         }
-        LOG.error("Unexpected MonitoredSocketImplV2: connectTime-1=" + (System.currentTimeMillis() - currentTimeMillis));
+        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-1=" + (System.currentTimeMillis() - currentTimeMillis));
     }
 
     @Override
     protected void connect(InetAddress inetAddress, int port) throws IOException {
         // FIXME:
-        LOG.error("Unexpected MonitoredSocketImplV2: connectTime-2");
+        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-2");
         invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
     }
 
@@ -240,12 +241,12 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
             this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
             // FIXME:经过简单测试，URLConnection、OkHttp3、httpClient都是connectTime-3
-            LOG.debug("MonitoredSocketImplV2: connectTime-3=" + connectTime + ", ipAddress="
+            Log.d(Constant.TAG, "MonitoredSocketImplV2: connectTime-3=" + connectTime + ", ipAddress="
                     + ipAddress + ", host=" + host);
             if (this.port == 443) {
                 NetworkMonitor.addConnectSocketInfo(ipAddress, host, this.connectTime);
                 // TODO:check this
-                LOG.debug("MonitoredSocketImplV2: https");
+                Log.d(Constant.TAG, "MonitoredSocketImplV2: https");
             }
         } catch (IOException e) {
             // TODO:采集异常
@@ -271,10 +272,10 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private InputStream unsafeInstrumentInputStream(InputStream inputStream) {
         if (inputStream != null) {
             if ((this.inputStream != null) && (this.inputStream.isDelegateSame(inputStream))) {
-                LOG.debug("MonitoredSocketImplV2: unsafeInstrumentInputStream DelegateSame");
+                Log.d(Constant.TAG, "MonitoredSocketImplV2: unsafeInstrumentInputStream DelegateSame");
                 inputStream = this.inputStream;
             } else {
-                LOG.debug("MonitoredSocketImplV2: new HttpResponseParsingInputStreamV2");
+                Log.d(Constant.TAG, "MonitoredSocketImplV2: new HttpResponseParsingInputStreamV2");
                 this.inputStream = new HttpResponseParsingInputStreamV2(this, inputStream);
                 inputStream = this.inputStream;
             }
@@ -285,10 +286,10 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private OutputStream unsafeInstrumentOutputStream(OutputStream outputStream) {
         if (outputStream != null) {
             if (this.outputStream != null && this.outputStream.isOutputStreamSame(outputStream)) {
-                LOG.debug("MonitoredSocketImplV2: unsafeInstrumentOutputStream DelegateSame");
+                Log.d(Constant.TAG, "MonitoredSocketImplV2: unsafeInstrumentOutputStream DelegateSame");
                 outputStream = this.outputStream;
             } else {
-                LOG.debug("MonitoredSocketImplV2: new HttpRequestParsingOutputStreamV2");
+                Log.d(Constant.TAG, "MonitoredSocketImplV2: new HttpRequestParsingOutputStreamV2");
                 this.outputStream = new HttpRequestParsingOutputStreamV2(this, outputStream);
                 outputStream = this.outputStream;
             }
@@ -298,14 +299,14 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected InputStream getInputStream() throws IOException {
-        LOG.debug("v2 getInputStream..");
+        Log.d(Constant.TAG, "v2 getInputStream..");
         InputStream inputStream = (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]);
         return unsafeInstrumentInputStream(inputStream);
     }
 
     @Override
     protected OutputStream getOutputStream() throws IOException {
-        LOG.debug("v2 getOutputStream..");
+        Log.d(Constant.TAG, "v2 getOutputStream..");
         OutputStream outputStream = (OutputStream) invokeThrowsIOException(GET_OUTPUT_STREAM_IDX, new Object[0]);
         try {
             outputStream = unsafeInstrumentOutputStream(outputStream);
@@ -328,7 +329,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected void close() throws IOException {
-        LOG.debug("MonitoredSocketImplV2 close");
+        Log.d(Constant.TAG, "MonitoredSocketImplV2 close");
         invokeThrowsIOException(CLOSE_IDX, new Object[0]);
         if (inputStream != null) {
             inputStream.notifySocketClosing();

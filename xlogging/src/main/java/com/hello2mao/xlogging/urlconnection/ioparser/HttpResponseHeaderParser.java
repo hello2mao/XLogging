@@ -1,6 +1,10 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 /**
  * Http Response Header parser
@@ -42,16 +46,16 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
      */
     protected AbstractParserState nextParserAfterEndOfHeader() {
         AbstractParserState parser;
-        LOG.debug("HttextParserAfterEndOfHeader isChunkedTransferEnHeader");
+        Log.d(Constant.TAG, "HttextParserAfterEndOfHeader isChunkedTransferEnHeader");
         if (notAllowedToHaveMessageBody()) {
-            LOG.debug("nextParserAfterEndOfHeader notAllowedToHaveMessageBody");
+            Log.d(Constant.TAG, "nextParserAfterEndOfHeader notAllowedToHaveMessageBody");
             getHandler().finishedMessage(getCharactersInMessage());
             parser = getHandler().getInitialParsingState();
         } else if (isChunkedTransferEncoding()) {
-            LOG.debug("nextParserAfterEndOfHeader isChunkedTransferEncoding");
+            Log.d(Constant.TAG, "nextParserAfterEndOfHeader isChunkedTransferEncoding");
             parser = new HttpChunkSizeParser(this);
         } else if (isContentLengthSet()) {
-            LOG.debug("nextParserAfterEndOfHeader isContentLengthSet");
+            Log.d(Constant.TAG, "nextParserAfterEndOfHeader isContentLengthSet");
             if (getContentLength() > 0) {
                 parser = new HttpBodyParser(this, getContentLength());
             } else {
@@ -59,11 +63,11 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
                 parser = getHandler().getInitialParsingState();
             }
         } else if (getHandler().getParsedRequestMethod().equals("CONNECT")) {
-            LOG.debug("nextParserAfterEndOfHeader getParsedRequestMethod");
+            Log.d(Constant.TAG, "nextParserAfterEndOfHeader getParsedRequestMethod");
             getHandler().finishedMessage(getCharactersInMessage());
             parser= getHandler().getInitialParsingState();
         } else {
-            LOG.debug("nextParserAfterEndOfHeader EOFBodyParser");
+            Log.d(Constant.TAG, "nextParserAfterEndOfHeader EOFBodyParser");
             parser = new HttpEOFBodyParser(this);
         }
         return parser;

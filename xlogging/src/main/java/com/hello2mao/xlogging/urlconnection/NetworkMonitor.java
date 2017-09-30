@@ -1,11 +1,14 @@
 package com.hello2mao.xlogging.urlconnection;
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NetworkMonitor extends HarvestAdapter {
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+public class NetworkMonitor {
+
     private static final long j = 1000L;
     public static final ConcurrentHashMap<String, ConnectSocketData> connectSocketMap;
     // a(v)
@@ -20,7 +23,7 @@ public class NetworkMonitor extends HarvestAdapter {
     // FIXME:why? 对于https的tcp建连时间的存储
     public static void addConnectSocketInfo(final String ipAddress, final String host, final int connectTime) {
         // FIXME:ipAddress 和 host 位置？
-        LOG.debug("addConnectSocketInfo :" + "ipAddress:" + ipAddress + ";host:" + host);
+        Log.d(Constant.TAG, "addConnectSocketInfo :" + "ipAddress:" + ipAddress + ";host:" + host);
         ConnectSocketData connectSocketData = connectSocketMap.get(ipAddress);
         if (connectSocketData != null) {
             connectSocketData.setHost(host);

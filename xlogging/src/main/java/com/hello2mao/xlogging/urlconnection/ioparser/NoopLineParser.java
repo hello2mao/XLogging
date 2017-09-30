@@ -1,8 +1,13 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
+
 public class NoopLineParser extends AbstractParserState {
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
 
     public static final NoopLineParser DEFAULT = new NoopLineParser();
 
@@ -44,7 +49,7 @@ public class NoopLineParser extends AbstractParserState {
 
     @Override
     public boolean parse(CharBuffer paramCharBuffer) {
-        LOG.debug("NoopLineParser parse");
+        Log.d(Constant.TAG, "NoopLineParser parse");
         return true;
     }
 }

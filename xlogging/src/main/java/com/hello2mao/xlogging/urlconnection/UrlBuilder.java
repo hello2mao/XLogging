@@ -1,9 +1,13 @@
 package com.hello2mao.xlogging.urlconnection;
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+
 import static android.R.attr.host;
 
 public class UrlBuilder {
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
 
     private String hostAddress;
     // 域名,e.g. ip.taobao.com
@@ -23,13 +27,13 @@ public class UrlBuilder {
 
     // String a();
     public String getHostAddress() {
-        LOG.debug("UrlBuilder gethostAddress:" + hostAddress);
+        Log.d(Constant.TAG, "UrlBuilder gethostAddress:" + hostAddress);
         return hostAddress;
     }
 
     // String b()
     public String getHostname() {
-        LOG.debug("UrlBuilder gethostName:" + hostname);
+        Log.d(Constant.TAG, "UrlBuilder gethostName:" + hostname);
         return hostname;
     }
 
@@ -40,7 +44,7 @@ public class UrlBuilder {
 
     // String d()
     String getHttpPath() {
-        LOG.debug("UrlBuilder getHttpPath:" + httpPath);
+        Log.d(Constant.TAG, "UrlBuilder getHttpPath:" + httpPath);
         return httpPath;
     }
 
@@ -50,19 +54,19 @@ public class UrlBuilder {
 
     // a
     void setHostAddress(String hostAddress) {
-        LOG.debug("UrlBuilder sethostAddress:" + hostAddress);
+        Log.d(Constant.TAG, "UrlBuilder sethostAddress:" + hostAddress);
         this.hostAddress = hostAddress;
     }
 
     //b
     public void setHostname(String hostname) {
-        LOG.debug("UrlBuilder sethostname:" + hostname);
+        Log.d(Constant.TAG, "UrlBuilder sethostname:" + hostname);
         this.hostname = hostname;
     }
 
     // void c(String)
     void setHttpPath(String httpPath) {
-        LOG.debug("UrlBuilder sethttpPath:" + httpPath);
+        Log.d(Constant.TAG, "UrlBuilder sethttpPath:" + httpPath);
         if (httpPath != null) {
             this.httpPath = httpPath;
         }
@@ -97,7 +101,7 @@ public class UrlBuilder {
     }
 
     public String getUrl() {
-        LOG.debug("UrlBuilder getUrl httpPath:" + httpPath + ", host:" + host + ","
+        Log.d(Constant.TAG, "UrlBuilder getUrl httpPath:" + httpPath + ", host:" + host + ","
         + ", port:" + this.hostPort + ", scheme:" + scheme);
         String host = getHost();
         if (onlyShowHostInUrl) {
@@ -111,39 +115,39 @@ public class UrlBuilder {
         }
         if (this.scheme != null) {
             protocal = protocal + this.scheme.schemeName + ":";
-            LOG.debug("UrlBuilder getUrl schemeName:" + protocal);
+            Log.d(Constant.TAG, "UrlBuilder getUrl schemeName:" + protocal);
         }
         if (httpPath.startsWith("//")) {
             return protocal + httpPath;
         }
         // 如 http://
         final String urlSchemePart = protocal + "//";
-        LOG.debug("UrlBuilder getUrl httpPath:" + httpPath + ", host:" + host);
+        Log.d(Constant.TAG, "UrlBuilder getUrl httpPath:" + httpPath + ", host:" + host);
         if (httpPath.startsWith(host)) {
-            LOG.debug("UrlBuilder getUrl httpPath.startsWith(host):" + urlSchemePart + httpPath);
+            Log.d(Constant.TAG, "UrlBuilder getUrl httpPath.startsWith(host):" + urlSchemePart + httpPath);
             return urlSchemePart + httpPath;
         }
         String urlPortPart = "";
         if (this.hostPort > 0 && (this.scheme == null || this.scheme.defaultPort != this.hostPort)) {
             final String urlPort = ":" + this.hostPort;
-            LOG.debug("getUrl String3:" + urlPort);
+            Log.d(Constant.TAG, "getUrl String3:" + urlPort);
             if (!host.endsWith(urlPort)) {
                 urlPortPart = urlPort;
             }
         }
-        LOG.debug("UrlBuilder getUrl result:" + urlSchemePart  + " host:" + host + " s:" + urlPortPart + " httpPath:" + httpPath);
+        Log.d(Constant.TAG, "UrlBuilder getUrl result:" + urlSchemePart  + " host:" + host + " s:" + urlPortPart + " httpPath:" + httpPath);
         return urlSchemePart + host + urlPortPart + httpPath;
     }
 
     private String addPortToHostname(final String s, final int n) {
-        LOG.debug("UrlBuilder addPortToHostname result:" + s + " port:" + n);
+        Log.d(Constant.TAG, "UrlBuilder addPortToHostname result:" + s + " port:" + n);
         if (n > 0) {
             final String string = ":" + n;
             if (!s.endsWith(string)) {
                 return s + string;
             }
         }
-        LOG.debug("UrlBuilder addPortToHostname result:" + s);
+        Log.d(Constant.TAG, "UrlBuilder addPortToHostname result:" + s);
         return s;
     }
 

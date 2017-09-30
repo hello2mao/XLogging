@@ -1,14 +1,19 @@
 package com.hello2mao.xlogging.urlconnection.tcpv2;
 
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.util.CustomException;
+import com.hello2mao.xlogging.util.ReflectionUtil;
+
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.net.SocketImpl;
 import java.net.SocketImplFactory;
 
 public class SocketV2 {
-
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
 
     public static boolean install() {
         Class<? extends SocketImpl> defaultSocketImplType;
@@ -16,9 +21,9 @@ public class SocketV2 {
         try {
             socketImplFactory = ReflectionUtil.getValueOfField(
                     ReflectionUtil.getFieldFromClass(Socket.class, SocketImplFactory.class), null);
-            // 已经安装APM监控，则返回
+            // 已经安装监控，则返回
             if (socketImplFactory != null && socketImplFactory instanceof MonitoredSocketImplFactoryV2) {
-                LOG.debug("NetworkLibInit: Already install MonitoredSocketImplFactoryV2");
+                Log.d(Constant.TAG, "NetworkLibInit: Already install MonitoredSocketImplFactoryV2");
                 return true;
             }
             if (socketImplFactory == null) {
@@ -26,28 +31,27 @@ public class SocketV2 {
                 if (defaultSocketImplType == null) {
                     return false;
                 }
-                LOG.debug("SocketV2: socketImplFactory == null, DefaultSocketImplType="
+                Log.d(Constant.TAG, "SocketV2: socketImplFactory == null, DefaultSocketImplType="
                         + defaultSocketImplType.toString());
-                // 没有socketImplFactory即还未安装APM监控，则安装
+                // 没有socketImplFactory即还未安装监控，则安装
                 // 正常情况下，走这~
                 Socket.setSocketImplFactory(new MonitoredSocketImplFactoryV2(defaultSocketImplType));
             } else {
-                LOG.debug("SocketV2: socketImplFactory != null");
+                Log.d(Constant.TAG, "SocketV2: socketImplFactory != null");
                 // 已经有socketImplFactory，但不是APM监控，则安装APM监控
                 // 只能通过反射安装，不然会报throw new SocketIOException("factory already defined");
                 reflectivelyInstallSocketImplFactory(new MonitoredSocketImplFactoryV2(socketImplFactory));
             }
         } catch (IOException e) {
-            LOG.error("Caught error while installSocketImplFactoryV24: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while installSocketImplFactoryV24: ", e);
             return false;
         } catch (CustomException e) {
-            LOG.error("Caught error while installSocketImplFactoryV24: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while installSocketImplFactoryV24: ", e);
+
             return false;
         } catch (IllegalAccessException e) {
-            LOG.error("Caught error while installSocketImplFactoryV24: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while installSocketImplFactoryV24: ", e);
+
             return false;
         }
         return true;
@@ -73,8 +77,8 @@ public class SocketV2 {
             socketImpl = ReflectionUtil.getValueOfField(
                     ReflectionUtil.getFieldFromClass(Socket.class, SocketImpl.class), new Socket());
         } catch (CustomException e) {
-            LOG.error("Caught error while getDefaultSocketImplType: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while getDefaultSocketImplType: ", e);
+
             return null;
         }
         if (socketImpl == null) {

@@ -25,8 +25,6 @@ import javax.net.ssl.SSLProtocolException;
 
 public class NetworkErrorUtil {
 
-    private static final UAQ AGENT = UAQ.getInstance();
-
     private static final int _ERROR_NULL = 0;
     private static final int NSURL_ERROR_UNKNOWN = -1;
     private static final int NSURL_ERROR_BADURL = -1000;
@@ -75,9 +73,9 @@ public class NetworkErrorUtil {
             } else {
                 transactionState.setErrorCode(NSURL_ERROR_SECURE_CONNECTION_FAILED, e.toString());
             }
-        } else if (e instanceof HttpResponseException) {
-            transactionState.setStatusCode(((HttpResponseException) e).getStatusCode());
-        } else if (e instanceof ClientProtocolException) {
+//        } else if (e instanceof HttpResponseException) {
+//            transactionState.setStatusCode(((HttpResponseException) e).getStatusCode());
+//        } else if (e instanceof ClientProtocolException) {
             transactionState.setErrorCode(NSURL_ERROR_BADSERVER_RESPONSE, e.toString());
         } else if (e instanceof SocketException) {
             transactionState.setErrorCode(NSURL_ERROR_SOCKET_ERROR, e.toString());
@@ -91,9 +89,9 @@ public class NetworkErrorUtil {
     }
 
     public static int exceptionToErrorCode(Exception e) {
-        if (e instanceof ClientProtocolException) {
-            return NSURL_ERROR_BADSERVER_RESPONSE;
-        }
+//        if (e instanceof ClientProtocolException) {
+//            return NSURL_ERROR_BADSERVER_RESPONSE;
+//        }
         if (e instanceof UnknownHostException) {
             return NSURL_ERROR_DNSLOOKUP_FAILED;
         }
@@ -138,9 +136,9 @@ public class NetworkErrorUtil {
             if (i <= stackTraceElements.length - 1) {
                 stackTrace.append("\n");
             }
-            if (++numErrors >= AGENT.getConfig().getStackTraceLimit()) {
-                break;
-            }
+//            if (++numErrors >= AGENT.getConfig().getStackTraceLimit()) {
+//                break;
+//            }
         }
         return stackTrace.toString();
     }

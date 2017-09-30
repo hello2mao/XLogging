@@ -1,6 +1,10 @@
 package com.hello2mao.xlogging.urlconnection.sslv2;
 
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+
 import java.net.SocketException;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -8,7 +12,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class SSLSocketV2 {
 
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
     private static boolean installed = false;
 
     /**
@@ -34,10 +38,10 @@ public class SSLSocketV2 {
             HttpsURLConnection.setDefaultSSLSocketFactory(monitoredSSLSocketFactoryV2);
             return installed = true;
         } catch (ThreadDeath threadDeath) {
-            LOG.error("Caught error while SSLSocketV2 install", threadDeath);
+            Log.e(Constant.TAG, "Caught error while SSLSocketV2 install", threadDeath);
             throw threadDeath;
         } catch (Throwable t) {
-            LOG.error("Caught error while SSLSocketV2 install", t);
+            Log.e(Constant.TAG, "Caught error while SSLSocketV2 install", t);
             return false;
         }
     }

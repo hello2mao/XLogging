@@ -1,8 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
-
-
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 public class HttpChunkBodyParser extends AbstractParserState {
     private int chunkLength;

@@ -1,6 +1,8 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
+
 public class HttpTrailerParser extends AbstractParserState {
     private static final int MAX_LENGTH = 128;
     private static final int INITIAL_LENGTH = 8;

@@ -1,6 +1,8 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
+
 public class NewlineLineParser extends AbstractParserState {
     private AbstractParserState nextParserAfterNewline;
 

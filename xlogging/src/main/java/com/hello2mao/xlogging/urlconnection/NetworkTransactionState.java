@@ -2,7 +2,9 @@ package com.hello2mao.xlogging.urlconnection;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 import com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil;
 
@@ -15,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NetworkTransactionState {
     private volatile boolean hasParseUrlParams;
 //    public static final int URLLIMIT = 1024;
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
     private String methodType;
     private String protocol;
     private int statusCode;
@@ -231,7 +233,7 @@ public class NetworkTransactionState {
         this.ipList = "";
         this.ipAddress = "";
         this.isStatusCodeCalled = false;
-        TraceMachine.enterNetworkSegment("External/unknownhost");
+//        TraceMachine.enterNetworkSegment("External/unknownhost");
     }
     
     public NetworkTransactionState(final String x5) {
@@ -304,7 +306,7 @@ public class NetworkTransactionState {
             }
         }
         catch (Exception ex) {
-            LOG.error("construce NetworkTransactionState error", ex);
+            Log.e(Constant.TAG, "construce NetworkTransactionState error", ex);
         }
     }
     
@@ -327,11 +329,11 @@ public class NetworkTransactionState {
      * @param carrier String
      */
     public void setCarrier(final String carrier) {
-        if (!this.isSent()) {
-            TraceMachine.setCurrentTraceParam("carrier", this.carrier = carrier);
-        } else {
-            LOG.warning("setCarrier(...) called on TransactionState in " + this.state.toString() + " state");
-        }
+//        if (!this.isSent()) {
+//            TraceMachine.setCurrentTraceParam("carrier", this.carrier = carrier);
+//        } else {
+//            LOG.warning("setCarrier(...) called on TransactionState in " + this.state.toString() + " state");
+//        }
     }
 
     /**
@@ -352,9 +354,9 @@ public class NetworkTransactionState {
 ////                    NBSTraceEngine.setCurrentTraceParam("txData", appData);
 //                }
 //            } catch (JSONException ex) {
-//                LOG.error("setAppData:", (Throwable)ex);
+//                Log.e(Constant.TAG, "setAppData:", (Throwable)ex);
 //            } catch (Exception ex2) {
-//                LOG.error("setAppData:", ex2);
+//                Log.e(Constant.TAG, "setAppData:", ex2);
 //            }
 //        } else {
 //            NetworkTransactionState.LOG.warning("setAppData(...) called on TransactionState in " + this.state.toString() + " state");
@@ -366,12 +368,12 @@ public class NetworkTransactionState {
     }
     
     public int getTcpHandShakeTime() {
-        LOG.debug("NetworkTransactionState getTcpHandShakeTime:" + tcpHandShakeTime);
+        Log.d(Constant.TAG, "NetworkTransactionState getTcpHandShakeTime:" + tcpHandShakeTime);
         return this.tcpHandShakeTime;
     }
     
     public void setTcpHandShakeTime(final int tcpHandShakeTime) {
-        LOG.debug("NetworkTransactionState setTcpHandShakeTime:" + tcpHandShakeTime);
+        Log.d(Constant.TAG, "NetworkTransactionState setTcpHandShakeTime:" + tcpHandShakeTime);
         this.tcpHandShakeTime = tcpHandShakeTime;
     }
     
@@ -446,14 +448,14 @@ public class NetworkTransactionState {
     public void setStatusCode(final int statusCode) {
         if (!this.isComplete()) {
             this.statusCode = statusCode;
-            TraceMachine.setCurrentTraceParam("status_code", statusCode);
-            LOG.debug("set status code:" + statusCode);
+//            TraceMachine.setCurrentTraceParam("status_code", statusCode);
+            Log.d(Constant.TAG, "set status code:" + statusCode);
         } else {
             if (this.statusCode == 0 && statusCode != 0) {
                 this.statusCode = statusCode;
-                TraceMachine.setCurrentTraceParam("status_code", statusCode);
+//                TraceMachine.setCurrentTraceParam("status_code", statusCode);
             }
-            LOG.warning("setStatusCode(...) called on TransactionState in " + this.state.toString() + " state");
+//            LOG.warning("setStatusCode(...) called on TransactionState in " + this.state.toString() + " state");
         }
     }
 
@@ -491,8 +493,8 @@ public class NetworkTransactionState {
         if (!this.isComplete()) {
             this.errorCode = errorCode;
             this.exception = exception;
-            LOG.debug("errorCode:" + this.errorCode + ", errorInfo:" + this.exception);
-            TraceMachine.setCurrentTraceParam("error_code", errorCode);
+            Log.d(Constant.TAG, "errorCode:" + this.errorCode + ", errorInfo:" + this.exception);
+//            TraceMachine.setCurrentTraceParam("error_code", errorCode);
         }
     }
     
@@ -510,18 +512,18 @@ public class NetworkTransactionState {
     
     public void setBytesSent(final long bytesSent) {
         if (!this.isComplete()) {
-            LOG.debug(bytesSent + " bytes sent");
+            Log.d(Constant.TAG, bytesSent + " bytes sent");
             this.bytesSent = bytesSent;
-            TraceMachine.setCurrentTraceParam("bytes_sent", bytesSent);
+//            TraceMachine.setCurrentTraceParam("bytes_sent", bytesSent);
             this.state = State.SENT;
         }
         else {
-            NetworkTransactionState.LOG.warning("setBytesSent(...) called on TransactionState in " + this.state.toString() + " state");
+//            NetworkTransactionState.LOG.warning("setBytesSent(...) called on TransactionState in " + this.state.toString() + " state");
         }
     }
     
     public void setBytesSentAfterComplete(final long bytesSent) {
-        LOG.debug("After Complete " + bytesSent + " bytes sent.");
+        Log.d(Constant.TAG, "After Complete " + bytesSent + " bytes sent.");
         this.bytesSent = bytesSent;
 //        this.state = b;
     }
@@ -529,11 +531,11 @@ public class NetworkTransactionState {
     public void setBytesReceived(final long bytesReceived) {
         if (!this.isComplete()) {
             this.bytesReceived = bytesReceived;
-            LOG.debug(bytesReceived + "bytes received");
-            TraceMachine.setCurrentTraceParam("bytes_received", bytesReceived);
+            Log.d(Constant.TAG, bytesReceived + "bytes received");
+//            TraceMachine.setCurrentTraceParam("bytes_received", bytesReceived);
         }
         else {
-            NetworkTransactionState.LOG.warning("setBytesReceived(...) called on TransactionState in " + this.state.toString() + " state");
+//            NetworkTransactionState.LOG.warning("setBytesReceived(...) called on TransactionState in " + this.state.toString() + " state");
         }
     }
     
@@ -543,11 +545,11 @@ public class NetworkTransactionState {
     
     public String getNetworkLibStr(ConnectSocketData connectSocketData) {
         if (networkLib.equals(NetworkLibType.UNKNOWN) && connectSocketData != null) {
-            LOG.debug("getNetworkLib 1:" + networkLib);
+            Log.d(Constant.TAG, "getNetworkLib 1:" + networkLib);
             if (connectSocketData.getNetworkLib() != null) {
                 networkLib = NetworkLibType.valueOf(connectSocketData.getNetworkLib());
             }
-            LOG.debug("getNetworkLib 2:" + networkLib);
+            Log.d(Constant.TAG, "getNetworkLib 2:" + networkLib);
         }
         return this.networkLib.name();
     }
@@ -564,7 +566,7 @@ public class NetworkTransactionState {
         if (!this.isComplete()) {
             this.state = State.COMPLETE;
             this.endTime = System.currentTimeMillis();
-            TraceMachine.exitMethod();
+//            TraceMachine.exitMethod();
         }
     }
     

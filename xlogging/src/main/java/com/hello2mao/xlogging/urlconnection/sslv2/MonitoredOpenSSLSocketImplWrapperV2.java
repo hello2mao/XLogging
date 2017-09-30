@@ -1,23 +1,35 @@
 package com.hello2mao.xlogging.urlconnection.sslv2;
 
 
+import android.util.Log;
+
+import com.android.org.conscrypt.OpenSSLSocketImplWrapper;
+import com.android.org.conscrypt.SSLParametersImpl;
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpResponseParsingInputStreamV1;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class MonitoredOpenSSLSocketImplWrapperV2 extends OpenSSLSocketImplWrapper
         implements MonitoredSocketInterface {
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
     private HttpResponseParsingInputStreamV1 inputStream;
     private HttpRequestParsingOutputStreamV1 outputStream;
     private int sslHandshakeTime;
     private final Queue<NetworkTransactionState> queue;
 
     protected MonitoredOpenSSLSocketImplWrapperV2(Socket socket, String host, int port,
-                                               boolean autoClose,
-                                               SSLParametersImpl sslParametersImpl)
+                                                  boolean autoClose,
+                                                  SSLParametersImpl sslParametersImpl)
             throws IOException {
         super(socket, host, port, autoClose, sslParametersImpl);
         this.queue = new LinkedList<>();
@@ -33,7 +45,7 @@ public class MonitoredOpenSSLSocketImplWrapperV2 extends OpenSSLSocketImplWrappe
         } else {
             networkTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
-        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
+//        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
         networkTransactionState.setSslHandShakeTime(sslHandshakeTime);
         return networkTransactionState;
     }
@@ -44,10 +56,10 @@ public class MonitoredOpenSSLSocketImplWrapperV2 extends OpenSSLSocketImplWrappe
             long currentTimeMillis = System.currentTimeMillis();
             super.startHandshake();
             sslHandshakeTime += (int)(System.currentTimeMillis() - currentTimeMillis);
-            LOG.debug("MonitoredOpenSSLSocketImplWrapperV2 startHandshake:" + sslHandshakeTime);
+            Log.d(Constant.TAG, "MonitoredOpenSSLSocketImplWrapperV2 startHandshake:" + sslHandshakeTime);
         } catch (IOException e) {
-            LOG.error("Caught error while MonitoredOpenSSLSocketImplWrapperV2 startHandshake: ", e);
-            AgentHealth.noticeException(e);
+            Log.e(Constant.TAG, "Caught error while MonitoredOpenSSLSocketImplWrapperV2 startHandshake: ", e);
+
             throw e;
         }
     }
@@ -94,7 +106,7 @@ public class MonitoredOpenSSLSocketImplWrapperV2 extends OpenSSLSocketImplWrappe
     public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
         synchronized (queue) {
             queue.add(networkTransactionState);
-            LOG.debug("SSLSocketWrapperV2 enqueuetransaction len:" + queue.size());
+            Log.d(Constant.TAG, "SSLSocketWrapperV2 enqueuetransaction len:" + queue.size());
         }
     }
 }

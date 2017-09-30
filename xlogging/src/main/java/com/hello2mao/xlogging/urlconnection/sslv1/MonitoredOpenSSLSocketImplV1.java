@@ -1,7 +1,10 @@
 package com.hello2mao.xlogging.urlconnection.sslv1;
 
 
+import com.android.org.conscrypt.OpenSSLSocketImpl;
+import com.android.org.conscrypt.SSLParametersImpl;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
+import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpResponseParsingInputStreamV1;
 

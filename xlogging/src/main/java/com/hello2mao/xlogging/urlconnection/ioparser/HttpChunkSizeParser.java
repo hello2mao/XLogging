@@ -1,7 +1,10 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import android.util.Log;
 
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 public class HttpChunkSizeParser extends AbstractParserState {
     private int parsedChunkSize = -1;
@@ -16,7 +19,7 @@ public class HttpChunkSizeParser extends AbstractParserState {
 
     @Override
     public AbstractParserState nextParserAfterSuccessfulParse() {
-//        LOG.debug("HttpChunkSizeParser nextParserAfterSuccessfulParse parsedChunkSize:" + parsedChunkSize);
+//        Log.d(Constant.TAG, "HttpChunkSizeParser nextParserAfterSuccessfulParse parsedChunkSize:" + parsedChunkSize);
         if (parsedChunkSize == 0) {
             return new HttpTrailerParser(this);
         }
@@ -67,7 +70,7 @@ public class HttpChunkSizeParser extends AbstractParserState {
 
     @Override
     public void close() {
-        LOG.debug("HttpChunkSizeParser close");
+        Log.d(Constant.TAG, "HttpChunkSizeParser close");
         getHandler().finishedMessage(getCharactersInMessage(), currentTimeStamp);
         getHandler().setNextParserState(NoopLineParser.DEFAULT);
     }

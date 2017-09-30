@@ -2,13 +2,17 @@ package com.hello2mao.xlogging.urlconnection.iov2;
 
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkLibType;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.ioparser.AbstractParserState;
 import com.hello2mao.xlogging.urlconnection.ioparser.HttpParserHandler;
+import com.hello2mao.xlogging.urlconnection.ioparser.HttpRequestLineParser;
 import com.hello2mao.xlogging.urlconnection.ioparser.NoopLineParser;
 import com.hello2mao.xlogging.urlconnection.util.NetworkTransactionUtil;
 
@@ -16,14 +20,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class HttpRequestParsingOutputStreamV2 extends OutputStream implements HttpParserHandler {
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
     private OutputStream outputStream;
     private MonitoredSocketInterface monitoredSocket;
     private AbstractParserState requestParser;
     private NetworkTransactionState networkTransactionState;
 
     public HttpRequestParsingOutputStreamV2(MonitoredSocketInterface monitoredSocket, OutputStream outputStream) {
-        LOG.debug("HttpRequestParsingOutputStreamV2 construct.");
+        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV2 construct.");
         if (monitoredSocket == null) {
             throw new NullPointerException("socket was null");
         }
@@ -50,7 +54,7 @@ public class HttpRequestParsingOutputStreamV2 extends OutputStream implements Ht
 
     @Override
     public void write(int oneByte) throws IOException {
-//        LOG.debug("HttpRequestParsingOutputStreamV2 write byte");
+//        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV2 write byte");
         this.outputStream.write(oneByte);
         try {
             this.requestParser.add(oneByte);
@@ -64,7 +68,7 @@ public class HttpRequestParsingOutputStreamV2 extends OutputStream implements Ht
 
     @Override
     public void write(@NonNull byte[] buffer) throws IOException {
-//        LOG.debug("HttpRequestParsingOutputStreamV2 write byte[]");
+//        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV2 write byte[]");
         this.outputStream.write(buffer);
         addBytesToParser(buffer, 0, buffer.length);
 
@@ -72,7 +76,7 @@ public class HttpRequestParsingOutputStreamV2 extends OutputStream implements Ht
 
     @Override
     public void write(@NonNull byte[] buffer, int offset, int byteCount) throws IOException {
-//        LOG.debug("HttpRequestParsingOutputStreamV2 write byte[]3");
+//        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV2 write byte[]3");
         this.outputStream.write(buffer, offset, byteCount);
         addBytesToParser(buffer, offset, byteCount);
     }
@@ -95,7 +99,7 @@ public class HttpRequestParsingOutputStreamV2 extends OutputStream implements Ht
 
     @Override
     public void requestLineFound(String requestmethod, String httpPath) {
-        LOG.debug("method:" + requestmethod + ", path:" + httpPath);
+        Log.d(Constant.TAG, "method:" + requestmethod + ", path:" + httpPath);
         final NetworkTransactionState networkTransactionState = this.getNetworkTransactionStateNN();
         NetworkTransactionUtil.setRequestMethod(networkTransactionState, requestmethod);
         if ("CONNECT".toUpperCase().equals(requestmethod)) {

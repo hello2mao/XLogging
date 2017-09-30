@@ -1,14 +1,17 @@
 package com.hello2mao.xlogging;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.hello2mao.xlogging.okhttp.XDns;
 import com.hello2mao.xlogging.okhttp.XLoggingInterceptor;
 import com.hello2mao.xlogging.okhttp.XSocketFactory;
+import com.hello2mao.xlogging.okhttp.util.Util;
+import com.hello2mao.xlogging.urlconnection.sslv1.SSLSocketV1;
+import com.hello2mao.xlogging.urlconnection.sslv2.SSLSocketV2;
+import com.hello2mao.xlogging.urlconnection.tcpv1.SocketV1;
+import com.hello2mao.xlogging.urlconnection.tcpv2.SocketV2;
 
-import java.util.List;
-
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 public class XLogging {
@@ -70,20 +73,46 @@ public class XLogging {
         BODY
     }
 
+    /**
+     * OkHttp install
+     *
+     * @param builder OkHttpClient.Builder
+     * @return OkHttpClient
+     */
     public static OkHttpClient install(OkHttpClient.Builder builder) {
         return install(builder.build());
     }
 
+    /**
+     * OkHttp install
+     *
+     * @param builder OkHttpClient.Builder
+     * @param level Level
+     * @return OkHttpClient
+     */
     public static OkHttpClient install(OkHttpClient.Builder builder, Level level) {
         return install(builder.build(), level);
     }
 
+    /**
+     * OkHttp install
+     *
+     * @param client OkHttpClient
+     * @return OkHttpClient
+     */
     public static OkHttpClient install(OkHttpClient client) {
         return install(client, Level.BASIC);
     }
 
+    /**
+     * OkHttp install
+     *
+     * @param client OkHttpClient
+     * @param level Level
+     * @return OkHttpClient
+     */
     public static OkHttpClient install(OkHttpClient client, Level level) {
-        if (isInstalled(client)) {
+        if (Util.isInstalled(client)) {
             Log.i(Constant.TAG, "Already install XLogging!");
             return client;
         }
@@ -96,22 +125,32 @@ public class XLogging {
     }
 
     /**
-     * 检查是否安装过XLogging
-     *
-     * @param client OkHttpClient
-     * @return boolean
+     * URLConnection install
      */
-    private static boolean isInstalled(OkHttpClient client) {
-        List<Interceptor> networkInterceptors = client.networkInterceptors();
-        if (networkInterceptors == null) {
-            return false;
+    public static void install() {
+
+        boolean socketInstalled;
+        boolean sslSocketInstalled;
+
+        if (Build.VERSION.SDK_INT < 19) { // < Android 4.4
+            // FIXME:(tcpv1+iov1) + (sslv1+iov1) + ioparser
+            socketInstalled = SocketV1.install();
+            sslSocketInstalled = SSLSocketV1.install();
+            Log.d(Constant.TAG, "install SocketV1 + SSLSocketV1");
+        } else if (Build.VERSION.SDK_INT < 24) { // < Android 7.0
+            // FIXME:(tcpv1+iov1) + (sslv2+iov1) + ioparser
+            socketInstalled = SocketV1.install();
+            sslSocketInstalled = SSLSocketV2.install();
+            Log.d(Constant.TAG, "install SocketV1 + SSLSocketV2");
+        } else { // >= Android 7.0
+            // FIXME: (tcpv2+iov2) + (sslv2+iov1) + ioparser
+            socketInstalled = SocketV2.install();
+            sslSocketInstalled = SSLSocketV2.install();
+            Log.d(Constant.TAG, "install SocketV2 + SSLSocketV2");
         }
-        for (Interceptor interceptor : networkInterceptors) {
-            if (interceptor instanceof XLoggingInterceptor) {
-                return true;
-            }
-        }
-        return false;
+
+        Log.d(Constant.TAG, "install NetworkLib, Socket=" + socketInstalled
+                + ", SSLSocket=" + sslSocketInstalled);
     }
 
 

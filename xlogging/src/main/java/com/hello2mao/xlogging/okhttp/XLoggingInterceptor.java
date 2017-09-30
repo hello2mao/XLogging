@@ -13,14 +13,8 @@ import okhttp3.Response;
 
 
 /**
- * Provides easy integration with <a href="http://square.github.io/okhttp/">OkHttp</a> 3.x by way of
+ * Provides easy integration with <a href="http://square.github.io/okhttp/">OkHttp</a> by way of
  * the new <a href="https://github.com/square/okhttp/wiki/Interceptors">Interceptor</a> system.
- * To use:
- * <pre>
- *   OkHttpClient client = new OkHttpClient.Builder()
- *       .addNetworkInterceptor(new XLoggingInterceptor())
- *       .build();
- * </pre>
  */
 public class XLoggingInterceptor implements Interceptor {
 
@@ -36,6 +30,7 @@ public class XLoggingInterceptor implements Interceptor {
         HttpTransaction transaction = new HttpTransaction();
         // inspect request
         Inspection.handleRequest(request, transaction);
+
         long startNs = System.nanoTime();
         Response response;
         try {
@@ -46,9 +41,11 @@ public class XLoggingInterceptor implements Interceptor {
             throw e;
         }
         if (chain.connection() != null) {
+            // FIXME:may double dns
             transaction.setAddress(chain.connection().route().address().dns().lookup(request.url().host()).get(0).getHostAddress());
         }
         transaction.setTookMs(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs));
+        // inspect response
         Inspection.handleResponse(response, transaction);
         update(transaction);
         return response;

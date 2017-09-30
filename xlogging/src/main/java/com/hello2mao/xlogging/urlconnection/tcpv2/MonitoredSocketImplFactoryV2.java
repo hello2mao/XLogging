@@ -1,16 +1,23 @@
 package com.hello2mao.xlogging.urlconnection.tcpv2;
 
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.util.CustomException;
+import com.hello2mao.xlogging.util.ReflectionUtil;
+
 import junit.framework.Assert;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.net.SocketImpl;
 import java.net.SocketImplFactory;
 
 public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
 
-    private static final AgentLog LOG = AgentLogManager.getAgentLog();
+
 
     private Class<? extends SocketImpl> defaultSocketImplClass;
     private SocketImplFactory delegateFactory;
@@ -31,7 +38,7 @@ public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
         SocketImpl socketImpl = null;
         // 已经有socketImplFactory，但不是APM监控，则安装APM监控
         if (delegateFactory != null) {
-            LOG.debug("MonitoredSocketImplFactoryV2: delegateFactory != null");
+            Log.d(Constant.TAG, "MonitoredSocketImplFactoryV2: delegateFactory != null");
             socketImpl = delegateFactory.createSocketImpl();
         }
         // 没有socketImplFactory即还未安装APM监控，则安装

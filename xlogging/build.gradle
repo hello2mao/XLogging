@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -27,6 +30,9 @@ dependencies {
     provided 'com.squareup.okhttp3:okhttp:3.9.0'
     // gson
     compile 'com.google.code.gson:gson:2.7'
+
+//    provided files('libs/android-libcore-4.3_r2.robolectric-0-real.jar')
+    provided 'com.bugvm:bugvm-rt:1.0.5'
 }
 
 publish {

@@ -1,8 +1,6 @@
 package com.hello2mao.xlogging.urlconnection;
 
-
 public class CharBuffer {
-    protected static final AgentLog LOG = AgentLogManager.getAgentLog();
 
     public char[] charArray;
     public int length;

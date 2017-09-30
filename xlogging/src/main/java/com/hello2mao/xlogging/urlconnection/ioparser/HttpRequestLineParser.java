@@ -1,6 +1,11 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
+import android.util.Log;
+
+import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.urlconnection.CharBuffer;
+
 /**
  * request 对应的输出流使用的第一个解析器，解析出本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httppath
  */
@@ -29,7 +34,7 @@ public class HttpRequestLineParser extends AbstractParserState {
 
     @Override
     public AbstractParserState nextParserAfterSuccessfulParse() {
-        LOG.debug("HttpRequestLineParser nextParserAfterSuccessfulParse HttpRequestHeaderParser");
+        Log.d(Constant.TAG, "HttpRequestLineParser nextParserAfterSuccessfulParse HttpRequestHeaderParser");
         return new HttpRequestHeaderParser(this);
     }
 
@@ -51,7 +56,7 @@ public class HttpRequestLineParser extends AbstractParserState {
     @Override
     public final boolean parse(CharBuffer paramCharBuffer) {
         String[] paramChars = paramCharBuffer.toString().split(" ");
-        LOG.debug("HttpRequestLineParser parse :" + paramChars.length + " buffer:" + paramCharBuffer);
+        Log.d(Constant.TAG, "HttpRequestLineParser parse :" + paramChars.length + " buffer:" + paramCharBuffer);
         if (paramChars.length != 3) {
             return false;
         }
