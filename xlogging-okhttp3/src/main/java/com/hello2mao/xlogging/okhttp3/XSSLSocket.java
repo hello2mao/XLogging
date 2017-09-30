@@ -1,65 +1,49 @@
 package com.hello2mao.xlogging.okhttp3;
 
+
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import com.hello2mao.xlogging.okhttp3.internal.bean.NetworkData;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.Proxy;
-import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.SocketImpl;
-import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
 
-public class XSocket extends Socket {
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 
-    private Socket impl;
+public class XSSLSocket extends SSLSocket {
+
+    private SSLSocket impl;
     private NetworkData networkData;
 
-    public XSocket(Socket socket, NetworkData networkData) {
+    public XSSLSocket(SSLSocket sslSocket, NetworkData networkData) {
         super();
-        this.impl = socket;
+        this.impl = sslSocket;
         this.networkData = networkData;
     }
 
-    public XSocket(Socket socket, Proxy proxy) {
-        super(proxy);
-        this.impl = socket;
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public SSLSession getHandshakeSession() {
+        return impl.getHandshakeSession();
     }
 
-    protected XSocket(Socket socket, SocketImpl impl) throws SocketException {
-        super(impl);
-        this.impl = socket;
+    @Override
+    public SSLParameters getSSLParameters() {
+        return impl.getSSLParameters();
     }
 
-    public XSocket(Socket socket, String host, int port) throws UnknownHostException,
-            IOException {
-        super(host, port);
-        this.impl = socket;
-    }
-
-    public XSocket(Socket socket, InetAddress address, int port) throws IOException {
-        super(address, port);
-        this.impl = socket;
-    }
-
-    public XSocket(Socket socket, String host, int port, InetAddress localAddr,
-                   int localPort) throws IOException {
-        super(host, port, localAddr, localPort);
-        this.impl = socket;
-    }
-
-    public XSocket(Socket socket, InetAddress address, int port, InetAddress localAddr,
-                   int localPort) throws IOException {
-        super(address, port, localAddr, localPort);
-        this.impl = socket;
-    }
-
-    public Socket getImpl() {
-        return impl;
+    @Override
+    public void setSSLParameters(SSLParameters params) {
+        impl.setSSLParameters(params);
     }
 
     @Override
@@ -69,18 +53,7 @@ public class XSocket extends Socket {
 
     @Override
     public void connect(SocketAddress endpoint, int timeout) throws IOException {
-        long startTime = System.currentTimeMillis();
-        try {
-            impl.connect(endpoint, timeout);
-        } catch (IOException e) {
-            networkData.setConnectException(e.getMessage());
-//            NetworkDatas.noticeNetworkData(networkData);
-            throw e;
-        }
-        networkData.setConnectTime(System.currentTimeMillis() - startTime);
-        if (!networkData.isHttps()) {
-//            NetworkDatas.noticeNetworkData(networkData);
-        }
+        impl.connect(endpoint, timeout);
     }
 
     @Override
@@ -278,4 +251,106 @@ public class XSocket extends Socket {
         impl.setPerformancePreferences(connectionTime, latency, bandwidth);
     }
 
+    @Override
+    public String[] getSupportedCipherSuites() {
+        return impl.getSupportedCipherSuites();
+    }
+
+    @Override
+    public String[] getEnabledCipherSuites() {
+        return impl.getEnabledCipherSuites();
+    }
+
+    @Override
+    public void setEnabledCipherSuites(String[] suites) {
+        impl.setEnabledCipherSuites(suites);
+    }
+
+    @Override
+    public String[] getSupportedProtocols() {
+        return impl.getSupportedProtocols();
+    }
+
+    @Override
+    public String[] getEnabledProtocols() {
+        return impl.getEnabledProtocols();
+    }
+
+    @Override
+    public void setEnabledProtocols(String[] protocols) {
+        impl.setEnabledProtocols(protocols);
+    }
+
+    @Override
+    public SSLSession getSession() {
+        return impl.getSession();
+    }
+
+    @Override
+    public void addHandshakeCompletedListener(HandshakeCompletedListener listener) {
+        impl.addHandshakeCompletedListener(listener);
+    }
+
+    @Override
+    public void removeHandshakeCompletedListener(HandshakeCompletedListener listener) {
+        impl.removeHandshakeCompletedListener(listener);
+    }
+
+    @Override
+    public void startHandshake() throws IOException {
+        long startTime = System.currentTimeMillis();
+        try {
+            // 原SSLSocket的startHandshake()
+            impl.startHandshake();
+        } catch (IOException e) {
+            // 采集异常
+            networkData.setHandshakeException(e.getMessage());
+            // 异步上报
+//            NetworkDatas.noticeNetworkData(networkData);
+            throw e;
+        }
+        // 记录SSL握手时间
+        networkData.setHandshakeTime(System.currentTimeMillis() - startTime);
+//        NetworkDatas.noticeNetworkData(networkData);
+    }
+
+    @Override
+    public void setUseClientMode(boolean mode) {
+        impl.setUseClientMode(mode);
+    }
+
+    @Override
+    public boolean getUseClientMode() {
+        return impl.getUseClientMode();
+    }
+
+    @Override
+    public void setNeedClientAuth(boolean need) {
+        impl.setNeedClientAuth(need);
+    }
+
+    @Override
+    public boolean getNeedClientAuth() {
+        return impl.getNeedClientAuth();
+    }
+
+    @Override
+    public void setWantClientAuth(boolean want) {
+        impl.setWantClientAuth(want);
+    }
+
+    @Override
+    public boolean getWantClientAuth() {
+        return impl.getWantClientAuth();
+    }
+
+    @Override
+    public void setEnableSessionCreation(boolean flag) {
+        impl.setEnableSessionCreation(flag);
+    }
+
+    @Override
+    public boolean getEnableSessionCreation() {
+        return impl.getEnableSessionCreation();
+    }
 }

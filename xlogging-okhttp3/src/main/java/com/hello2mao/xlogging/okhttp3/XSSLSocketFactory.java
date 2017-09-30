@@ -7,21 +7,33 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
-public class XSocketFactory extends SocketFactory {
+public class XSSLSocketFactory extends SSLSocketFactory {
 
-    private SocketFactory impl;
+    private SSLSocketFactory impl;
     private NetworkData networkData;
 
-    public XSocketFactory(SocketFactory socketFactory, NetworkData networkData) {
-        this.impl = socketFactory;
+    public XSSLSocketFactory(SSLSocketFactory sslSocketFactory, NetworkData networkData) {
+        super();
+        this.impl = sslSocketFactory;
         this.networkData = networkData;
     }
 
     @Override
+    public String[] getDefaultCipherSuites() {
+        return impl.getDefaultCipherSuites();
+    }
+
+    @Override
+    public String[] getSupportedCipherSuites() {
+        return impl.getSupportedCipherSuites();
+    }
+
+    @Override
     public Socket createSocket() throws IOException {
-        return new XSocket(impl.createSocket(), networkData);
+        return impl.createSocket();
     }
 
     @Override
@@ -44,5 +56,17 @@ public class XSocketFactory extends SocketFactory {
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int
             localPort) throws IOException {
         return impl.createSocket(address, port, localAddress, localPort);
+    }
+
+    @Override
+    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws
+            IOException {
+        if (s instanceof XSocket) {
+            Socket rawSocket = ((XSocket) s).getImpl();
+            return new XSSLSocket((SSLSocket) impl.createSocket(rawSocket, host, port, autoClose),
+                    networkData);
+        } else {
+            return impl.createSocket(s, host, port, autoClose);
+        }
     }
 }
