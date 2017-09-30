@@ -1,18 +1,64 @@
 XLogging
 =====
 
-XLogging is an inspector for Android OkHttp clients. 
+XLogging is an enhanced inspector for Android OkHttp clients. 
 
-## Example
-Level.HEADERS
+## Feature
+#### DNS
+* DNS lookup time
+* DNS lookup results
+* DNS lookup error
+
+#### TCP
+* TCP connect time
+* TCP connect error
+
+#### SSL
+* TODO
+
+#### HTTP
+* Http + Https
+* URL
+* Http header
+* Http methdod
+* Http body
+* Http status code
+* Http error
+* Http protocol
+* Http request+response
+* Http bytes send
+* Http bytes received
+* Http response time
+
+## Quick Start
+Gradle:
+```
+compile 'com.hello2mao:xlogging:1.1.0'
+```
+Use:
+```
+OkHttpClient.Builder builder = new OkHttpClient.Builder();
+OkHttpClient okHttpClient = XLogging.install(builder.build(), XLogging.Level.BODY);
+
+或者
+
+OkHttpClient client = new OkHttpClient();
+client = XLogging.install(client, XLogging.Level.BODY);
 
 ```
+
+## Example
+Level.BODY
+
+```
+    DNS lookup: hostname=image.baidu.com results=[image.baidu.com/112.80.248.122] dnsTime=8ms
+    TCP connect: socket=image.baidu.com/112.80.248.122:80 connectTime=10ms
     --> GET http://image.baidu.com/channel/listjson?pn=0&rn=3&tag1=%E7%BE%8E%E5%A5%B3&tag2=%E5%85%A8%E9%83%A8&ftags=%E6%A0%A1%E8%8A%B1&ie=utf8 http/1.1
     Host: image.baidu.com
     User-Agent: okhttp/3.6.0
     Connection: Keep-Alive
     Accept-Encoding: gzip
-    --> END GET
+    ==> END GET
     
     <-- 200 OK (63ms, 5789-byte body)
     Vary: Accept-Encoding
@@ -30,7 +76,9 @@ Level.HEADERS
     Transfer-Encoding: chunked
     Content-Encoding: gzip
     Access-Control-Allow-Origin: https://m.baidu.com,https://www.baidu.com,http://m.baidu.com,http://www.baidu.com
-    --> END HTTP
+    
+    {"tag1":"美女","tag2":"全部","totalNum":16870,"start_index"   :0,"return_number" :3,"data":[]}
+    ==> END HTTP
 ```
 
 License

@@ -1,9 +1,7 @@
 package com.hello2mao.xlogging.sample.http;
 
 
-import com.hello2mao.xlogging.okhttp3.XDns;
-import com.hello2mao.xlogging.okhttp3.XLoggingInterceptor;
-import com.hello2mao.xlogging.okhttp3.XSocketFactory;
+import com.hello2mao.xlogging.okhttp.XLogging;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 import com.hello2mao.xlogging.sample.http.api.BaiduImageApis;
 
@@ -44,19 +42,13 @@ public class RetrofitHelper {
 
     private void initOkHttp() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        // XLoggingInterceptor应用举例
-        XLoggingInterceptor xLoggingInterceptor = new XLoggingInterceptor();
-        xLoggingInterceptor.setLevel(XLoggingInterceptor.Level.HEADERS);
-        builder.addNetworkInterceptor(xLoggingInterceptor);
-        builder.socketFactory(new XSocketFactory());
-        builder.dns(new XDns());
         // 设置超时
         builder.connectTimeout(10, TimeUnit.SECONDS);
         builder.readTimeout(20, TimeUnit.SECONDS);
         builder.writeTimeout(20, TimeUnit.SECONDS);
         // 错误重连
         builder.retryOnConnectionFailure(true);
-        okHttpClient = builder.build();
+        okHttpClient = XLogging.install(builder.build(), XLogging.Level.BODY);
     }
 
     private <T> T getApiService(String baseUrl, Class<T> clz) {
