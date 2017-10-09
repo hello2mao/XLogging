@@ -1,7 +1,6 @@
 package com.hello2mao.xlogging.sample.http;
 
 
-import com.hello2mao.xlogging.okhttp.XLogging;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 import com.hello2mao.xlogging.sample.http.api.BaiduImageApis;
 
@@ -48,7 +47,8 @@ public class RetrofitHelper {
         builder.writeTimeout(20, TimeUnit.SECONDS);
         // 错误重连
         builder.retryOnConnectionFailure(true);
-        okHttpClient = XLogging.install(builder.build(), XLogging.Level.BODY);
+//        okHttpClient = XLogging.enableOkHttp(builder.build(), XLogging.Level.BODY);
+        okHttpClient = builder.build();
     }
 
     private <T> T getApiService(String baseUrl, Class<T> clz) {

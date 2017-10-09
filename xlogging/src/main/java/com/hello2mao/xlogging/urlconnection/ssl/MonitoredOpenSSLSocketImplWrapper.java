@@ -1,4 +1,4 @@
-package com.hello2mao.xlogging.urlconnection.sslv1;
+package com.hello2mao.xlogging.urlconnection.ssl;
 
 
 import android.util.Log;
@@ -19,24 +19,25 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class MonitoredOpenSSLSocketImplWrapperV1 extends OpenSSLSocketImplWrapper implements MonitoredSocketInterface {
+public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
+        implements MonitoredSocketInterface {
 
-
-    private final Queue<NetworkTransactionState> queue;
-    private int sslHandshakeTime;
     private HttpResponseParsingInputStreamV1 inputStream;
     private HttpRequestParsingOutputStreamV1 outputStream;
+    private int sslHandshakeTime;
+    private final Queue<NetworkTransactionState> queue;
 
-    protected MonitoredOpenSSLSocketImplWrapperV1(Socket socket, String host, int port,
-                                                  boolean autoClose, SSLParametersImpl sslParametersImpl) throws IOException {
+    protected MonitoredOpenSSLSocketImplWrapper(Socket socket, String host, int port,
+                                                boolean autoClose, SSLParametersImpl sslParametersImpl)
+            throws IOException {
         super(socket, host, port, autoClose, sslParametersImpl);
         this.queue = new LinkedList<>();
         this.sslHandshakeTime = 0;
     }
 
-    private NetworkTransactionState createNetworkTransactionState(boolean b) {
-        NetworkTransactionState networkTransactionState = new NetworkTransactionState("x5");
-        Log.d(Constant.TAG, "create connection stats");
+    @Override
+    public NetworkTransactionState createNetworkTransactionState() {
+        NetworkTransactionState networkTransactionState = new NetworkTransactionState();
         int port = this.getPort();
         networkTransactionState.setPort(port);
         if (port == 443) {
@@ -44,9 +45,22 @@ public class MonitoredOpenSSLSocketImplWrapperV1 extends OpenSSLSocketImplWrappe
         } else {
             networkTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
-//        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
-        networkTransactionState.setSslHandShakeTime(this.sslHandshakeTime);
+        networkTransactionState.setSslHandShakeTime(sslHandshakeTime);
         return networkTransactionState;
+    }
+
+    @Override
+    public NetworkTransactionState dequeueNetworkTransactionState() {
+        synchronized (queue) {
+            return queue.poll();
+        }
+    }
+
+    @Override
+    public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
+        synchronized (queue) {
+            queue.add(networkTransactionState);
+        }
     }
 
     @Override
@@ -55,17 +69,19 @@ public class MonitoredOpenSSLSocketImplWrapperV1 extends OpenSSLSocketImplWrappe
             long currentTimeMillis = System.currentTimeMillis();
             super.startHandshake();
             sslHandshakeTime += (int)(System.currentTimeMillis() - currentTimeMillis);
-        } catch (IOException ex) {
-            // TODO:
-            throw ex;
+            Log.d(Constant.TAG, "MonitoredOpenSSLSocketImplWrapper startHandshake:" + sslHandshakeTime);
+        } catch (IOException e) {
+            Log.e(Constant.TAG, "Caught error while MonitoredOpenSSLSocketImplWrapper startHandshake: ", e);
+
+            throw e;
         }
     }
 
     @Override
     public void close() throws IOException {
         super.close();
-        if (this.inputStream != null) {
-            this.inputStream.notifySocketClosing();
+        if (inputStream != null) {
+            inputStream.notifySocketClosing();
         }
     }
 
@@ -87,25 +103,5 @@ public class MonitoredOpenSSLSocketImplWrapperV1 extends OpenSSLSocketImplWrappe
         return this.outputStream = new HttpRequestParsingOutputStreamV1(this, outputStream);
     }
 
-    @Override
-    public NetworkTransactionState createNetworkTransactionState() {
-        return this.createNetworkTransactionState(true);
-    }
 
-    @Override
-    public NetworkTransactionState dequeueNetworkTransactionState() {
-        synchronized (queue) {
-            Log.d(Constant.TAG, "SSLSocketWrapperV1 start dequeuetransaction len:" + queue.size());
-            return queue.poll();
-        }
-    }
-
-    @Override
-    public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
-        synchronized (queue) {
-            queue.add(networkTransactionState);
-            Log.d(Constant.TAG, "SSLSocketWrapperV1  enqueuetransaction len:" + queue.size());
-
-        }
-    }
 }

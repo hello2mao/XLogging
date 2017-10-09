@@ -7,8 +7,7 @@ import com.hello2mao.xlogging.okhttp.XDns;
 import com.hello2mao.xlogging.okhttp.XLoggingInterceptor;
 import com.hello2mao.xlogging.okhttp.XSocketFactory;
 import com.hello2mao.xlogging.okhttp.util.Util;
-import com.hello2mao.xlogging.urlconnection.sslv1.SSLSocketV1;
-import com.hello2mao.xlogging.urlconnection.sslv2.SSLSocketV2;
+import com.hello2mao.xlogging.urlconnection.ssl.SSLSocket;
 import com.hello2mao.xlogging.urlconnection.tcpv1.SocketV1;
 import com.hello2mao.xlogging.urlconnection.tcpv2.SocketV2;
 
@@ -79,8 +78,8 @@ public class XLogging {
      * @param builder OkHttpClient.Builder
      * @return OkHttpClient
      */
-    public static OkHttpClient install(OkHttpClient.Builder builder) {
-        return install(builder.build());
+    public static OkHttpClient enableOkHttp(OkHttpClient.Builder builder) {
+        return enableOkHttp(builder.build());
     }
 
     /**
@@ -90,8 +89,8 @@ public class XLogging {
      * @param level Level
      * @return OkHttpClient
      */
-    public static OkHttpClient install(OkHttpClient.Builder builder, Level level) {
-        return install(builder.build(), level);
+    public static OkHttpClient enableOkHttp(OkHttpClient.Builder builder, Level level) {
+        return enableOkHttp(builder.build(), level);
     }
 
     /**
@@ -100,8 +99,8 @@ public class XLogging {
      * @param client OkHttpClient
      * @return OkHttpClient
      */
-    public static OkHttpClient install(OkHttpClient client) {
-        return install(client, Level.BASIC);
+    public static OkHttpClient enableOkHttp(OkHttpClient client) {
+        return enableOkHttp(client, Level.BASIC);
     }
 
     /**
@@ -111,7 +110,7 @@ public class XLogging {
      * @param level Level
      * @return OkHttpClient
      */
-    public static OkHttpClient install(OkHttpClient client, Level level) {
+    public static OkHttpClient enableOkHttp(OkHttpClient client, Level level) {
         if (Util.isInstalled(client)) {
             Log.i(Constant.TAG, "Already install XLogging!");
             return client;
@@ -127,28 +126,20 @@ public class XLogging {
     /**
      * URLConnection install
      */
-    public static void install() {
+    public static void enableURLConnection() {
 
         boolean socketInstalled;
         boolean sslSocketInstalled;
 
-        if (Build.VERSION.SDK_INT < 19) { // < Android 4.4
-            // FIXME:(tcpv1+iov1) + (sslv1+iov1) + ioparser
+        // minSdkVersion=21即Android5.0
+        // 注：对5.0以下版本的支持在XLogging v1.1.0版本实现了，
+        // 但考虑到维护成本，从v1.2.0开始只支持Android5.0及以上
+        if (Build.VERSION.SDK_INT < 24) { // < Android 7.0
             socketInstalled = SocketV1.install();
-            sslSocketInstalled = SSLSocketV1.install();
-            Log.d(Constant.TAG, "install SocketV1 + SSLSocketV1");
-        } else if (Build.VERSION.SDK_INT < 24) { // < Android 7.0
-            // FIXME:(tcpv1+iov1) + (sslv2+iov1) + ioparser
-            socketInstalled = SocketV1.install();
-            sslSocketInstalled = SSLSocketV2.install();
-            Log.d(Constant.TAG, "install SocketV1 + SSLSocketV2");
         } else { // >= Android 7.0
-            // FIXME: (tcpv2+iov2) + (sslv2+iov1) + ioparser
             socketInstalled = SocketV2.install();
-            sslSocketInstalled = SSLSocketV2.install();
-            Log.d(Constant.TAG, "install SocketV2 + SSLSocketV2");
         }
-
+        sslSocketInstalled = SSLSocket.install();
         Log.d(Constant.TAG, "install NetworkLib, Socket=" + socketInstalled
                 + ", SSLSocket=" + sslSocketInstalled);
     }

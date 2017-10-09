@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
-
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 import junit.framework.Assert;
@@ -25,6 +24,14 @@ public class HttpBodyParser extends AbstractParserState {
         return true;
     }
 
+    /**
+     * 重写对HttpBody的解析
+     *
+     * @param data the next byte of data from the stream.
+     *             The value byte is an <code>int</code> in the range <code>0</code> to <code>255</code>.
+     *             Or <code>-1</code> if the end of the stream is reached.
+     * @return boolean
+     */
     @Override
     public boolean add(int data) {
         if (data == -1) {
@@ -33,7 +40,7 @@ public class HttpBodyParser extends AbstractParserState {
         }
         this.count += 1;
         this.charactersInMessage += 1;
-        if (contentLength< 1024) {
+        if (contentLength < 1024) {
             body.append(data);
         }
         // body解析完成
@@ -43,11 +50,10 @@ public class HttpBodyParser extends AbstractParserState {
             }
             getHandler().finishedMessage(getCharactersInMessage());
             AbstractParserState parser = getHandler().getInitialParsingState();
-            Assert.assertNotNull(parser);
+            // 重置parser
             getHandler().setNextParserState(parser);
             return true;
         }
-        // TODO:
         this.currentTimeStamp = System.currentTimeMillis();
         return false;
     }
@@ -78,7 +84,7 @@ public class HttpBodyParser extends AbstractParserState {
 
     public int getContentLength()
     {
-        return this.contentLength;
+        return contentLength;
     }
 
     protected int getInitialBufferSize()

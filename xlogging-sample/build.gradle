@@ -33,8 +33,8 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
-//    compile project(':xlogging-okhttp')
-    compile 'com.hello2mao:xlogging:1.1.0'
+    compile project(':xlogging')
+//    compile 'com.hello2mao:xlogging:1.1.0'
 
     //rx
     compile 'io.reactivex:rxjava:1.1.6'

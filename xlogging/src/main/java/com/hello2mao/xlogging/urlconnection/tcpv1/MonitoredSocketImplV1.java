@@ -162,7 +162,8 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         super.setOption(optID, value);
     }
 
-    private NetworkTransactionState networkTransactionState(boolean b) {
+    @Override
+    public NetworkTransactionState createNetworkTransactionState() {
         final NetworkTransactionState networkTransactionState = new NetworkTransactionState();
         networkTransactionState.setAddress((this.address == null) ? "" : this.address);
         networkTransactionState.setPort(this.port);
@@ -176,12 +177,6 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         Log.d(Constant.TAG, "monitoredSockedImplV1 networkTransactionState setconnectTime:" + connectTime);
         networkTransactionState.setTcpHandShakeTime(this.connectTime);
         return networkTransactionState;
-    }
-
-    @Override
-    public NetworkTransactionState createNetworkTransactionState() {
-        Log.d(Constant.TAG, "monitoredSockedImplV1 createNetworkTransactionState");
-        return networkTransactionState(true);
     }
 
     @Override

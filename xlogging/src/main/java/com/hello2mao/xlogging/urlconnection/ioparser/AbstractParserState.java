@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
-
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 import junit.framework.Assert;
@@ -8,7 +7,7 @@ import junit.framework.Assert;
 public abstract class AbstractParserState {
     private HttpParserHandler handler;
     private int maxBufferSize;
-//    public static final int UNSET_INT_VALUE = -1;
+    private static final int UNSET_INT_VALUE = -1;
     int charactersInMessage;
     long currentTimeStamp;
     protected CharBuffer buffer;
@@ -37,7 +36,7 @@ public abstract class AbstractParserState {
      * @return boolean
      */
     public boolean add(int data) {
-        if (data == -1) {
+        if (data == UNSET_INT_VALUE) {
             // 流结束
             reachedEOF();
             return true;
@@ -46,8 +45,8 @@ public abstract class AbstractParserState {
         char character = (char) data;
         AbstractParserState parser;
         if (character == '\n') { // 遇到换行符，则进行解析，会调用相应parser
-            if (parse(buffer)) {
-                // 获取下个parser
+            if (parse(buffer)) { // 对缓冲的buffer进行解析
+                // 解析成功，则获取下个parser
                 parser = nextParserAfterSuccessfulParse();
             } else {
                 parser = NoopLineParser.DEFAULT;
@@ -73,7 +72,14 @@ public abstract class AbstractParserState {
         return parser != this;
     }
 
-    public final void add(byte[] buffer, int offset, int count) {
+    /**
+     * 把内容块加入缓存buffer进行parser
+     *
+     * @param buffer byte[]
+     * @param offset int
+     * @param count int
+     */
+    public void add(byte[] buffer, int offset, int count) {
         int j;
         for (int i = addBlock(buffer, offset, count); i > 0 && i < count; i += j) {
             j = handler.getCurrentParserState().addBlock(buffer, offset + i, count - i);

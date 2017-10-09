@@ -6,5 +6,5 @@ package com.hello2mao.xlogging.urlconnection;
  */
 
 public class NetConstants {
-    public static final String APMNETWORKLIB = "APM-NetLibType";
+    public static final String XLoggingNETWORKLIB = "XLogging-NetLibType";
 }

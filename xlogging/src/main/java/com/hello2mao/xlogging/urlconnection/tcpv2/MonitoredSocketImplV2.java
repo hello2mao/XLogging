@@ -1,7 +1,6 @@
 package com.hello2mao.xlogging.urlconnection.tcpv2;
 
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.hello2mao.xlogging.Constant;
@@ -11,7 +10,6 @@ import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.iov2.HttpRequestParsingOutputStreamV2;
 import com.hello2mao.xlogging.urlconnection.iov2.HttpResponseParsingInputStreamV2;
-import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 import com.hello2mao.xlogging.util.ReflectionUtil;
 import com.hello2mao.xlogging.util.URLUtil;
 
@@ -54,7 +52,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private static final int SUPPORTS_URGENT_DATA_IDX = 19;
     private static final int NUM_METHODS = 20;
 
-    // F
     private SocketImpl delegate;
     private static Field addressField;
     private static Field fdField;
@@ -65,9 +62,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private HttpRequestParsingOutputStreamV2 outputStream;
     private final Queue<NetworkTransactionState> queue;
 
-    //String C
     private String ipAddress;
-    // int B
     private int connectTime;
 
     static {
@@ -107,31 +102,18 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     public MonitoredSocketImplV2(SocketImpl socketImpl) {
-        this.ipAddress = "";
-        this.queue = new LinkedList<>();
         if (socketImpl == null) {
             throw new NullPointerException("delegate was null");
         }
+        this.ipAddress = "";
+        this.queue = new LinkedList<>();
         this.delegate = socketImpl;
         syncFromDelegate();
     }
 
-    private NetworkTransactionState createNetworkTransactionState(final boolean b) {
-        Log.d(Constant.TAG, "MonitorSocketImplV2 createNewStats");
-        final NetworkTransactionState nbsTransactionState = new NetworkTransactionState();
-        nbsTransactionState.setAddress((this.ipAddress == null) ? "" : this.ipAddress);
-        nbsTransactionState.setPort(this.port);
-        if (this.port == 443) {
-            nbsTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
-        }
-        else {
-            nbsTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
-        }
-//        nbsTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
-        nbsTransactionState.setTcpHandShakeTime(this.connectTime);
-        return nbsTransactionState;
-    }
-
+    /**
+     * 从delegate同步address/fd/localport/port
+     */
     private void syncFromDelegate() {
         try {
             this.address = (InetAddress) addressField.get(delegate);
@@ -140,10 +122,13 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             this.port = portField.getInt(delegate);
         } catch (IllegalArgumentException | IllegalAccessException e) {
             Log.e(Constant.TAG, "Caught error while syncFromDelegate: ", e);
-
         }
     }
 
+
+    /**
+     * 同步address/fd/localport/port到delegate
+     */
     private void syncToDelegate() {
         try {
             addressField.set(delegate, address);
@@ -151,6 +136,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             localportField.setInt(delegate, localport);
             portField.setInt(delegate, port);
         } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -197,78 +183,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         return null;
     }
 
-    @Override
-    protected void create(boolean stream) throws IOException {
-        invokeThrowsIOException(CREATE_IDX, new Object[] { stream });
-    }
-
-    @Override
-    protected void connect(String host, int port) throws IOException {
-        long currentTimeMillis = System.currentTimeMillis();
-        invokeThrowsIOException(CONNECT_STRING_INT_IDX, new Object[] { host, port});
-        // FIXME:
-        connectTime = (int)(System.currentTimeMillis() - currentTimeMillis);
-        if (port == 443 && !TextUtils.isEmpty(host)) {
-            final ConnectSocketData connectSocketData = new ConnectSocketData();
-            connectSocketData.setSocketAddress(host);
-            connectSocketData.setHost(host);
-            connectSocketData.setPort(port);
-            connectSocketData.setConnectTime(connectTime);
-            NetworkMonitor.addConnectSocket(connectSocketData);
-        }
-        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-1=" + (System.currentTimeMillis() - currentTimeMillis));
-    }
-
-    @Override
-    protected void connect(InetAddress inetAddress, int port) throws IOException {
-        // FIXME:
-        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-2");
-        invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
-    }
-
-    @Override
-    protected void connect(SocketAddress socketAddress, int timeout) throws IOException {
-        try {
-            String host = "";
-            if (socketAddress instanceof InetSocketAddress) {
-                // inetSocketAddress="ip.taobao.com/42.120.226.92:80" URLConnection/OkHttp3
-                // inetSocketAddress="/42.120.226.92:80" HttpClient
-                InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
-                host = URLUtil.getHost(inetSocketAddress);
-                this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
-            }
-            long currentTimeMillis = System.currentTimeMillis();
-            invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
-            this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
-            // FIXME:经过简单测试，URLConnection、OkHttp3、httpClient都是connectTime-3
-            Log.d(Constant.TAG, "MonitoredSocketImplV2: connectTime-3=" + connectTime + ", ipAddress="
-                    + ipAddress + ", host=" + host);
-            if (this.port == 443) {
-                NetworkMonitor.addConnectSocketInfo(ipAddress, host, this.connectTime);
-                // TODO:check this
-                Log.d(Constant.TAG, "MonitoredSocketImplV2: https");
-            }
-        } catch (IOException e) {
-            // TODO:采集异常
-            throw  e;
-        }
-    }
-
-    @Override
-    protected void bind(InetAddress host, int port) throws IOException {
-        invokeThrowsIOException(BIND_IDX, new Object[] { host, port});
-    }
-
-    @Override
-    protected void listen(int backlog) throws IOException {
-        invokeThrowsIOException(LISTEN_IDX, new Object[] { backlog});
-    }
-
-    @Override
-    protected void accept(SocketImpl s) throws IOException {
-        invokeThrowsIOException(ACCEPT_IDX, new Object[] { s});
-    }
-
     private InputStream unsafeInstrumentInputStream(InputStream inputStream) {
         if (inputStream != null) {
             if ((this.inputStream != null) && (this.inputStream.isDelegateSame(inputStream))) {
@@ -298,6 +212,98 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
+    public NetworkTransactionState createNetworkTransactionState() {
+        Log.d(Constant.TAG, "MonitorSocketImplV2 createNewStats");
+        final NetworkTransactionState nbsTransactionState = new NetworkTransactionState();
+        nbsTransactionState.setAddress((this.ipAddress == null) ? "" : this.ipAddress);
+        nbsTransactionState.setPort(this.port);
+        if (this.port == 443) {
+            nbsTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
+        } else {
+            nbsTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
+        }
+//        nbsTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
+        nbsTransactionState.setTcpHandShakeTime(this.connectTime);
+        return nbsTransactionState;
+    }
+
+    @Override
+    public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
+        synchronized (queue) {
+            queue.add(networkTransactionState);
+        }
+    }
+
+    @Override
+    public NetworkTransactionState dequeueNetworkTransactionState() {
+        synchronized (queue) {
+            return queue.poll();
+        }
+    }
+
+    /* 以下是对SocketImpl的override */
+
+    @Override
+    protected void create(boolean stream) throws IOException {
+        invokeThrowsIOException(CREATE_IDX, new Object[] { stream });
+    }
+
+    @Override
+    protected void connect(String host, int port) throws IOException {
+        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-1=");
+        invokeThrowsIOException(CONNECT_STRING_INT_IDX, new Object[] { host, port});
+    }
+
+    @Override
+    protected void connect(InetAddress inetAddress, int port) throws IOException {
+        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-2");
+        invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
+    }
+
+    @Override
+    protected void connect(SocketAddress socketAddress, int timeout) throws IOException {
+        try {
+            String host = "";
+            if (socketAddress instanceof InetSocketAddress) {
+                // inetSocketAddress="ip.taobao.com/42.120.226.92:80" URLConnection/OkHttp3
+                // inetSocketAddress="/42.120.226.92:80" HttpClient
+                InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
+                host = URLUtil.getHost(inetSocketAddress);
+                this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
+            }
+            long currentTimeMillis = System.currentTimeMillis();
+            invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
+            this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
+            // FIXME:经过简单测试，URLConnection、OkHttp3、httpClient都是connectTime-3
+            Log.d(Constant.TAG, "MonitoredSocketImplV2: connectTime-3=" + connectTime + ", ipAddress="
+                    + ipAddress + ", host=" + host);
+            if (this.port == 443) {
+                NetworkMonitor.addConnectSocketInfo(ipAddress, host, this.connectTime);
+                // TODO:check this
+                Log.d(Constant.TAG, "MonitoredSocketImplV2: https");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw  e;
+        }
+    }
+
+    @Override
+    protected void bind(InetAddress host, int port) throws IOException {
+        invokeThrowsIOException(BIND_IDX, new Object[] { host, port});
+    }
+
+    @Override
+    protected void listen(int backlog) throws IOException {
+        invokeThrowsIOException(LISTEN_IDX, new Object[] { backlog});
+    }
+
+    @Override
+    protected void accept(SocketImpl s) throws IOException {
+        invokeThrowsIOException(ACCEPT_IDX, new Object[] { s});
+    }
+
+    @Override
     protected InputStream getInputStream() throws IOException {
         Log.d(Constant.TAG, "v2 getInputStream..");
         InputStream inputStream = (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]);
@@ -308,14 +314,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     protected OutputStream getOutputStream() throws IOException {
         Log.d(Constant.TAG, "v2 getOutputStream..");
         OutputStream outputStream = (OutputStream) invokeThrowsIOException(GET_OUTPUT_STREAM_IDX, new Object[0]);
-        try {
-            outputStream = unsafeInstrumentOutputStream(outputStream);
-        } catch (ThreadDeath threadDeath) {
-            throw threadDeath;
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        return outputStream;
+        return unsafeInstrumentOutputStream(outputStream);
     }
 
     @Override
@@ -329,7 +328,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected void close() throws IOException {
-        Log.d(Constant.TAG, "MonitoredSocketImplV2 close");
         invokeThrowsIOException(CLOSE_IDX, new Object[0]);
         if (inputStream != null) {
             inputStream.notifySocketClosing();
@@ -372,47 +370,38 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    public void setPerformancePreferences(final int connectionTime, final int latency, final int bandwidth) {
+    public void setPerformancePreferences(int connectionTime, int latency, int bandwidth) {
         invokeNoThrow(SET_PERFORMANCE_PREFERENCES_IDX, new Object[] { connectionTime, latency, bandwidth });
     }
 
     @Override
     public void setOption(int optID, Object value) throws SocketException {
+        syncToDelegate();
         delegate.setOption(optID, value);
+        syncFromDelegate();
     }
 
     @Override
     public Object getOption(int optID) throws SocketException {
-        return delegate.getOption(optID);
+        syncToDelegate();
+        Object obj = delegate.getOption(optID);
+        syncFromDelegate();
+        return obj;
     }
 
     @Override
     public boolean supportsUrgentData() {
-        return (Boolean) invokeNoThrow(SUPPORTS_URGENT_DATA_IDX, new Object[0]);
+        syncToDelegate();
+        boolean bool = invokeNoThrow(SUPPORTS_URGENT_DATA_IDX, new Object[0]);
+        syncFromDelegate();
+        return bool;
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
-    }
-
-
-    @Override
-    public NetworkTransactionState createNetworkTransactionState() {
-        return createNetworkTransactionState(true);
-    }
-
-    @Override
-    public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
-        synchronized (queue) {
-            queue.add(networkTransactionState);
-        }
-    }
-
-    @Override
-    public NetworkTransactionState dequeueNetworkTransactionState() {
-        synchronized (queue) {
-            return queue.poll();
-        }
+        syncToDelegate();
+        String str = delegate.toString();
+        syncFromDelegate();
+        return str;
     }
 }

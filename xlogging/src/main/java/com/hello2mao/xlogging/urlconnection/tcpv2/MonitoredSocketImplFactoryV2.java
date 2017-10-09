@@ -1,15 +1,8 @@
 package com.hello2mao.xlogging.urlconnection.tcpv2;
 
 
-import android.util.Log;
-
-import com.hello2mao.xlogging.Constant;
-import com.hello2mao.xlogging.util.CustomException;
 import com.hello2mao.xlogging.util.ReflectionUtil;
 
-import junit.framework.Assert;
-
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.Socket;
 import java.net.SocketImpl;
@@ -17,18 +10,13 @@ import java.net.SocketImplFactory;
 
 public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
 
-
-
-    private Class<? extends SocketImpl> defaultSocketImplClass;
     private SocketImplFactory delegateFactory;
 
-    // 还未安装APM监控，则安装
-    public MonitoredSocketImplFactoryV2(Class<? extends SocketImpl> clazz) {
-        // FIXME:defaultSocketImplClass似乎未利用，why？
-        this.defaultSocketImplClass = clazz;
+    // 还未安装XLogging监控，则安装
+    public MonitoredSocketImplFactoryV2() {
     }
 
-    // 已经有socketImplFactory，但不是APM监控，则安装APM监控
+    // 已经有socketImplFactory，但不是XLogging监控，则安装XLogging监控
     public MonitoredSocketImplFactoryV2(SocketImplFactory socketImplFactory) {
         this.delegateFactory = socketImplFactory;
     }
@@ -36,28 +24,29 @@ public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
     @Override
     public SocketImpl createSocketImpl() {
         SocketImpl socketImpl = null;
-        // 已经有socketImplFactory，但不是APM监控，则安装APM监控
+        // 已经有socketImplFactory，但不是XLogging监控，则安装XLogging监控
         if (delegateFactory != null) {
-            Log.d(Constant.TAG, "MonitoredSocketImplFactoryV2: delegateFactory != null");
             socketImpl = delegateFactory.createSocketImpl();
         }
-        // 没有socketImplFactory即还未安装APM监控，则安装
+        // 没有socketImplFactory即还未安装XLogging监控，则安装
         if (socketImpl == null) {
             try {
-                // FIXME:why?
+                // 先保存socketImplFactory
                 Field socketImplFactoryField = ReflectionUtil.getFieldFromClass(Socket.class, SocketImplFactory.class);
                 socketImplFactoryField.setAccessible(true);
                 SocketImplFactory socketImplFactory = (SocketImplFactory) socketImplFactoryField.get(null);
                 socketImplFactoryField.set(null, null);
 
+                // 后去原始的socketImpl
                 socketImpl = ReflectionUtil.getValueOfField(
                         ReflectionUtil.getFieldFromClass(Socket.class, SocketImpl.class), new Socket());
 
-                // FIXME:why?
+                // 获取socketImpl后复原socketImplFactory
                 Socket.setSocketImplFactory(socketImplFactory);
-            } catch (CustomException | IllegalAccessException | IOException ignored) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        Assert.assertNotNull(socketImpl);
         return new MonitoredSocketImplV2(socketImpl);
     }
 }

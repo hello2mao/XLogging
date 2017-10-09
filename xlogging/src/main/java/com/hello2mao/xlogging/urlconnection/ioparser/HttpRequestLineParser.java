@@ -1,9 +1,6 @@
 package com.hello2mao.xlogging.urlconnection.ioparser;
 
 
-import android.util.Log;
-
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 /**
@@ -13,8 +10,8 @@ public class HttpRequestLineParser extends AbstractParserState {
 
     private static final int MAX_LINE_LENGTH = 2048;
 
-    public HttpRequestLineParser(HttpParserHandler paramHttpParserHandler) {
-        super(paramHttpParserHandler);
+    public HttpRequestLineParser(HttpParserHandler parserHandler) {
+        super(parserHandler);
     }
 
     @Override
@@ -34,7 +31,7 @@ public class HttpRequestLineParser extends AbstractParserState {
 
     @Override
     public AbstractParserState nextParserAfterSuccessfulParse() {
-        Log.d(Constant.TAG, "HttpRequestLineParser nextParserAfterSuccessfulParse HttpRequestHeaderParser");
+        // 接下来进行Http请求头的解析
         return new HttpRequestHeaderParser(this);
     }
 
@@ -50,13 +47,13 @@ public class HttpRequestLineParser extends AbstractParserState {
      *      先通过HttpRequestLineParser 解析第一行，获取本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httppath
      *      HttpRequestLineParser解析成功后（parse函数返回true）；下面会使用HttpRequestHeaderParser解析后续的request head
      *      若parse函数返回false（request head 第一行不是符合规则的三个字段）；则后续内容不做解析（使用解析器NoopLineParser）
-     * @param paramCharBuffer CharBuffer
+     *
+     * @param charBuffer CharBuffer
      * @return boolean
      */
     @Override
-    public final boolean parse(CharBuffer paramCharBuffer) {
-        String[] paramChars = paramCharBuffer.toString().split(" ");
-        Log.d(Constant.TAG, "HttpRequestLineParser parse :" + paramChars.length + " buffer:" + paramCharBuffer);
+    public boolean parse(CharBuffer charBuffer) {
+        String[] paramChars = charBuffer.toString().split(" ");
         if (paramChars.length != 3) {
             return false;
         }

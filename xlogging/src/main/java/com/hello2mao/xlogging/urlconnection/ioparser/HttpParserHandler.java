@@ -5,16 +5,13 @@ import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 
 public interface HttpParserHandler {
 
-    // a(a )
     void setNextParserState(AbstractParserState paramAbstractParserState);
-    // a(String p0, String p1)
+
     void requestLineFound(String requestMethod, String httpPath);
 
-    // boolean a(int)
     boolean statusLineFound(int statusCode, String protocol);
 
-    void hostNameFound(final String host);
-//    void setParserState();
+    void hostNameFound(String host);
 
     void finishedMessage(int paramInt, long paramLong);
 
@@ -28,7 +25,7 @@ public interface HttpParserHandler {
 
     NetworkTransactionState getNetworkTransactionState();
 
-    void appendBody(String p0);
+    void appendBody(String body);
 
     void contentTypeFound(String contentType);
 

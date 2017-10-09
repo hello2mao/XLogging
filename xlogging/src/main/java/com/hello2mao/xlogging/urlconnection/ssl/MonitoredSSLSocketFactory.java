@@ -1,7 +1,10 @@
-package com.hello2mao.xlogging.urlconnection.sslv1;
+package com.hello2mao.xlogging.urlconnection.ssl;
 
+
+import android.util.Log;
 
 import com.android.org.conscrypt.SSLParametersImpl;
+import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.BaseSSLSocketFactory;
 import com.hello2mao.xlogging.util.ReflectionUtil;
 
@@ -12,62 +15,63 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocketFactory;
 
-public class MonitoredSSLSocketFactoryV1 extends BaseSSLSocketFactory {
+public class MonitoredSSLSocketFactory extends BaseSSLSocketFactory {
+    
     private SSLParametersImpl sslParameters;
     private SSLSocketFactory delegate;
 
-    public MonitoredSSLSocketFactoryV1(SSLSocketFactory ssLSocketFactory) {
+    public MonitoredSSLSocketFactory(SSLSocketFactory ssLSocketFactory) {
         this.delegate = ssLSocketFactory;
         this.sslParameters = getParameters(ssLSocketFactory);
     }
 
     @Override
     public String[] getDefaultCipherSuites() {
-        return this.delegate.getDefaultCipherSuites();
+        return delegate.getDefaultCipherSuites();
     }
 
     @Override
     public String[] getSupportedCipherSuites() {
-        return this.delegate.getSupportedCipherSuites();
+        return delegate.getSupportedCipherSuites();
     }
 
     @Override
     public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException {
-        return new MonitoredOpenSSLSocketImplWrapperV1(socket, host, port, autoClose, cloneSSLParameters(this.sslParameters));
-    }
-
-    @Override
-    public Socket createSocket(String host, int port) throws IOException {
-        return new MonitoredOpenSSLSocketImplV1(host, port, cloneSSLParameters(this.sslParameters));
+        return new MonitoredOpenSSLSocketImplWrapper(socket, host, port, autoClose, cloneSSLParameters(sslParameters));
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        return new MonitoredOpenSSLSocketImplV1(host, port, localHost, localPort, cloneSSLParameters(this.sslParameters));
+        return new MonitoredOpenSSLSocketImpl(host, port, localHost, localPort, cloneSSLParameters(sslParameters));
+    }
+
+    @Override
+    public Socket createSocket(String host, int port) throws IOException {
+        return new MonitoredOpenSSLSocketImpl(host, port, cloneSSLParameters(sslParameters));
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        return new MonitoredOpenSSLSocketImplV1(host, port, cloneSSLParameters(this.sslParameters));
+        return new MonitoredOpenSSLSocketImpl(host, port, cloneSSLParameters(sslParameters));
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        return new MonitoredOpenSSLSocketImplV1(address, port, localAddress, localPort, cloneSSLParameters(this.sslParameters));
+        return new MonitoredOpenSSLSocketImpl(address, port, localAddress, localPort, cloneSSLParameters(sslParameters));
     }
 
     @Override
     public Socket createSocket() throws IOException {
-        return new MonitoredOpenSSLSocketImplV1(cloneSSLParameters(this.sslParameters));
+        return new MonitoredOpenSSLSocketImpl(cloneSSLParameters(sslParameters));
     }
 
     private static SSLParametersImpl getParameters(SSLSocketFactory sslSocketFactory) {
         SSLParametersImpl sslParametersImpl;
         try {
             sslParametersImpl = (SSLParametersImpl) ReflectionUtil.getFieldFromObject(
-                    ReflectionUtil.getFieldFromClass(sslSocketFactory.getClass(),
-                            SSLParametersImpl.class, false), sslSocketFactory);
+                    ReflectionUtil.getFieldFromClass(sslSocketFactory.getClass(), SSLParametersImpl.class), sslSocketFactory);
         } catch (Throwable t) {
+            Log.e(Constant.TAG, "Caught error while MonitoredSSLSocketFactory getParameters", t);
             sslParametersImpl = null;
         }
         return cloneSSLParameters(sslParametersImpl);
@@ -75,17 +79,18 @@ public class MonitoredSSLSocketFactoryV1 extends BaseSSLSocketFactory {
 
     private static SSLParametersImpl cloneSSLParameters(SSLParametersImpl sslParametersImpl) {
         try {
-            Method declaredMethod = SSLParametersImpl.class.getDeclaredMethod("clone", (Class<?>[])new Class[0]);
+            Method declaredMethod = SSLParametersImpl.class.getDeclaredMethod("clone", (Class<?>[]) new Class[0]);
             declaredMethod.setAccessible(true);
-            return (SSLParametersImpl)declaredMethod.invoke(sslParametersImpl);
+            return (SSLParametersImpl) declaredMethod.invoke(sslParametersImpl);
         } catch (Throwable t) {
+            Log.e(Constant.TAG, "Caught error while MonitoredSSLSocketFactory getParameters", t);
             return null;
         }
     }
 
     @Override
     public SSLSocketFactory getDelegate() {
-        return this.delegate;
+        return delegate;
     }
-}
 
+}

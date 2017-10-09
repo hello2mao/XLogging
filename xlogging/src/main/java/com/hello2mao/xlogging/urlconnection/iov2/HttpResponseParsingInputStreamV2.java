@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.iov2;
 
-
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,7 +27,6 @@ import static com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil.setErro
 
 public class HttpResponseParsingInputStreamV2 extends InputStream implements HttpParserHandler {
 
-
     private int connectTime;
     private InputStream inputStream;
     private MonitoredSocketInterface monitoredSocket;
@@ -48,10 +46,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
         }
         this.monitoredSocket = monitoredSocket;
         this.inputStream = inputStream;
-        this.responseParser = this.getInitialParsingState();
-        if (this.responseParser == null) {
-            throw new NullPointerException("parser was null");
-        }
+        this.responseParser = getInitialParsingState();
     }
 
     @Override

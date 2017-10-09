@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.hello2mao.xlogging.XLogging;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 import com.hello2mao.xlogging.sample.http.RetrofitHelper;
 
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ButterKnife.bind(this);
         showPic();
+        XLogging.enableURLConnection();
     }
 
     @OnClick(R.id.okhttp3_get)
