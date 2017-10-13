@@ -1,10 +1,8 @@
 package com.hello2mao.xlogging.urlconnection;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
-import com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
