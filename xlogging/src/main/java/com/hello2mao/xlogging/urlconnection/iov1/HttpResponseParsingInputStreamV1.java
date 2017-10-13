@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.iov1;
 
-
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -22,10 +21,6 @@ import java.io.InputStream;
 import java.net.InetAddress;
 
 import static com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil.setErrorCodeFromException;
-
-/**
- * Created by xuaifang on 17/8/1.
- */
 
 public class HttpResponseParsingInputStreamV1 extends InputStream implements HttpParserHandler {
 

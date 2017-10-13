@@ -37,7 +37,7 @@ public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
                 SocketImplFactory socketImplFactory = (SocketImplFactory) socketImplFactoryField.get(null);
                 socketImplFactoryField.set(null, null);
 
-                // 后去原始的socketImpl
+                // 获取原始的socketImpl
                 socketImpl = ReflectionUtil.getValueOfField(
                         ReflectionUtil.getFieldFromClass(Socket.class, SocketImpl.class), new Socket());
 

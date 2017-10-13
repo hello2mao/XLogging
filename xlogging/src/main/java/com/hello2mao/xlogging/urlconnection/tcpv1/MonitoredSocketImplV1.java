@@ -1,7 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.tcpv1;
 
-
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.hello2mao.xlogging.Constant;
@@ -11,8 +9,9 @@ import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.iov1.HttpResponseParsingInputStreamV1;
-import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 import com.hello2mao.xlogging.util.URLUtil;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,15 +24,11 @@ import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * Created by xuaifang on 17/8/1.
- */
-
 public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredSocketInterface {
 
+    private static final XLog log = XLogManager.getAgentLog();
     private int connectTime;
-    private final Queue<NetworkTransactionState> transactionStates;
-    private boolean c;
+    private Queue<NetworkTransactionState> transactionStates;
     private String address;
     private HttpResponseParsingInputStreamV1 inputStream;
     private HttpRequestParsingOutputStreamV1 outputStream;
@@ -44,53 +39,29 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     }
 
     @Override
-    public final void close() throws IOException {
-        Log.d(Constant.TAG, "V1 close");
+    public void close() throws IOException {
         super.close();
-        if (this.inputStream != null) {
-            this.inputStream.notifySocketClosing();
+        if (inputStream != null) {
+            inputStream.notifySocketClosing();
         }
     }
 
     @Override
-    public final void connect(final String host, final int port) throws IOException {
-        try {
-            final long currentTimeMillis = System.currentTimeMillis();
-            super.connect(host, port);
-            this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
-            if (port == 443 && !TextUtils.isEmpty(host)) {
-                final ConnectSocketData connectSocketData = new ConnectSocketData();
-                connectSocketData.setHost(host);
-                connectSocketData.setPort(port);
-                connectSocketData.setConnectTime(connectTime);
-                NetworkMonitor.addConnectSocket(connectSocketData);
-            }
-            Log.d(Constant.TAG, "connectTime V1  ..1:" + connectTime);
-        }
-        catch (IOException ex) {
-            // TODO
-            throw ex;
-        }
+    public void connect(String host, int port) throws IOException {
+        super.connect(host, port);
+        log.error("Unexpected: MonitoredSocketImplV1 connect-1");
     }
 
     @Override
-    public final void connect(final InetAddress inetAddress, final int port) throws IOException {
-        try {
-            // FIXME
-            Log.d(Constant.TAG, "unexpected connectTime V1  ..2:");
-            super.connect(inetAddress, port);
-        }
-        catch (IOException ex) {
-            // TODO
-            throw ex;
-        }
+    public void connect(InetAddress inetAddress, int port) throws IOException {
+        super.connect(inetAddress, port);
+        log.error("Unexpected: MonitoredSocketImplV1 connect-2");
     }
 
     @Override
-    public final void connect(final SocketAddress socketAddress, final int timeout) throws IOException {
+    public void connect(SocketAddress socketAddress, int timeout) throws IOException {
         // /220.181.57.112:443
         // ip.taobao.com/140.205.140.33:80
-        Log.d(Constant.TAG, "connect V1 ..3 socketAddress:" + socketAddress);
         String host = "";
         String ipAddress = "";
         try {
@@ -103,7 +74,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
                 address = ipAddress;
                 Log.d(Constant.TAG, "connect V1 ..3 address:" + address + " host:" + host);
             }
-            final long currentTimeMillis = System.currentTimeMillis();
+            long currentTimeMillis = System.currentTimeMillis();
             super.connect(socketAddress, timeout);
             this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
             if (this.port == 443) {
@@ -111,23 +82,16 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
                 NetworkMonitor.addConnectSocketInfo(ipAddress, host, this.connectTime);
             }
             Log.d(Constant.TAG, "connectTime V1  ..3:" + connectTime);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             // TODO
             throw ex;
         }
     }
 
     @Override
-    public final InputStream getInputStream() throws IOException {
-        Log.d(Constant.TAG, "v1 getInputStream..");
+    public InputStream getInputStream() throws IOException {
         try {
-            final InputStream inputStream = super.getInputStream();
-//            return inputStream;
-            if (inputStream == null) {
-                Log.d(Constant.TAG, "v1 getInputStream is null");
-                return null;
-            }
+            InputStream inputStream = super.getInputStream();
             return this.inputStream = new HttpResponseParsingInputStreamV1(this, inputStream);
         } catch (IOException ex) {
             // TODO
@@ -136,15 +100,15 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     }
 
     @Override
-    public final Object getOption(final int n) throws SocketException {
+    public Object getOption(int n) throws SocketException {
         return super.getOption(n);
     }
 
     @Override
-    public final OutputStream getOutputStream() throws IOException {
+    public OutputStream getOutputStream() throws IOException {
         Log.d(Constant.TAG, "v1 getOutputStream..");
         try {
-            final OutputStream outputStream = super.getOutputStream();
+            OutputStream outputStream = super.getOutputStream();
 //            return outputStream;
             if (outputStream == null) {
                 Log.d(Constant.TAG, "v1 getOutputStream..null");
@@ -158,13 +122,13 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     }
 
     @Override
-    public final void setOption(final int optID, final Object value) throws SocketException {
+    public void setOption(int optID, Object value) throws SocketException {
         super.setOption(optID, value);
     }
 
     @Override
     public NetworkTransactionState createNetworkTransactionState() {
-        final NetworkTransactionState networkTransactionState = new NetworkTransactionState();
+        NetworkTransactionState networkTransactionState = new NetworkTransactionState();
         networkTransactionState.setAddress((this.address == null) ? "" : this.address);
         networkTransactionState.setPort(this.port);
         if (this.port == 443) {

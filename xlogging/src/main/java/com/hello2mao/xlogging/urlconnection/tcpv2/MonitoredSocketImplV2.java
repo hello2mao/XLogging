@@ -12,6 +12,8 @@ import com.hello2mao.xlogging.urlconnection.iov2.HttpRequestParsingOutputStreamV
 import com.hello2mao.xlogging.urlconnection.iov2.HttpResponseParsingInputStreamV2;
 import com.hello2mao.xlogging.util.ReflectionUtil;
 import com.hello2mao.xlogging.util.URLUtil;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import java.util.Queue;
 
 public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocketInterface {
 
+    private static final XLog log = XLogManager.getAgentLog();
     private static final int ACCEPT_IDX = 0;
     private static final int AVAILABLE_IDX = 1;
     private static final int BIND_IDX = 2;
@@ -96,8 +99,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             methods[19] = SocketImpl.class.getDeclaredMethod("supportsUrgentData");
             ReflectionUtil.setAccessible(methods);
         } catch (Exception e) {
-            Log.e(Constant.TAG, "Caught error while MonitoredSocketImplV2 static field: ", e);
-
+            e.printStackTrace();
         }
     }
 
@@ -250,13 +252,13 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected void connect(String host, int port) throws IOException {
-        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-1=");
+        log.error("Unexpected MonitoredSocketImplV2: connectTime-1");
         invokeThrowsIOException(CONNECT_STRING_INT_IDX, new Object[] { host, port});
     }
 
     @Override
     protected void connect(InetAddress inetAddress, int port) throws IOException {
-        Log.e(Constant.TAG, "Unexpected MonitoredSocketImplV2: connectTime-2");
+        log.error("Unexpected MonitoredSocketImplV2: connectTime-2");
         invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
     }
 
@@ -274,9 +276,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             long currentTimeMillis = System.currentTimeMillis();
             invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
             this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
-            // FIXME:经过简单测试，URLConnection、OkHttp3、httpClient都是connectTime-3
-            Log.d(Constant.TAG, "MonitoredSocketImplV2: connectTime-3=" + connectTime + ", ipAddress="
-                    + ipAddress + ", host=" + host);
             if (this.port == 443) {
                 NetworkMonitor.addConnectSocketInfo(ipAddress, host, this.connectTime);
                 // TODO:check this

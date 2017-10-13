@@ -7,13 +7,18 @@ import com.hello2mao.xlogging.okhttp.XDns;
 import com.hello2mao.xlogging.okhttp.XLoggingInterceptor;
 import com.hello2mao.xlogging.okhttp.XSocketFactory;
 import com.hello2mao.xlogging.okhttp.util.Util;
-import com.hello2mao.xlogging.urlconnection.ssl.SSLSocket;
-import com.hello2mao.xlogging.urlconnection.tcpv1.SocketV1;
-import com.hello2mao.xlogging.urlconnection.tcpv2.SocketV2;
+import com.hello2mao.xlogging.urlconnection.ssl.Ssl;
+import com.hello2mao.xlogging.urlconnection.tcpv1.TcpV1;
+import com.hello2mao.xlogging.urlconnection.tcpv2.TcpV2;
+import com.hello2mao.xlogging.xlog.AndroidXLog;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import okhttp3.OkHttpClient;
 
 public class XLogging {
+
+    private static final XLog log = XLogManager.getAgentLog();
 
     public enum Level {
 
@@ -72,6 +77,36 @@ public class XLogging {
         BODY
     }
 
+    public static void install() {
+
+        boolean tcpInstalled;
+        boolean sslInstalled;
+
+        // init log
+        XLog xlog = new AndroidXLog();
+        xlog.setLevel(XLog.DEBUG);
+        XLogManager.setAgentLog(xlog);
+
+        // 安装tcp监控
+        // minSdkVersion=21即Android5.0
+        // 注：对5.0以下版本的支持在XLogging v1.1.0版本实现了，
+        // 但考虑到维护成本，从v1.2.0开始只支持Android5.0及以上
+        if (Build.VERSION.SDK_INT < 24) { // < Android 7.0
+            tcpInstalled = TcpV1.install();
+        } else { // >= Android 7.0
+            tcpInstalled = TcpV2.install();
+        }
+
+        // 安装ssl监控
+        sslInstalled = Ssl.install();
+
+        if (tcpInstalled && sslInstalled) {
+            log.info("XLogging install success!");
+        } else {
+            log.error("XLogging install failed!");
+        }
+    }
+
     /**
      * OkHttp install
      *
@@ -123,26 +158,7 @@ public class XLogging {
         return originBuilder.build();
     }
 
-    /**
-     * URLConnection install
-     */
-    public static void enableURLConnection() {
 
-        boolean socketInstalled;
-        boolean sslSocketInstalled;
-
-        // minSdkVersion=21即Android5.0
-        // 注：对5.0以下版本的支持在XLogging v1.1.0版本实现了，
-        // 但考虑到维护成本，从v1.2.0开始只支持Android5.0及以上
-        if (Build.VERSION.SDK_INT < 24) { // < Android 7.0
-            socketInstalled = SocketV1.install();
-        } else { // >= Android 7.0
-            socketInstalled = SocketV2.install();
-        }
-        sslSocketInstalled = SSLSocket.install();
-        Log.d(Constant.TAG, "install NetworkLib, Socket=" + socketInstalled
-                + ", SSLSocket=" + sslSocketInstalled);
-    }
 
 
 }

@@ -8,7 +8,7 @@ import com.hello2mao.xlogging.Constant;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
-public class SSLSocket {
+public class Ssl {
 
     private static boolean installed = false;
 
@@ -21,10 +21,10 @@ public class SSLSocket {
             HttpsURLConnection.setDefaultSSLSocketFactory(new MonitoredSSLSocketFactory(defaultSSLSocketFactory));
             return installed = true;
         } catch (ThreadDeath threadDeath) {
-            Log.e(Constant.TAG, "Caught error while SSLSocket install", threadDeath);
+            Log.e(Constant.TAG, "Caught error while Ssl install", threadDeath);
             throw threadDeath;
         } catch (Throwable t) {
-            Log.e(Constant.TAG, "Caught error while SSLSocket install", t);
+            Log.e(Constant.TAG, "Caught error while Ssl install", t);
             return false;
         }
     }

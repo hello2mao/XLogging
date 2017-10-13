@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ButterKnife.bind(this);
         showPic();
-        XLogging.enableURLConnection();
+        XLogging.install();
     }
 
     @OnClick(R.id.okhttp3_get)
