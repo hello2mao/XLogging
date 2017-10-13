@@ -1,21 +1,22 @@
 package com.hello2mao.xlogging.urlconnection.listener;
 
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
+import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+
 import java.util.EventObject;
 
 public class StreamEvent extends EventObject {
 
     private Exception exception;
-    private NetworkTransactionState networkTransactionState;
+    private HttpTransactionState httpTransactionState;
 
-    public StreamEvent(Object source, NetworkTransactionState networkTransactionState) {
+    public StreamEvent(Object source, HttpTransactionState httpTransactionState) {
         super(source);
-        this.networkTransactionState = networkTransactionState;
+        this.httpTransactionState = httpTransactionState;
     }
 
-    public StreamEvent(Object source, NetworkTransactionState networkTransactionState, Exception exception) {
+    public StreamEvent(Object source, HttpTransactionState httpTransactionState, Exception exception) {
         super(source);
-        this.networkTransactionState = networkTransactionState;
+        this.httpTransactionState = httpTransactionState;
         this.exception = exception;
     }
 
@@ -23,8 +24,8 @@ public class StreamEvent extends EventObject {
         return exception;
     }
 
-    public NetworkTransactionState getNetworkTransactionState() {
-        return networkTransactionState;
+    public HttpTransactionState getHttpTransactionState() {
+        return httpTransactionState;
     }
 
     public boolean isError() {

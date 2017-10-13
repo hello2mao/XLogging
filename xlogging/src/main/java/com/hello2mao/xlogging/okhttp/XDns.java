@@ -1,6 +1,7 @@
 package com.hello2mao.xlogging.okhttp;
 
-import android.util.Log;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -14,6 +15,7 @@ import static java.lang.System.currentTimeMillis;
 public class XDns implements Dns {
 
     private Dns impl;
+    private static final XLog log = XLogManager.getAgentLog();
 
     public XDns(Dns dns) {
         this.impl = dns;

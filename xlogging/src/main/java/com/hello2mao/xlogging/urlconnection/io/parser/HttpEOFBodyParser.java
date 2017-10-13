@@ -3,9 +3,9 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
-public class HttpEOFBodyParser extends AbstractParserState {
+public class HttpEOFBodyParser extends AbstractParser {
 
-    public HttpEOFBodyParser(AbstractParserState parser) {
+    public HttpEOFBodyParser(AbstractParser parser) {
         super(parser);
     }
 
@@ -41,12 +41,12 @@ public class HttpEOFBodyParser extends AbstractParserState {
 
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         return NoopLineParser.DEFAULT;
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         return NoopLineParser.DEFAULT;
     }
 

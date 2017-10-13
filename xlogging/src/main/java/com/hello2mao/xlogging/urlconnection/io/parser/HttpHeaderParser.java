@@ -7,7 +7,7 @@ import com.hello2mao.xlogging.urlconnection.CharBuffer;
  * Http Header parser
  * 会有相应的request和response parser完善其功能
  */
-public abstract class HttpHeaderParser extends AbstractParserState {
+public abstract class HttpHeaderParser extends AbstractParser {
 
     private static final int MAX_HEADER_LENGTH = 256;
     private static final int INITIAL_HEADER_LENGTH = 100;
@@ -19,11 +19,11 @@ public abstract class HttpHeaderParser extends AbstractParserState {
     private boolean isContentTypeSet = false;
     private boolean parsedEndOfHeader = false;
 
-    public HttpHeaderParser(AbstractParserState parser) {
+    public HttpHeaderParser(AbstractParser parser) {
         super(parser);
     }
 
-    protected abstract AbstractParserState nextParserAfterEndOfHeader();
+    protected abstract AbstractParser nextParserAfterEndOfHeader();
 
     private boolean isEndOfHeaderSection() {
         int i = buffer.length;
@@ -31,7 +31,7 @@ public abstract class HttpHeaderParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         if (this.parsedEndOfHeader) {
             return nextParserAfterEndOfHeader();
         }
@@ -42,7 +42,7 @@ public abstract class HttpHeaderParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         buffer.length = 0;
         return new NewlineLineParser(this);
     }

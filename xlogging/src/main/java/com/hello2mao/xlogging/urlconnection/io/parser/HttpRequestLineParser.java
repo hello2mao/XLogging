@@ -6,7 +6,7 @@ import com.hello2mao.xlogging.urlconnection.CharBuffer;
 /**
  * request 对应的输出流使用的第一个解析器，解析出本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httppath
  */
-public class HttpRequestLineParser extends AbstractParserState {
+public class HttpRequestLineParser extends AbstractParser {
 
     private static final int MAX_LINE_LENGTH = 2048;
 
@@ -25,12 +25,12 @@ public class HttpRequestLineParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         return NoopLineParser.DEFAULT;
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         // 接下来进行Http请求头的解析
         return new HttpRequestHeaderParser(this);
     }

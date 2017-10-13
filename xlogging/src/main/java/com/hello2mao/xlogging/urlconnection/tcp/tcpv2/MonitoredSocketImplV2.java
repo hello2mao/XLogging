@@ -1,9 +1,9 @@
 package com.hello2mao.xlogging.urlconnection.tcp.tcpv2;
 
 
+import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkMonitor;
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.io.ioV2.HttpRequestParsingOutputStreamV2;
 import com.hello2mao.xlogging.urlconnection.io.ioV2.HttpResponseParsingInputStreamV2;
@@ -60,7 +60,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private SocketImpl delegate;
     private HttpResponseParsingInputStreamV2 inputStream;
     private HttpRequestParsingOutputStreamV2 outputStream;
-    private final Queue<NetworkTransactionState> queue;
+    private final Queue<HttpTransactionState> queue;
     private String ipAddress;
     private int connectTime;
 
@@ -207,9 +207,9 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    public NetworkTransactionState createNetworkTransactionState() {
+    public HttpTransactionState createNetworkTransactionState() {
         log.debug("MonitorSocketImplV2 createNewStats");
-        final NetworkTransactionState nbsTransactionState = new NetworkTransactionState();
+        final HttpTransactionState nbsTransactionState = new HttpTransactionState();
         nbsTransactionState.setAddress((this.ipAddress == null) ? "" : this.ipAddress);
         nbsTransactionState.setPort(this.port);
         if (this.port == 443) {
@@ -223,14 +223,14 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
+    public void enqueueNetworkTransactionState(HttpTransactionState httpTransactionState) {
         synchronized (queue) {
-            queue.add(networkTransactionState);
+            queue.add(httpTransactionState);
         }
     }
 
     @Override
-    public NetworkTransactionState dequeueNetworkTransactionState() {
+    public HttpTransactionState dequeueNetworkTransactionState() {
         synchronized (queue) {
             return queue.poll();
         }

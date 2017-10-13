@@ -4,13 +4,13 @@ import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 import junit.framework.Assert;
 
-public class HttpBodyParser extends AbstractParserState {
+public class HttpBodyParser extends AbstractParser {
 
     private int contentLength;
     private int count = 0;
     private StringBuilder body;
 
-    public HttpBodyParser(AbstractParserState parser, int contentLength) {
+    public HttpBodyParser(AbstractParser parser, int contentLength) {
         super(parser);
         Assert.assertTrue(contentLength > 0 && contentLength < Integer.MAX_VALUE);
         this.contentLength = contentLength;
@@ -49,7 +49,7 @@ public class HttpBodyParser extends AbstractParserState {
                 getHandler().appendBody(body.toString());
             }
             getHandler().finishedMessage(getCharactersInMessage());
-            AbstractParserState parser = getHandler().getInitialParsingState();
+            AbstractParser parser = getHandler().getInitialParsingState();
             // 重置parser
             getHandler().setNextParserState(parser);
             return true;
@@ -99,13 +99,13 @@ public class HttpBodyParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull()
+    public AbstractParser nextParserAfterBufferFull()
     {
         return NoopLineParser.DEFAULT;
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         return NoopLineParser.DEFAULT;
     }
 

@@ -1,8 +1,6 @@
 package com.hello2mao.xlogging.urlconnection;
 
 
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
-
 import org.apache.http.conn.ConnectTimeoutException;
 
 import java.io.FileNotFoundException;
@@ -46,10 +44,10 @@ public class NetworkErrorUtil {
     /**
      * 设置错误码,并把错误信息放入assistData中
      *
-     * @param transactionState NetworkTransactionState
+     * @param transactionState HttpTransactionState
      * @param e Exception
      */
-    public static void setErrorCodeFromException(NetworkTransactionState transactionState, Exception e) {
+    public static void setErrorCodeFromException(HttpTransactionState transactionState, Exception e) {
         // FIXME:这个单词拼错了，但是后端已经按这个解了，所以暂时不修改
 //        transactionState.addAssistData("NetExcetpion", e.getMessage());
 

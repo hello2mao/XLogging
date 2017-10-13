@@ -3,7 +3,9 @@ package com.hello2mao.xlogging.okhttp;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
+
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +22,7 @@ import javax.net.ssl.SSLSocket;
 
 public class XSSLSocket extends SSLSocket {
 
+    private static final XLog log = XLogManager.getAgentLog();
     private SSLSocket impl;
 
     public XSSLSocket(SSLSocket sslSocket) {

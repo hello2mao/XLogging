@@ -2,16 +2,16 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
-public class HttpChunkSizeParser extends AbstractParserState {
+public class HttpChunkSizeParser extends AbstractParser {
 
     private int parsedChunkSize = -1;
 
-    public HttpChunkSizeParser(AbstractParserState paramAbstractParserState) {
-        super(paramAbstractParserState);
+    public HttpChunkSizeParser(AbstractParser parser) {
+        super(parser);
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         if (parsedChunkSize == 0) {
             return new HttpTrailerParser(this);
         }
@@ -20,7 +20,7 @@ public class HttpChunkSizeParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         return NoopLineParser.DEFAULT;
     }
 

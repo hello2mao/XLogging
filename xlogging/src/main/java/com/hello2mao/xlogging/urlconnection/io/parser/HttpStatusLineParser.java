@@ -9,7 +9,7 @@ import com.hello2mao.xlogging.urlconnection.CharBuffer;
  * e.g.
  * HTTP/1.1 200 OK
  */
-public class HttpStatusLineParser extends AbstractParserState {
+public class HttpStatusLineParser extends AbstractParser {
 
     private static final int MAX_LENGTH_HTTP_STATUS_LINE = 64;
     private static final int INITIAL_LENGTH_HTTP_STATUS_LINE = 20;
@@ -48,12 +48,12 @@ public class HttpStatusLineParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         return new HttpResponseHeaderParser(this, parsedStatusCode);
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         return NoopLineParser.DEFAULT;
     }
 

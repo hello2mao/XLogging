@@ -26,7 +26,7 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
 
     private int parsedStatusCode;
 
-    public HttpResponseHeaderParser(AbstractParserState parser, int parsedStatusCode) {
+    public HttpResponseHeaderParser(AbstractParser parser, int parsedStatusCode) {
         super(parser);
         this.parsedStatusCode = parsedStatusCode;
     }
@@ -41,8 +41,8 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
      *
      * @return parser
      */
-    protected AbstractParserState nextParserAfterEndOfHeader() {
-        AbstractParserState parser;
+    protected AbstractParser nextParserAfterEndOfHeader() {
+        AbstractParser parser;
         log.debug("HttextParserAfterEndOfHeader isChunkedTransferEnHeader");
         if (notAllowedToHaveMessageBody()) {
             log.debug("nextParserAfterEndOfHeader notAllowedToHaveMessageBody");

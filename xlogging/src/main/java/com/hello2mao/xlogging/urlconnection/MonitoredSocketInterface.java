@@ -3,9 +3,9 @@ package com.hello2mao.xlogging.urlconnection;
 
 public interface MonitoredSocketInterface {
 
-    NetworkTransactionState createNetworkTransactionState();
+    HttpTransactionState createNetworkTransactionState();
 
-    NetworkTransactionState dequeueNetworkTransactionState();
+    HttpTransactionState dequeueNetworkTransactionState();
 
-    void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState);
+    void enqueueNetworkTransactionState(HttpTransactionState httpTransactionState);
 }

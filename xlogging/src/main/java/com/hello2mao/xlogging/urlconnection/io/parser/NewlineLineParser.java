@@ -3,13 +3,13 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
-public class NewlineLineParser extends AbstractParserState {
-    private AbstractParserState nextParserAfterNewline;
+public class NewlineLineParser extends AbstractParser {
+    private AbstractParser nextParserAfterNewline;
 
-    public NewlineLineParser(AbstractParserState paramAbstractParserState)
+    public NewlineLineParser(AbstractParser parser)
     {
-        super(paramAbstractParserState);
-        this.nextParserAfterNewline = paramAbstractParserState;
+        super(parser);
+        this.nextParserAfterNewline = parser;
     }
 
     @Override
@@ -43,14 +43,14 @@ public class NewlineLineParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull()
+    public AbstractParser nextParserAfterBufferFull()
     {
 //        Assert.is(false);
         return this;
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse()
+    public AbstractParser nextParserAfterSuccessfulParse()
     {
 //        Assert.is(false);
         return this;

@@ -2,15 +2,19 @@ package com.hello2mao.xlogging.urlconnection;
 
 import android.text.TextUtils;
 
-import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * 存储网络数据的核心结构
- */
-public class NetworkTransactionState {
+public class HttpTransactionState {
+
+    private static final XLog log = XLogManager.getAgentLog();
+
+
+
+
     private volatile boolean hasParseUrlParams;
     private String methodType;
     private String protocol;
@@ -52,6 +56,17 @@ public class NetworkTransactionState {
         READY,
         SENT,
         COMPLETE
+    }
+
+    public enum RequestMethodType {
+        GET,
+        POST,
+        PUT,
+        DELETE,
+        HEAD,
+        TRACE,
+        OPTIONS,
+        CONNECT
     }
     
     public int getConnectType() {
@@ -181,7 +196,7 @@ public class NetworkTransactionState {
     
     @Override
     public String toString() {
-        return "NetworkTransactionState{hasParseUrlParams="
+        return "HttpTransactionState{hasParseUrlParams="
                 + this.hasParseUrlParams + ", methodType='"
                 + this.methodType + '\'' + ", statusCode="
                 + this.statusCode + ", errorCode="
@@ -207,7 +222,7 @@ public class NetworkTransactionState {
                 + this.isStatusCodeCalled + '}';
     }
     
-    public NetworkTransactionState() {
+    public HttpTransactionState() {
         this.hasParseUrlParams = false;
         this.exception = null;
         this.socketReusability = 0;
@@ -230,7 +245,7 @@ public class NetworkTransactionState {
 //        TraceMachine.enterNetworkSegment("External/unknownhost");
     }
     
-    public NetworkTransactionState(final String x5) {
+    public HttpTransactionState(final String x5) {
         this.hasParseUrlParams = false;
         this.exception = null;
         this.socketReusability = 0;
@@ -252,7 +267,7 @@ public class NetworkTransactionState {
         this.isStatusCodeCalled = false;
     }
     
-    public NetworkTransactionState(final NetworkTransactionState transactionState) {
+    public HttpTransactionState(final HttpTransactionState transactionState) {
         this();
         try {
             if (null != transactionState) {
@@ -300,7 +315,7 @@ public class NetworkTransactionState {
             }
         }
         catch (Exception ex) {
-            log.error("construce NetworkTransactionState error", ex);
+            log.error("construce HttpTransactionState error", ex);
         }
     }
     
@@ -353,7 +368,7 @@ public class NetworkTransactionState {
 //                log.error("setAppData:", ex2);
 //            }
 //        } else {
-//            NetworkTransactionState.LOG.warning("setAppData(...) called on TransactionState in " + this.state.toString() + " state");
+//            HttpTransactionState.LOG.warning("setAppData(...) called on TransactionState in " + this.state.toString() + " state");
 //        }
     }
     
@@ -362,12 +377,12 @@ public class NetworkTransactionState {
     }
     
     public int getTcpHandShakeTime() {
-        log.debug("NetworkTransactionState getTcpHandShakeTime:" + tcpHandShakeTime);
+        log.debug("HttpTransactionState getTcpHandShakeTime:" + tcpHandShakeTime);
         return this.tcpHandShakeTime;
     }
     
     public void setTcpHandShakeTime(final int tcpHandShakeTime) {
-        log.debug("NetworkTransactionState setTcpHandShakeTime:" + tcpHandShakeTime);
+        log.debug("HttpTransactionState setTcpHandShakeTime:" + tcpHandShakeTime);
         this.tcpHandShakeTime = tcpHandShakeTime;
     }
     
@@ -512,7 +527,7 @@ public class NetworkTransactionState {
             this.state = State.SENT;
         }
         else {
-//            NetworkTransactionState.LOG.warning("setBytesSent(...) called on TransactionState in " + this.state.toString() + " state");
+//            HttpTransactionState.LOG.warning("setBytesSent(...) called on TransactionState in " + this.state.toString() + " state");
         }
     }
     
@@ -529,23 +544,12 @@ public class NetworkTransactionState {
 //            TraceMachine.setCurrentTraceParam("bytes_received", bytesReceived);
         }
         else {
-//            NetworkTransactionState.LOG.warning("setBytesReceived(...) called on TransactionState in " + this.state.toString() + " state");
+//            HttpTransactionState.LOG.warning("setBytesReceived(...) called on TransactionState in " + this.state.toString() + " state");
         }
     }
     
     public long getBytesReceived() {
         return this.bytesReceived;
-    }
-    
-    public String getNetworkLibStr(ConnectSocketData connectSocketData) {
-        if (networkLib.equals(NetworkLibType.UNKNOWN) && connectSocketData != null) {
-            log.debug("getNetworkLib 1:" + networkLib);
-            if (connectSocketData.getNetworkLib() != null) {
-                networkLib = NetworkLibType.valueOf(connectSocketData.getNetworkLib());
-            }
-            log.debug("getNetworkLib 2:" + networkLib);
-        }
-        return this.networkLib.name();
     }
 
     public NetworkLibType getNetworkLib() {

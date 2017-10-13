@@ -3,7 +3,7 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
-public class HttpChunkBodyParser extends AbstractParserState {
+public class HttpChunkBodyParser extends AbstractParser {
     private int chunkLength;
     private int count = 0;
     private HttpChunkSizeParser sizeParser;
@@ -21,9 +21,9 @@ public class HttpChunkBodyParser extends AbstractParserState {
 
     private boolean isStatusError() {
         try {
-            if (bodyContent == null && getHandler().getNetworkTransactionState() != null
-                    && (getHandler().getNetworkTransactionState().getStatusCode() >= 400
-                    || getHandler().getNetworkTransactionState().getStatusCode() == -1)) {
+            if (bodyContent == null && getHandler().getHttpTransactionState() != null
+                    && (getHandler().getHttpTransactionState().getStatusCode() >= 400
+                    || getHandler().getHttpTransactionState().getStatusCode() == -1)) {
                 return true;
             }
         } catch (Exception e) {
@@ -73,12 +73,12 @@ public class HttpChunkBodyParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         return this.sizeParser;
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         return null;
     }
 

@@ -5,11 +5,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-
-import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
-import com.hello2mao.xlogging.urlconnection.RequestMethodType;
 
 /**
  *
@@ -19,21 +14,21 @@ public class NetworkTransactionUtil {
 
 
     public static void setNetWorkTransactionState(final MonitoredSocketInterface monitoredSocket,
-                                                  final NetworkTransactionState networkTransactionState) {
-        NetworkTransactionState currentNetworkTransactionState = monitoredSocket.dequeueNetworkTransactionState();
-        if (currentNetworkTransactionState != null) {
-            networkTransactionState.setHttpPath(currentNetworkTransactionState.getHttpPath());
-            networkTransactionState.setHost(currentNetworkTransactionState.getUrlBuilder().getHostname());
-            networkTransactionState.setNetworkLib(currentNetworkTransactionState.getNetworkLib());
-            networkTransactionState.setRequestMethod(currentNetworkTransactionState.getRequestMethodType());
-            networkTransactionState.setStartTime(currentNetworkTransactionState.getStartTime());
-            networkTransactionState.setTyIdRandomInt(currentNetworkTransactionState.getTyIdRandomInt());
-            networkTransactionState.setRequestEndTime(currentNetworkTransactionState.getRequestEndTime());
-            networkTransactionState.setBytesSent(currentNetworkTransactionState.getBytesSent());
-            networkTransactionState.setScheme(currentNetworkTransactionState.getUrlBuilder().getScheme());
-            networkTransactionState.setPort(currentNetworkTransactionState.getPort());
-            networkTransactionState.setAddress(currentNetworkTransactionState.getUrlBuilder().getHostAddress());
-            networkTransactionState.setState(1);
+                                                  final HttpTransactionState httpTransactionState) {
+        HttpTransactionState currentHttpTransactionState = monitoredSocket.dequeueNetworkTransactionState();
+        if (currentHttpTransactionState != null) {
+            httpTransactionState.setHttpPath(currentHttpTransactionState.getHttpPath());
+            httpTransactionState.setHost(currentHttpTransactionState.getUrlBuilder().getHostname());
+            httpTransactionState.setNetworkLib(currentHttpTransactionState.getNetworkLib());
+            httpTransactionState.setRequestMethod(currentHttpTransactionState.getRequestMethodType());
+            httpTransactionState.setStartTime(currentHttpTransactionState.getStartTime());
+            httpTransactionState.setTyIdRandomInt(currentHttpTransactionState.getTyIdRandomInt());
+            httpTransactionState.setRequestEndTime(currentHttpTransactionState.getRequestEndTime());
+            httpTransactionState.setBytesSent(currentHttpTransactionState.getBytesSent());
+            httpTransactionState.setScheme(currentHttpTransactionState.getUrlBuilder().getScheme());
+            httpTransactionState.setPort(currentHttpTransactionState.getPort());
+            httpTransactionState.setAddress(currentHttpTransactionState.getUrlBuilder().getHostAddress());
+            httpTransactionState.setState(1);
         }
     }
 
@@ -101,7 +96,7 @@ public class NetworkTransactionUtil {
         return networkType;
     }
 
-    public static void setRequestMethod(final NetworkTransactionState transaction, final String requestmethod) {
+    public static void setRequestMethod(final HttpTransactionState transaction, final String requestmethod) {
         if (requestmethod.toUpperCase().equals("OPTIONS")) {
             transaction.setRequestMethod(RequestMethodType.OPTIONS);
         } else if (requestmethod.toUpperCase().equals("GET")) {

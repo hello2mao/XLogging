@@ -3,13 +3,13 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
-public class HttpTrailerParser extends AbstractParserState {
+public class HttpTrailerParser extends AbstractParser {
     private static final int MAX_LENGTH = 128;
     private static final int INITIAL_LENGTH = 8;
     private boolean foundEmptyLine = false;
 
-    public HttpTrailerParser(AbstractParserState paramAbstractParserState) {
-        super(paramAbstractParserState);
+    public HttpTrailerParser(AbstractParser parser) {
+        super(parser);
     }
 
     public boolean isFoundEmptyLine() {
@@ -32,13 +32,13 @@ public class HttpTrailerParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         this.buffer.length = 0;
         return new NewlineLineParser(this);
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         if (this.foundEmptyLine) {
             getHandler().finishedMessage(getCharactersInMessage());
             return getHandler().getInitialParsingState();

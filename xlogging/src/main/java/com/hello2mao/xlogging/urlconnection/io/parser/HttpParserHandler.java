@@ -1,11 +1,10 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
-
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
+import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
 
 public interface HttpParserHandler {
 
-    void setNextParserState(AbstractParserState paramAbstractParserState);
+    void setNextParserState(AbstractParser parser);
 
     void requestLineFound(String requestMethod, String httpPath);
 
@@ -17,13 +16,13 @@ public interface HttpParserHandler {
 
     void finishedMessage(int paramInt);
 
-    AbstractParserState getCurrentParserState();
+    AbstractParser getCurrentParserState();
 
-    AbstractParserState getInitialParsingState();
+    AbstractParser getInitialParsingState();
 
     String getParsedRequestMethod();
 
-    NetworkTransactionState getNetworkTransactionState();
+    HttpTransactionState getHttpTransactionState();
 
     void appendBody(String body);
 

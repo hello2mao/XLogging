@@ -1,6 +1,7 @@
 package com.hello2mao.xlogging.okhttp;
 
-import android.util.Log;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.nio.channels.SocketChannel;
 
 public class XSocket extends Socket {
 
+    private static final XLog log = XLogManager.getAgentLog();
     private Socket impl;
 
     public XSocket(Socket socket) {

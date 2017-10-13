@@ -3,7 +3,7 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
-public class NoopLineParser extends AbstractParserState {
+public class NoopLineParser extends AbstractParser {
 
 
     public static final NoopLineParser DEFAULT = new NoopLineParser();
@@ -35,18 +35,17 @@ public class NoopLineParser extends AbstractParserState {
     }
 
     @Override
-    public AbstractParserState nextParserAfterBufferFull() {
+    public AbstractParser nextParserAfterBufferFull() {
         return this;
     }
 
     @Override
-    public AbstractParserState nextParserAfterSuccessfulParse() {
+    public AbstractParser nextParserAfterSuccessfulParse() {
         return this;
     }
 
     @Override
     public boolean parse(CharBuffer paramCharBuffer) {
-        log.debug("NoopLineParser parse");
         return true;
     }
 }

@@ -5,31 +5,32 @@ public class CharBuffer {
     public char[] charArray;
     public int length;
 
-    public CharBuffer(int n) {
-        this.charArray = new char[n];
+    public CharBuffer(int bufferSize) {
+        this.charArray = new char[bufferSize];
     }
 
-    public final String subStringTrimmed(int sepratorIndex) {
-        if (sepratorIndex > this.length) {
-            throw new IndexOutOfBoundsException("endIndex: " + sepratorIndex + " > length: " + this.length);
+    public String subStringTrimmed(int separateIndex) {
+        if (separateIndex > length) {
+            throw new IndexOutOfBoundsException("endIndex: " + separateIndex
+                    + " > length: " + length);
         }
-        if (sepratorIndex < 0) {
-            throw new IndexOutOfBoundsException("beginIndex: 0 > endIndex: " + sepratorIndex);
+        if (separateIndex < 0) {
+            throw new IndexOutOfBoundsException("beginIndex: 0 > endIndex: " + separateIndex);
         }
         int i;
-        int lastIndex = sepratorIndex;
-        for (i = 0; i < sepratorIndex; i++) {
-            if (!isWhiteSpace(this.charArray[i])) {
+        int lastIndex = separateIndex;
+        for (i = 0; i < separateIndex; i++) {
+            if (!isWhiteSpace(charArray[i])) {
                 break;
             }
         }
-        while ((lastIndex > i) && (isWhiteSpace(this.charArray[(lastIndex - 1)]))) {
+        while ((lastIndex > i) && (isWhiteSpace(charArray[(lastIndex - 1)]))) {
             lastIndex -= 1;
         }
-        return new String(this.charArray, i, lastIndex - i);
+        return new String(charArray, i, lastIndex - i);
     }
 
-    private static boolean isWhiteSpace(final char character) {
+    private static boolean isWhiteSpace(char character) {
         return character == ' ' || character == '\t' || character == '\r' || character == '\n';
     }
 

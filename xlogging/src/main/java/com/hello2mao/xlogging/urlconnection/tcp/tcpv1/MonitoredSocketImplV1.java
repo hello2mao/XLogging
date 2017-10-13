@@ -1,8 +1,8 @@
 package com.hello2mao.xlogging.urlconnection.tcp.tcpv1;
 
+import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkMonitor;
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.io.ioV1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.io.ioV1.HttpResponseParsingInputStreamV1;
@@ -25,7 +25,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
 
     private static final XLog log = XLogManager.getAgentLog();
     private int connectTime;
-    private Queue<NetworkTransactionState> transactionStates;
+    private Queue<HttpTransactionState> transactionStates;
     private String address;
     private HttpResponseParsingInputStreamV1 inputStream;
     private HttpRequestParsingOutputStreamV1 outputStream;
@@ -124,24 +124,24 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     }
 
     @Override
-    public NetworkTransactionState createNetworkTransactionState() {
-        NetworkTransactionState networkTransactionState = new NetworkTransactionState();
-        networkTransactionState.setAddress((this.address == null) ? "" : this.address);
-        networkTransactionState.setPort(this.port);
+    public HttpTransactionState createNetworkTransactionState() {
+        HttpTransactionState httpTransactionState = new HttpTransactionState();
+        httpTransactionState.setAddress((this.address == null) ? "" : this.address);
+        httpTransactionState.setPort(this.port);
         if (this.port == 443) {
-            networkTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
+            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
         }
         else {
-            networkTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
+            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
-//        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
-        log.debug("monitoredSockedImplV1 networkTransactionState setconnectTime:" + connectTime);
-        networkTransactionState.setTcpHandShakeTime(this.connectTime);
-        return networkTransactionState;
+//        httpTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
+        log.debug("monitoredSockedImplV1 httpTransactionState setconnectTime:" + connectTime);
+        httpTransactionState.setTcpHandShakeTime(this.connectTime);
+        return httpTransactionState;
     }
 
     @Override
-    public NetworkTransactionState dequeueNetworkTransactionState() {
+    public HttpTransactionState dequeueNetworkTransactionState() {
         synchronized (this.transactionStates) {
             log.debug("v1 dequeue transaction");
             return this.transactionStates.poll();
@@ -149,10 +149,10 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     }
 
     @Override
-    public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
+    public void enqueueNetworkTransactionState(HttpTransactionState httpTransactionState) {
         synchronized (this.transactionStates) {
             log.debug("v1 enqueue transaction");
-            this.transactionStates.add(networkTransactionState);
+            this.transactionStates.add(httpTransactionState);
         }
     }
 }

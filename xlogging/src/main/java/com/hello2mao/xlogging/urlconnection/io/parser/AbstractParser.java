@@ -4,7 +4,8 @@ import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 import junit.framework.Assert;
 
-public abstract class AbstractParserState {
+public abstract class AbstractParser {
+
     private HttpParserHandler handler;
     private int maxBufferSize;
     private static final int UNSET_INT_VALUE = -1;
@@ -12,11 +13,11 @@ public abstract class AbstractParserState {
     long currentTimeStamp;
     protected CharBuffer buffer;
 
-    public AbstractParserState(AbstractParserState parser) {
+    public AbstractParser(AbstractParser parser) {
         initialize(parser.handler, parser.charactersInMessage);
     }
 
-    public AbstractParserState(HttpParserHandler httpParserHandler) {
+    public AbstractParser(HttpParserHandler httpParserHandler) {
         initialize(httpParserHandler, 0);
     }
 
@@ -43,7 +44,7 @@ public abstract class AbstractParserState {
         }
         charactersInMessage += 1;
         char character = (char) data;
-        AbstractParserState parser;
+        AbstractParser parser;
         if (character == '\n') { // 遇到换行符，则进行解析，会调用相应parser
             if (parse(buffer)) { // 对缓冲的buffer进行解析
                 // 解析成功，则获取下个parser
@@ -123,9 +124,9 @@ public abstract class AbstractParserState {
 
     protected abstract int getMaxBufferSize();
 
-    public abstract AbstractParserState nextParserAfterBufferFull();
+    public abstract AbstractParser nextParserAfterBufferFull();
 
-    public abstract AbstractParserState nextParserAfterSuccessfulParse();
+    public abstract AbstractParser nextParserAfterSuccessfulParse();
 
     public abstract boolean parse(CharBuffer charBuffer);
 

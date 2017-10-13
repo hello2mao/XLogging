@@ -3,13 +3,13 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 
 public class HttpRequestHeaderParser extends HttpHeaderParser {
 
-    public HttpRequestHeaderParser(AbstractParserState paramAbstractParserState) {
-        super(paramAbstractParserState);
+    public HttpRequestHeaderParser(AbstractParser parser) {
+        super(parser);
     }
 
     @Override
-    protected AbstractParserState nextParserAfterEndOfHeader() {
-        AbstractParserState parserState;
+    protected AbstractParser nextParserAfterEndOfHeader() {
+        AbstractParser parserState;
         if (isChunkedTransferEncoding()) { // chunked编码传输解析body
             parserState = new HttpChunkSizeParser(this);
         } else if ((isContentLengthSet()) && (getContentLength() > 0)) { // 常规body解析
