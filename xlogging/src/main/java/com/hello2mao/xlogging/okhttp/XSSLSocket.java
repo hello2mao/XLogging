@@ -5,8 +5,6 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -307,7 +305,7 @@ public class XSSLSocket extends SSLSocket {
         }
         // 记录SSL握手时间
         long handshakeTime = System.currentTimeMillis() - startTime;
-        Log.d(Constant.TAG, "handshakeTime: " + handshakeTime);
+        log.debug("handshakeTime: " + handshakeTime);
     }
 
     @Override

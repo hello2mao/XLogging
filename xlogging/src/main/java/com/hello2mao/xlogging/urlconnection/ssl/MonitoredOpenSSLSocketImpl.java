@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.android.org.conscrypt.OpenSSLSocketImpl;
 import com.android.org.conscrypt.SSLParametersImpl;
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
@@ -90,7 +89,7 @@ public class MonitoredOpenSSLSocketImpl extends OpenSSLSocketImpl implements Mon
             long currentTimeMillis = System.currentTimeMillis();
             super.startHandshake();
             this.sslHandshakeTime = (int)(System.currentTimeMillis() - currentTimeMillis);
-            Log.d(Constant.TAG, "sslHandshakeTime V2:" + sslHandshakeTime);
+            log.debug("sslHandshakeTime V2:" + sslHandshakeTime);
         } catch (IOException ex) {
             ex.printStackTrace();
             throw ex;

@@ -2,8 +2,6 @@ package com.hello2mao.xlogging.okhttp;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -76,7 +74,7 @@ public class XSocket extends Socket {
             throw e;
         }
         long connectTime = System.currentTimeMillis() - startTime;
-        Log.d(Constant.TAG, "TCP connect: socket=" + endpoint + " connectTime=" + connectTime + "ms");
+        log.debug("TCP connect: socket=" + endpoint + " connectTime=" + connectTime + "ms");
     }
 
     @Override

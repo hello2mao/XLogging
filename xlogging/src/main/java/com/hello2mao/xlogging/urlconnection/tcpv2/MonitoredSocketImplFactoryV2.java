@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.tcpv2;
 
-
 import com.hello2mao.xlogging.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -32,9 +31,12 @@ public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
         if (socketImpl == null) {
             try {
                 // 先保存socketImplFactory
-                Field socketImplFactoryField = ReflectionUtil.getFieldFromClass(Socket.class, SocketImplFactory.class);
+                Field socketImplFactoryField = ReflectionUtil.getFieldFromClass(Socket.class,
+                        SocketImplFactory.class);
                 socketImplFactoryField.setAccessible(true);
                 SocketImplFactory socketImplFactory = (SocketImplFactory) socketImplFactoryField.get(null);
+                // socketImplFactory置null，
+                // 否则下面获取socketImpl时会调用MonitoredSocketImplFactoryV2的createSocketImpl而发生错误
                 socketImplFactoryField.set(null, null);
 
                 // 获取原始的socketImpl

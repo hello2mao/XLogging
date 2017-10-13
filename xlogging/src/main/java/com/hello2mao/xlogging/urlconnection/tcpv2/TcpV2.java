@@ -19,10 +19,13 @@ public class TcpV2 {
      */
     public static boolean install() {
         try {
-            Field socketImplFactoryField = ReflectionUtil.getFieldFromClass(Socket.class, SocketImplFactory.class);
-            SocketImplFactory socketImplFactory = ReflectionUtil.getValueOfField(socketImplFactoryField, null);
+            Field socketImplFactoryField = ReflectionUtil.getFieldFromClass(Socket.class,
+                    SocketImplFactory.class);
+            SocketImplFactory socketImplFactory = ReflectionUtil.getValueOfField(
+                    socketImplFactoryField, null);
             // 已经安装监控，则返回
-            if (socketImplFactory != null && socketImplFactory instanceof MonitoredSocketImplFactoryV2) {
+            if (socketImplFactory != null && socketImplFactory
+                    instanceof MonitoredSocketImplFactoryV2) {
                 log.info("Already install MonitoredSocketImplFactoryV2");
                 return true;
             }

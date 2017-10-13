@@ -3,7 +3,6 @@ package com.hello2mao.xlogging.urlconnection.ioparser;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 /**
@@ -26,14 +25,14 @@ public class HttpStatusLineParser extends AbstractParserState {
     @Override
     public boolean parse(CharBuffer charBuffer) {
         String[] split = charBuffer.toString().split(" ");
-        Log.d(Constant.TAG, "HttpStatusLineParser parse:" + charBuffer);
+        log.debug("HttpStatusLineParser parse:" + charBuffer);
         if (split.length >= 3) {
             try {
                 parsedStatusCode = Integer.parseInt(split[1]);
                 getHandler().statusLineFound(parsedStatusCode, split[0]);
                 return true;
             } catch (NumberFormatException e) {
-                Log.e(Constant.TAG, "Caught error while HttpStatusLineParser parse: ", e);
+                log.error("Caught error while HttpStatusLineParser parse: ", e);
 
             }
         }

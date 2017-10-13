@@ -1,10 +1,8 @@
 package com.hello2mao.xlogging.urlconnection;
 
-
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 import com.hello2mao.xlogging.urlconnection.util.NetworkErrorUtil;
 
@@ -16,8 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NetworkTransactionState {
     private volatile boolean hasParseUrlParams;
-//    public static final int URLLIMIT = 1024;
-
     private String methodType;
     private String protocol;
     private int statusCode;
@@ -306,7 +302,7 @@ public class NetworkTransactionState {
             }
         }
         catch (Exception ex) {
-            Log.e(Constant.TAG, "construce NetworkTransactionState error", ex);
+            log.error("construce NetworkTransactionState error", ex);
         }
     }
     
@@ -354,9 +350,9 @@ public class NetworkTransactionState {
 ////                    NBSTraceEngine.setCurrentTraceParam("txData", appData);
 //                }
 //            } catch (JSONException ex) {
-//                Log.e(Constant.TAG, "setAppData:", (Throwable)ex);
+//                log.error("setAppData:", (Throwable)ex);
 //            } catch (Exception ex2) {
-//                Log.e(Constant.TAG, "setAppData:", ex2);
+//                log.error("setAppData:", ex2);
 //            }
 //        } else {
 //            NetworkTransactionState.LOG.warning("setAppData(...) called on TransactionState in " + this.state.toString() + " state");
@@ -368,12 +364,12 @@ public class NetworkTransactionState {
     }
     
     public int getTcpHandShakeTime() {
-        Log.d(Constant.TAG, "NetworkTransactionState getTcpHandShakeTime:" + tcpHandShakeTime);
+        log.debug("NetworkTransactionState getTcpHandShakeTime:" + tcpHandShakeTime);
         return this.tcpHandShakeTime;
     }
     
     public void setTcpHandShakeTime(final int tcpHandShakeTime) {
-        Log.d(Constant.TAG, "NetworkTransactionState setTcpHandShakeTime:" + tcpHandShakeTime);
+        log.debug("NetworkTransactionState setTcpHandShakeTime:" + tcpHandShakeTime);
         this.tcpHandShakeTime = tcpHandShakeTime;
     }
     
@@ -449,7 +445,7 @@ public class NetworkTransactionState {
         if (!this.isComplete()) {
             this.statusCode = statusCode;
 //            TraceMachine.setCurrentTraceParam("status_code", statusCode);
-            Log.d(Constant.TAG, "set status code:" + statusCode);
+            log.debug("set status code:" + statusCode);
         } else {
             if (this.statusCode == 0 && statusCode != 0) {
                 this.statusCode = statusCode;
@@ -493,7 +489,7 @@ public class NetworkTransactionState {
         if (!this.isComplete()) {
             this.errorCode = errorCode;
             this.exception = exception;
-            Log.d(Constant.TAG, "errorCode:" + this.errorCode + ", errorInfo:" + this.exception);
+            log.debug("errorCode:" + this.errorCode + ", errorInfo:" + this.exception);
 //            TraceMachine.setCurrentTraceParam("error_code", errorCode);
         }
     }
@@ -512,7 +508,7 @@ public class NetworkTransactionState {
     
     public void setBytesSent(final long bytesSent) {
         if (!this.isComplete()) {
-            Log.d(Constant.TAG, bytesSent + " bytes sent");
+            log.debug(bytesSent + " bytes sent");
             this.bytesSent = bytesSent;
 //            TraceMachine.setCurrentTraceParam("bytes_sent", bytesSent);
             this.state = State.SENT;
@@ -523,7 +519,7 @@ public class NetworkTransactionState {
     }
     
     public void setBytesSentAfterComplete(final long bytesSent) {
-        Log.d(Constant.TAG, "After Complete " + bytesSent + " bytes sent.");
+        log.debug("After Complete " + bytesSent + " bytes sent.");
         this.bytesSent = bytesSent;
 //        this.state = b;
     }
@@ -531,7 +527,7 @@ public class NetworkTransactionState {
     public void setBytesReceived(final long bytesReceived) {
         if (!this.isComplete()) {
             this.bytesReceived = bytesReceived;
-            Log.d(Constant.TAG, bytesReceived + "bytes received");
+            log.debug(bytesReceived + "bytes received");
 //            TraceMachine.setCurrentTraceParam("bytes_received", bytesReceived);
         }
         else {
@@ -545,11 +541,11 @@ public class NetworkTransactionState {
     
     public String getNetworkLibStr(ConnectSocketData connectSocketData) {
         if (networkLib.equals(NetworkLibType.UNKNOWN) && connectSocketData != null) {
-            Log.d(Constant.TAG, "getNetworkLib 1:" + networkLib);
+            log.debug("getNetworkLib 1:" + networkLib);
             if (connectSocketData.getNetworkLib() != null) {
                 networkLib = NetworkLibType.valueOf(connectSocketData.getNetworkLib());
             }
-            Log.d(Constant.TAG, "getNetworkLib 2:" + networkLib);
+            log.debug("getNetworkLib 2:" + networkLib);
         }
         return this.networkLib.name();
     }

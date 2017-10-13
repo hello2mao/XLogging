@@ -7,7 +7,6 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.RequestMethodType;
@@ -42,7 +41,7 @@ public class NetworkTransactionUtil {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager == null) {
-            Log.e(Constant.TAG, "couldn't get connectivity manager");
+            log.error("couldn't get connectivity manager");
             return false;
         }
         final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

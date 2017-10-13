@@ -3,7 +3,6 @@ package com.hello2mao.xlogging.urlconnection.ioparser;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 public class HttpEOFBodyParser extends AbstractParserState {
@@ -14,7 +13,7 @@ public class HttpEOFBodyParser extends AbstractParserState {
 
     @Override
     public boolean parse(CharBuffer paramCharBuffer) {
-        Log.d(Constant.TAG, "HttpEOFBodyParser parse");
+        log.debug("HttpEOFBodyParser parse");
         return true;
     }
 

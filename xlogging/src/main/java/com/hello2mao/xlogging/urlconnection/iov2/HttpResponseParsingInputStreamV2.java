@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkMonitor;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
@@ -78,7 +77,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 
     @Override
     public int read() throws IOException {
-        Log.d(Constant.TAG, "read character in InputStream");
+        log.debug("read character in InputStream");
         int read;
         try {
             read = this.inputStream.read();
@@ -99,7 +98,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 
     @Override
     public int read(@NonNull byte[] buffer) throws IOException {
-        Log.d(Constant.TAG, "read buffer in InputStream");
+        log.debug("read buffer in InputStream");
         try {
             int read = inputStream.read(buffer);
             addBufferToParser(buffer, 0, read);
@@ -148,7 +147,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
     }
 
     private void unsafeLogError(Exception ex) {
-        Log.d(Constant.TAG, "setErrorCode: " + ex.toString());
+        log.debug("setErrorCode: " + ex.toString());
         final NetworkTransactionState networkTransactionState = this.getNetworkTransactionStateNN();
         if (networkTransactionState != null) {
             setErrorCodeFromException(networkTransactionState, ex);
@@ -210,14 +209,14 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 
     @Override
     public void finishedMessage(int charactersInMessage) {
-        Log.d(Constant.TAG, "finishedMessage, charactersInMessage=" + charactersInMessage);
+        log.debug("finishedMessage, charactersInMessage=" + charactersInMessage);
         finishedMessage(charactersInMessage, -1L);
     }
 
     @Override
     public void finishedMessage(final int bytesReceived, final long currentTime) {
         try {
-            Log.d(Constant.TAG, "HttpResponseParsingInputStreamV2 finishedMessage2 start:"
+            log.debug("HttpResponseParsingInputStreamV2 finishedMessage2 start:"
                     + networkTransactionState.toString() + " bytesReceived:" + bytesReceived
                     + "  currentTime:" + currentTime + " readCount:" + readCount);
 
@@ -252,21 +251,21 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 //                String networkLib = "";
                 if (TextUtils.isEmpty(this.networkTransactionState.getIpAddress())
                         && this.networkTransactionState.getUrlBuilder() != null) {
-                    Log.d(Constant.TAG, "begin get ipAddress:" + System.currentTimeMillis());
+                    log.debug("begin get ipAddress:" + System.currentTimeMillis());
                     final String ipAddress =
                             getIpAddress(URLUtil.getHost(this.networkTransactionState.getUrlBuilder().getHostname()));
-                    Log.d(Constant.TAG, "end get ipAddress:" + System.currentTimeMillis() + ", ipAddress:" + ipAddress);
+                    log.debug("end get ipAddress:" + System.currentTimeMillis() + ", ipAddress:" + ipAddress);
                     if (!TextUtils.isEmpty(ipAddress)) {
                         this.networkTransactionState.setAddress(ipAddress);
                     }
                 }
-                Log.d(Constant.TAG, "inputV2 finished readCount is:" + readCount + " port:" + networkTransactionState.getPort());
+                log.debug("inputV2 finished readCount is:" + readCount + " port:" + networkTransactionState.getPort());
                 final String ipAddress = this.networkTransactionState.getIpAddress();
                 final ConnectSocketData connectSocketData = NetworkMonitor.connectSocketMap.get(ipAddress);
                 if (this.readCount == 1) {
                     if (this.networkTransactionState.getPort() == 443) {
                         if (connectSocketData == null) {
-                            Log.d(Constant.TAG, "no tcp event found in tcpConnectMap!" + ipAddress);
+                            log.debug("no tcp event found in tcpConnectMap!" + ipAddress);
                             return;
                         }
                         connectSocketData.setHttp(true);
@@ -289,7 +288,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 //                this.networkTransactionState.setConnectType(
 //                        NetworkTransactionUtil.getContentType(((AndroidAgentImpl) Agent.getImpl()).getContext()));
                 int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.networkTransactionState.getSslHandShakeTime());
-                Log.d(Constant.TAG, "network data V2 when finished:" + this.networkTransactionState.getUrl()
+                log.debug("network data V2 when finished:" + this.networkTransactionState.getUrl()
                         + "\n statusCode:" + this.networkTransactionState.getStatusCode()
                         + "\n errorCode:" + this.networkTransactionState.getErrorCode()
                         + "\n startTime:" + this.networkTransactionState.getStartTime()
@@ -312,7 +311,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
 //                        + "\n networkLib：" + networkLib
                 );
 
-                Log.d(Constant.TAG, "finishedMessage2 end:" + networkTransactionState.toString()
+                log.debug("finishedMessage2 end:" + networkTransactionState.toString()
                         + " bytesReceived:" + bytesReceived
                         + "  currentTime:" + currentTime);
 //                NetworkDataCommon networkDataCommon =
@@ -334,7 +333,7 @@ public class HttpResponseParsingInputStreamV2 extends InputStream implements Htt
     public void contentTypeFound(String substring) {
         NetworkTransactionState currentNetworkTransactionState = getNetworkTransactionStateNN();
         if (currentNetworkTransactionState != null) {
-            Log.d(Constant.TAG, "content-type found:" + substring);
+            log.debug("content-type found:" + substring);
             final int index = substring.indexOf(";");
             if (index > 0 && index < substring.length()) {
                 substring = substring.substring(0, index);

@@ -2,7 +2,6 @@ package com.hello2mao.xlogging.urlconnection;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.tracing.ConnectSocketData;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +22,7 @@ public class NetworkMonitor {
     // FIXME:why? 对于https的tcp建连时间的存储
     public static void addConnectSocketInfo(final String ipAddress, final String host, final int connectTime) {
         // FIXME:ipAddress 和 host 位置？
-        Log.d(Constant.TAG, "addConnectSocketInfo :" + "ipAddress:" + ipAddress + ";host:" + host);
+        log.debug("addConnectSocketInfo :" + "ipAddress:" + ipAddress + ";host:" + host);
         ConnectSocketData connectSocketData = connectSocketMap.get(ipAddress);
         if (connectSocketData != null) {
             connectSocketData.setHost(host);

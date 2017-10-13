@@ -2,7 +2,6 @@ package com.hello2mao.xlogging.urlconnection.tcpv1;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkMonitor;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
@@ -72,7 +71,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
                 // ip.taobao.com
                 host = URLUtil.getHost(inetSocketAddress);
                 address = ipAddress;
-                Log.d(Constant.TAG, "connect V1 ..3 address:" + address + " host:" + host);
+                log.debug("connect V1 ..3 address:" + address + " host:" + host);
             }
             long currentTimeMillis = System.currentTimeMillis();
             super.connect(socketAddress, timeout);
@@ -81,7 +80,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
                 // FIXME: 17/9/22    why not   this.connectTime = (int) (System.currentTimeMillis() - currentTimeMillis);
                 NetworkMonitor.addConnectSocketInfo(ipAddress, host, this.connectTime);
             }
-            Log.d(Constant.TAG, "connectTime V1  ..3:" + connectTime);
+            log.debug("connectTime V1  ..3:" + connectTime);
         } catch (IOException ex) {
             // TODO
             throw ex;
@@ -106,12 +105,12 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-        Log.d(Constant.TAG, "v1 getOutputStream..");
+        log.debug("v1 getOutputStream..");
         try {
             OutputStream outputStream = super.getOutputStream();
 //            return outputStream;
             if (outputStream == null) {
-                Log.d(Constant.TAG, "v1 getOutputStream..null");
+                log.debug("v1 getOutputStream..null");
                 return null;
             }
             return this.outputStream = new HttpRequestParsingOutputStreamV1(this, outputStream);
@@ -138,7 +137,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
             networkTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
 //        networkTransactionState.setCarrier(Agent.getActiveNetworkCarrier());
-        Log.d(Constant.TAG, "monitoredSockedImplV1 networkTransactionState setconnectTime:" + connectTime);
+        log.debug("monitoredSockedImplV1 networkTransactionState setconnectTime:" + connectTime);
         networkTransactionState.setTcpHandShakeTime(this.connectTime);
         return networkTransactionState;
     }
@@ -146,7 +145,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     @Override
     public NetworkTransactionState dequeueNetworkTransactionState() {
         synchronized (this.transactionStates) {
-            Log.d(Constant.TAG, "v1 dequeue transaction");
+            log.debug("v1 dequeue transaction");
             return this.transactionStates.poll();
         }
     }
@@ -154,7 +153,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     @Override
     public void enqueueNetworkTransactionState(NetworkTransactionState networkTransactionState) {
         synchronized (this.transactionStates) {
-            Log.d(Constant.TAG, "v1 enqueue transaction");
+            log.debug("v1 enqueue transaction");
             this.transactionStates.add(networkTransactionState);
         }
     }

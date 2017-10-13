@@ -1,11 +1,6 @@
 package com.hello2mao.xlogging.urlconnection.ssl;
 
-
-import android.util.Log;
-
 import com.android.org.conscrypt.SSLParametersImpl;
-import com.hello2mao.xlogging.Constant;
-import com.hello2mao.xlogging.urlconnection.BaseSSLSocketFactory;
 import com.hello2mao.xlogging.util.ReflectionUtil;
 
 import java.io.IOException;
@@ -71,7 +66,7 @@ public class MonitoredSSLSocketFactory extends BaseSSLSocketFactory {
             sslParametersImpl = (SSLParametersImpl) ReflectionUtil.getFieldFromObject(
                     ReflectionUtil.getFieldFromClass(sslSocketFactory.getClass(), SSLParametersImpl.class), sslSocketFactory);
         } catch (Throwable t) {
-            Log.e(Constant.TAG, "Caught error while MonitoredSSLSocketFactory getParameters", t);
+            log.error("Caught error while MonitoredSSLSocketFactory getParameters", t);
             sslParametersImpl = null;
         }
         return cloneSSLParameters(sslParametersImpl);
@@ -83,7 +78,7 @@ public class MonitoredSSLSocketFactory extends BaseSSLSocketFactory {
             declaredMethod.setAccessible(true);
             return (SSLParametersImpl) declaredMethod.invoke(sslParametersImpl);
         } catch (Throwable t) {
-            Log.e(Constant.TAG, "Caught error while MonitoredSSLSocketFactory getParameters", t);
+            log.error("Caught error while MonitoredSSLSocketFactory getParameters", t);
             return null;
         }
     }

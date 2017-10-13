@@ -3,7 +3,6 @@ package com.hello2mao.xlogging.okhttp.util;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.XLogging;
 import com.hello2mao.xlogging.okhttp.bean.HttpTransaction;
 
@@ -58,6 +57,6 @@ public class LogUtil {
     private static void printLog(String requestMsg, String responseMsg, HttpTransaction httpTransaction) {
         requestMsg += "==> END " + httpTransaction.getMethod() + "\n\n";
         responseMsg += "<== END HTTP" + "\n";
-        Log.d(Constant.TAG, requestMsg + responseMsg);
+        log.debug(requestMsg + responseMsg);
     }
 }

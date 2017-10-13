@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkLibType;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
@@ -26,7 +25,7 @@ public class HttpRequestParsingOutputStreamV2 extends OutputStream implements Ht
     private NetworkTransactionState networkTransactionState;
 
     public HttpRequestParsingOutputStreamV2(MonitoredSocketInterface monitoredSocket, OutputStream outputStream) {
-        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV2 construct.");
+        log.debug("HttpRequestParsingOutputStreamV2 construct.");
         if (monitoredSocket == null) {
             throw new NullPointerException("socket was null");
         }
@@ -92,7 +91,7 @@ public class HttpRequestParsingOutputStreamV2 extends OutputStream implements Ht
 
     @Override
     public void requestLineFound(String requestMethod, String httpPath) {
-        Log.d(Constant.TAG, "requestLineFound, method:" + requestMethod + ", path:" + httpPath);
+        log.debug("requestLineFound, method:" + requestMethod + ", path:" + httpPath);
         NetworkTransactionState networkTransactionState = getNetworkTransactionState();
         NetworkTransactionUtil.setRequestMethod(networkTransactionState, requestMethod);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {

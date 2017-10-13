@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.android.org.conscrypt.OpenSSLSocketImplWrapper;
 import com.android.org.conscrypt.SSLParametersImpl;
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
 import com.hello2mao.xlogging.urlconnection.UrlBuilder;
@@ -69,9 +68,9 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             long currentTimeMillis = System.currentTimeMillis();
             super.startHandshake();
             sslHandshakeTime += (int)(System.currentTimeMillis() - currentTimeMillis);
-            Log.d(Constant.TAG, "MonitoredOpenSSLSocketImplWrapper startHandshake:" + sslHandshakeTime);
+            log.debug("MonitoredOpenSSLSocketImplWrapper startHandshake:" + sslHandshakeTime);
         } catch (IOException e) {
-            Log.e(Constant.TAG, "Caught error while MonitoredOpenSSLSocketImplWrapper startHandshake: ", e);
+            log.error("Caught error while MonitoredOpenSSLSocketImplWrapper startHandshake: ", e);
 
             throw e;
         }

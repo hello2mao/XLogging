@@ -1,7 +1,6 @@
 package com.hello2mao.xlogging;
 
 import android.os.Build;
-import android.util.Log;
 
 import com.hello2mao.xlogging.okhttp.XDns;
 import com.hello2mao.xlogging.okhttp.XLoggingInterceptor;
@@ -147,7 +146,6 @@ public class XLogging {
      */
     public static OkHttpClient enableOkHttp(OkHttpClient client, Level level) {
         if (Util.isInstalled(client)) {
-            Log.i(Constant.TAG, "Already install XLogging!");
             return client;
         }
         OkHttpClient.Builder originBuilder = client.newBuilder();

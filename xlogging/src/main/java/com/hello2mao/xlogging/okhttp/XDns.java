@@ -2,8 +2,6 @@ package com.hello2mao.xlogging.okhttp;
 
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -34,7 +32,7 @@ public class XDns implements Dns {
         }
         // 记录DNS查询时间
         long dnsTime = System.currentTimeMillis() - startTime;
-        Log.d(Constant.TAG, "DNS lookup: hostname=" + hostname + " results=" + results
+        log.debug("DNS lookup: hostname=" + hostname + " results=" + results
                 + " dnsTime=" + dnsTime + "ms");
         return results;
     }

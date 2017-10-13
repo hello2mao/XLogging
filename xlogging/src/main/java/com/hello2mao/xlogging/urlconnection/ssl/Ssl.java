@@ -1,15 +1,15 @@
 package com.hello2mao.xlogging.urlconnection.ssl;
 
 
-import android.util.Log;
-
-import com.hello2mao.xlogging.Constant;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 public class Ssl {
 
+    private static final XLog log = XLogManager.getAgentLog();
     private static boolean installed = false;
 
     public static boolean install() {
@@ -21,10 +21,10 @@ public class Ssl {
             HttpsURLConnection.setDefaultSSLSocketFactory(new MonitoredSSLSocketFactory(defaultSSLSocketFactory));
             return installed = true;
         } catch (ThreadDeath threadDeath) {
-            Log.e(Constant.TAG, "Caught error while Ssl install", threadDeath);
+            log.error("Caught error while Ssl install", threadDeath);
             throw threadDeath;
         } catch (Throwable t) {
-            Log.e(Constant.TAG, "Caught error while Ssl install", t);
+            log.error("Caught error while Ssl install", t);
             return false;
         }
     }

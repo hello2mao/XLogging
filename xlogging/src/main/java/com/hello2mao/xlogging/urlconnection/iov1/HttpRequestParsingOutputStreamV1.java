@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.hello2mao.xlogging.Constant;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkLibType;
 import com.hello2mao.xlogging.urlconnection.NetworkTransactionState;
@@ -31,7 +30,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
     private AbstractParserState requestParser;
 
     public HttpRequestParsingOutputStreamV1(final MonitoredSocketInterface monitoredSocket, final OutputStream outputStream) {
-        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV1 construct.");
+        log.debug("HttpRequestParsingOutputStreamV1 construct.");
         if (monitoredSocket == null) {
             throw new NullPointerException("socket was null");
         }
@@ -58,7 +57,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
 
     @Override
     public void write(final int oneByte) throws IOException {
-//        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV1 byte:");
+//        log.debug("HttpRequestParsingOutputStreamV1 byte:");
         this.outputStream.write(oneByte);
         try {
             this.requestParser.add(oneByte);
@@ -72,7 +71,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
 
     @Override
     public void write(@NonNull final byte[] buffer) throws IOException {
-//        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV1 byte[]:");
+//        log.debug("HttpRequestParsingOutputStreamV1 byte[]:");
         this.outputStream.write(buffer);
         this.addBytesToParser(buffer, 0, buffer.length);
 
@@ -87,14 +86,14 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
      */
     @Override
     public void write(@NonNull final byte[] buffer, final int offset, final int byteCount) throws IOException {
-//        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV1 byte[]3:" + buffer);
+//        log.debug("HttpRequestParsingOutputStreamV1 byte[]3:" + buffer);
         this.outputStream.write(buffer, offset, byteCount);
         this.addBytesToParser(buffer, offset, byteCount);
     }
 
     @Override
     public void requestLineFound(final String requestMethod, final String httpPath) {
-        Log.d(Constant.TAG, "HttpRequestParsingOutputStreamV1 requestLineFound:" + requestMethod + " httpPath:" + httpPath);
+        log.debug("HttpRequestParsingOutputStreamV1 requestLineFound:" + requestMethod + " httpPath:" + httpPath);
         final NetworkTransactionState networkTransactionState = getNetworkTransactionStateNN();
         NetworkTransactionUtil.setRequestMethod(networkTransactionState, requestMethod);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {
@@ -121,7 +120,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
 
     @Override
     public void finishedMessage(final int charactersInMessage) {
-        Log.d(Constant.TAG, "outputV1 finishedMessage , byteSent" + charactersInMessage);
+        log.debug("outputV1 finishedMessage , byteSent" + charactersInMessage);
         final NetworkTransactionState networkTransactionState = this.networkTransactionState;
         this.networkTransactionState = null;
 //        com.networkbench.agent.impl.m.b.a(networkTransactionState);
@@ -144,7 +143,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
     @Override
     public String getParsedRequestMethod() {
 //        com.networkbench.agent.impl.m.b.a(false);
-        Log.d(Constant.TAG, "output1 getParsedRequestMethod");
+        log.debug("output1 getParsedRequestMethod");
         final NetworkTransactionState networkTransactionState = getNetworkTransactionStateNN();
         String requestMethod = null;
         if (networkTransactionState != null) {
@@ -168,7 +167,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
 
     @Override
     public void hostNameFound(final String host) {
-        Log.d(Constant.TAG, "output1 hostNameFound1 host:" + host);
+        log.debug("output1 hostNameFound1 host:" + host);
         final NetworkTransactionState networkTransactionState = this.getNetworkTransactionStateNN();
 //        com.networkbench.agent.impl.m.b.a(networkTransactionState);
         if (networkTransactionState != null) {
@@ -203,7 +202,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
      */
     @Override
     public void libTypeFound(final String libType) {
-        Log.d(Constant.TAG, "output1 libTypeFound:" + libType);
+        log.debug("output1 libTypeFound:" + libType);
         final NetworkTransactionState networkTransactionState = getNetworkTransactionStateNN();
 //        com.networkbench.agent.impl.m.b.a(networkTransactionState);
         if (networkTransactionState != null && null != libType) {
@@ -255,7 +254,7 @@ public class HttpRequestParsingOutputStreamV1 extends OutputStream implements Ht
 
     private NetworkTransactionState getNetworkTransactionStateNN() {
         if (this.networkTransactionState == null) {
-            Log.d(Constant.TAG, "outputV1 getNetworkTransactionStateNN, createNetworkTransactionState");
+            log.debug("outputV1 getNetworkTransactionStateNN, createNetworkTransactionState");
             this.networkTransactionState = this.monitoredSocket.createNetworkTransactionState();
         }
 //        com.networkbench.agent.impl.m.b.a(this.networkTransactionState);
