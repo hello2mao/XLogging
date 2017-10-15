@@ -4,7 +4,7 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 import com.hello2mao.xlogging.urlconnection.CharBuffer;
 
 /**
- * request 对应的输出流使用的第一个解析器，解析出本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httppath
+ * request对应的输出流使用的第一个解析器，解析出本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httpPath
  */
 public class HttpRequestLineParser extends AbstractParser {
 
@@ -43,21 +43,16 @@ public class HttpRequestLineParser extends AbstractParser {
      * Accept-Encoding: gzip
      * User-Agent: okhttp/3.8.0
      *
-     * 对于Request的输出流的解析流程：
-     *      先通过HttpRequestLineParser 解析第一行，获取本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httppath
-     *      HttpRequestLineParser解析成功后（parse函数返回true）；下面会使用HttpRequestHeaderParser解析后续的request head
-     *      若parse函数返回false（request head 第一行不是符合规则的三个字段）；则后续内容不做解析（使用解析器NoopLineParser）
-     *
-     * @param charBuffer CharBuffer
+     * @param buffer CharBuffer
      * @return boolean
      */
     @Override
-    public boolean parse(CharBuffer charBuffer) {
-        String[] paramChars = charBuffer.toString().split(" ");
-        if (paramChars.length != 3) {
+    public boolean parse(CharBuffer buffer) {
+        String[] requestLine = buffer.toString().split(" ");
+        if (requestLine.length != 3) {
             return false;
         }
-        getHandler().requestLineFound(paramChars[0], paramChars[1]);
+        getHandler().requestLineFound(requestLine[0], requestLine[1]);
         return true;
     }
 }

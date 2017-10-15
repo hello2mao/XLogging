@@ -31,19 +31,19 @@ public abstract class AbstractParser {
     /**
      * 把单个字节加入缓存buffer进行parser
      *
-     * @param data the next byte of data from the stream.
+     * @param oneByte the next byte of data from the stream.
      *             The value byte is an <code>int</code> in the range <code>0</code> to <code>255</code>.
      *             Or <code>-1</code> if the end of the stream is reached.
      * @return boolean
      */
-    public boolean add(int data) {
-        if (data == UNSET_INT_VALUE) {
+    public boolean add(int oneByte) {
+        if (oneByte == -1) {
             // 流结束
             reachedEOF();
             return true;
         }
         charactersInMessage += 1;
-        char character = (char) data;
+        char character = (char) oneByte;
         AbstractParser parser;
         if (character == '\n') { // 遇到换行符，则进行解析，会调用相应parser
             if (parse(buffer)) { // 对缓冲的buffer进行解析
@@ -128,14 +128,14 @@ public abstract class AbstractParser {
 
     public abstract AbstractParser nextParserAfterSuccessfulParse();
 
-    public abstract boolean parse(CharBuffer charBuffer);
+    public abstract boolean parse(CharBuffer buffer);
 
     private void reachedEOF() {
         getHandler().setNextParserState(NoopLineParser.DEFAULT);
     }
 
-    void setCharactersInMessage(int paramInt) {
-        charactersInMessage = paramInt;
+    void setCharactersInMessage(int charactersInMessage) {
+        this.charactersInMessage = charactersInMessage;
     }
 
     public String toString() {

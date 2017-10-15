@@ -13,6 +13,46 @@ public class HttpTransactionState {
     private static final XLog log = XLogManager.getAgentLog();
 
 
+    private enum State {
+        READY,
+        SENT,
+        COMPLETE
+    }
+
+    private enum RequestMethodType {
+        GET,
+        POST,
+        PUT,
+        DELETE,
+        HEAD,
+        TRACE,
+        OPTIONS,
+        CONNECT
+    }
+
+    public void setRequestMethod(String requestMethod) {
+        if (requestMethod.toUpperCase().equals("OPTIONS")) {
+            this.requestMethod = RequestMethodType.OPTIONS;
+        } else if (requestMethod.toUpperCase().equals("GET")) {
+            this.requestMethod = RequestMethodType.GET;
+        } else if (requestMethod.toUpperCase().equals("HEAD")) {
+            this.requestMethod = RequestMethodType.HEAD;
+        } else if (requestMethod.toUpperCase().equals("POST")) {
+            this.requestMethod = RequestMethodType.POST;
+        } else if (requestMethod.toUpperCase().equals("PUT")) {
+            this.requestMethod = RequestMethodType.PUT;
+        } else if (requestMethod.toUpperCase().equals("DELETE")) {
+            this.requestMethod = RequestMethodType.DELETE;
+        } else if (requestMethod.toUpperCase().equals("TRACE")) {
+            this.requestMethod = RequestMethodType.TRACE;
+        } else if (requestMethod.toUpperCase().equals("CONNECT")) {
+            this.requestMethod = RequestMethodType.CONNECT;
+        } else {
+            this.requestMethod = RequestMethodType.GET;
+        }
+    }
+
+
 
 
     private volatile boolean hasParseUrlParams;
@@ -52,22 +92,7 @@ public class HttpTransactionState {
     private ConcurrentHashMap<String, String> requestHeaderParam;
     private HashMap<String, Object> responseHeaderParam;
 
-    private enum State {
-        READY,
-        SENT,
-        COMPLETE
-    }
 
-    public enum RequestMethodType {
-        GET,
-        POST,
-        PUT,
-        DELETE,
-        HEAD,
-        TRACE,
-        OPTIONS,
-        CONNECT
-    }
     
     public int getConnectType() {
         return this.connectType;
@@ -84,10 +109,7 @@ public class HttpTransactionState {
     public void setCdnVendorName(final String cdnVendorName) {
         this.cdnVendorName = cdnVendorName;
     }
-    
-    public void setRequestMethod(final RequestMethodType request) {
-        this.requestMethod = request;
-    }
+
     
     public String getRequestMethod() {
         return requestMethod.name();
@@ -242,32 +264,9 @@ public class HttpTransactionState {
         this.ipList = "";
         this.ipAddress = "";
         this.isStatusCodeCalled = false;
-//        TraceMachine.enterNetworkSegment("External/unknownhost");
     }
     
-    public HttpTransactionState(final String x5) {
-        this.hasParseUrlParams = false;
-        this.exception = null;
-        this.socketReusability = 0;
-        this.formattedUrlParams = null;
-        this.urlParams = null;
-        this.urlBuilder = new UrlBuilder();
-        this.inQueue = false;
-        this.requestHeaderParam = new ConcurrentHashMap<>();
-        this.responseHeaderParam = new HashMap<>();
-        this.startTime = System.currentTimeMillis();
-        this.carrier = "Other";
-        this.state = State.READY;
-        this.errorCode = NetworkErrorUtil.exceptionOk();
-        this.requestMethod = RequestMethodType.GET;
-        this.networkLib = NetworkLibType.UNKNOWN;
-        this.dnsElapse = 0;
-        this.ipList = "";
-        this.ipAddress = "";
-        this.isStatusCodeCalled = false;
-    }
-    
-    public HttpTransactionState(final HttpTransactionState transactionState) {
+    public HttpTransactionState(HttpTransactionState transactionState) {
         this();
         try {
             if (null != transactionState) {
@@ -313,9 +312,8 @@ public class HttpTransactionState {
                 this.requestHeaderParam.putAll(transactionState.requestHeaderParam);
                 this.responseHeaderParam.putAll(transactionState.responseHeaderParam);
             }
-        }
-        catch (Exception ex) {
-            log.error("construce HttpTransactionState error", ex);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     
@@ -423,7 +421,7 @@ public class HttpTransactionState {
     }
 //
     public void setScheme(final UrlBuilder.Scheme scheme) {
-        this.urlBuilder.setScheme(scheme);
+        urlBuilder.setScheme(scheme);
     }
 //
     public String getUrl() {

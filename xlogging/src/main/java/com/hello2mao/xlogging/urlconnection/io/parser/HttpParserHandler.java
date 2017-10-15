@@ -4,9 +4,16 @@ import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
 
 public interface HttpParserHandler {
 
-    void setNextParserState(AbstractParser parser);
+    AbstractParser getInitialParser();
 
     void requestLineFound(String requestMethod, String httpPath);
+
+
+
+
+    void setNextParserState(AbstractParser parser);
+
+
 
     boolean statusLineFound(int statusCode, String protocol);
 
@@ -17,8 +24,6 @@ public interface HttpParserHandler {
     void finishedMessage(int paramInt);
 
     AbstractParser getCurrentParserState();
-
-    AbstractParser getInitialParsingState();
 
     String getParsedRequestMethod();
 

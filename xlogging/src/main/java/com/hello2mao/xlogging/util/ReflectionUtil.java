@@ -4,23 +4,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 
 public class ReflectionUtil {
-    
-    public static <C, F> F getValueOfField(Field field, C c) throws Exception {
-        Object value;
-        if (field == null) {
-            return null;
-        }
-        field.setAccessible(true);
-        try {
-            value = field.get(c);
-        } catch (ThreadDeath threadDeath) {
-            throw threadDeath;
-        } catch (Throwable t) {
-            throw new Exception("Unable to get value of field", t);
-        }
-        return (F) value;
-    }
-    
+
     public static Field getFieldFromClass(Class<?> clazz, Class<?> fieldClazz) throws Exception {
         Field[] declaredFields = clazz.getDeclaredFields();
         Field field = null;
@@ -38,6 +22,22 @@ public class ReflectionUtil {
         }
         field.setAccessible(true);
         return field;
+    }
+    
+    public static <C, F> F getValueOfField(Field field, C c) throws Exception {
+        Object value;
+        if (field == null) {
+            return null;
+        }
+        field.setAccessible(true);
+        try {
+            value = field.get(c);
+        } catch (ThreadDeath threadDeath) {
+            throw threadDeath;
+        } catch (Throwable t) {
+            throw new Exception("Unable to get value of field", t);
+        }
+        return (F) value;
     }
 
     public static void setAccessible(AccessibleObject accessibleObject, AccessibleObject[] array) {
