@@ -8,7 +8,6 @@ XLogging is an enhanced network monitor for Android URLConnection/OkHttp/HttpCli
 
 ## Feature
 -------------
-
 * Network Lib
   * URLConnection: TODO
   * OkHttp
@@ -42,7 +41,6 @@ XLogging is an enhanced network monitor for Android URLConnection/OkHttp/HttpCli
 
 ## Quick Start
 -------------
-
 Gradle:
 ```
 compile 'com.hello2mao:xlogging:1.1.0'
