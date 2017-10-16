@@ -1,9 +1,12 @@
 XLogging
-=====
+=========================
+[![](https://img.shields.io/travis/USER/REPO.svg)
+[![](https://img.shields.io/badge/release-v1.1.0-blue.svg)
 
-XLogging is an enhanced network inspector for Android URLConnection/OkHttp/HttpClient. 
+XLogging is an enhanced network monitor for Android URLConnection/OkHttp/HttpClient.
 
 ## Feature
+-------------
 * Network Lib
   * URLConnection: TODO
   * OkHttp
@@ -36,6 +39,7 @@ XLogging is an enhanced network inspector for Android URLConnection/OkHttp/HttpC
   * Http response time
 
 ## Quick Start
+-------------
 Gradle:
 ```
 compile 'com.hello2mao:xlogging:1.1.0'
@@ -87,7 +91,7 @@ Level.BODY
 ```
 
 License
--------
+-------------
 
     Copyright (C) 2017 hello2mao.
 
