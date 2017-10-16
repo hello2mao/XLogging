@@ -23,15 +23,13 @@ public class HttpStatusLineParser extends AbstractParser {
     @Override
     public boolean parse(CharBuffer charBuffer) {
         String[] split = charBuffer.toString().split(" ");
-        log.debug("HttpStatusLineParser parse:" + charBuffer);
         if (split.length >= 3) {
             try {
                 parsedStatusCode = Integer.parseInt(split[1]);
                 getHandler().statusLineFound(parsedStatusCode, split[0]);
                 return true;
             } catch (NumberFormatException e) {
-                log.error("Caught error while HttpStatusLineParser parse: ", e);
-
+                e.printStackTrace();
             }
         }
         return false;

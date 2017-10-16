@@ -2,7 +2,6 @@ package com.hello2mao.xlogging.urlconnection;
 
 public class UrlBuilder {
 
-
     private String hostAddress;
     // 域名,e.g. ip.taobao.com
     private String hostname;
@@ -10,13 +9,11 @@ public class UrlBuilder {
     private String httpPath;
     private Scheme scheme;
     private int hostPort;
-    private boolean onlyShowHostInUrl;
 
     public UrlBuilder() {
         this.httpPath = "/";
         this.scheme = null;
         this.hostPort = -1;
-        this.onlyShowHostInUrl = false;
     }
 
     public String getHostAddress() {
@@ -28,15 +25,11 @@ public class UrlBuilder {
     }
 
     int getHostPort() {
-        return this.hostPort;
+        return hostPort;
     }
 
     String getHttpPath() {
         return httpPath;
-    }
-
-    public void setOnlyShowHostInUrlt(boolean onlyShowHostInUrl) {
-        this.onlyShowHostInUrl = onlyShowHostInUrl;
     }
 
     void setHostAddress(String hostAddress) {
@@ -48,15 +41,11 @@ public class UrlBuilder {
     }
 
     void setHttpPath(String httpPath) {
-        if (httpPath != null) {
-            this.httpPath = httpPath;
-        }
+        this.httpPath = httpPath;
     }
 
     void setHostPort(int hostPort) {
-        if (hostPort > 0) {
-            this.hostPort = hostPort;
-        }
+        this.hostPort = hostPort;
     }
 
     public void setScheme(Scheme scheme) {
@@ -75,15 +64,12 @@ public class UrlBuilder {
         return str;
     }
 
-    private boolean uriContainsScheme(final String uri) {
+    private boolean uriContainsScheme(String uri) {
         return uri != null && (uri.regionMatches(true, 0, "http:", 0, 5) || uri.regionMatches(true, 0, "https:", 0, 6));
     }
 
     public String getUrl() {
         String host = getHost();
-        if (onlyShowHostInUrl) {
-            return addPortToHostname(host, this.hostPort);
-        }
         String httpPath = this.httpPath;
         // 如http:
         String protocal = "";
@@ -111,28 +97,8 @@ public class UrlBuilder {
         return urlSchemePart + host + urlPortPart + httpPath;
     }
 
-    private String addPortToHostname(final String s, final int n) {
-        if (n > 0) {
-            final String string = ":" + n;
-            if (!s.endsWith(string)) {
-                return s + string;
-            }
-        }
-        return s;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("hostAddress: ").append(this.hostAddress);
-        sb.append("hostname: ").append(this.hostname);
-        sb.append("httpPath: ").append(this.httpPath);
-        sb.append("scheme: ").append(this.scheme);
-        sb.append("hostPort: ").append(this.hostPort);
-        return sb.toString();
-    }
-
     public enum Scheme {
+
         HTTP("http", 80),
         HTTPS("https", 443);
 

@@ -6,45 +6,29 @@ public interface HttpParserHandler {
 
     AbstractParser getInitialParser();
 
+    AbstractParser getCurrentParser();
+
+    void setNextParser(AbstractParser parser);
+
     void requestLineFound(String requestMethod, String httpPath);
-
-
-
-
-    void setNextParserState(AbstractParser parser);
-
-
-
-    boolean statusLineFound(int statusCode, String protocol);
 
     void hostNameFound(String host);
 
-    void finishedMessage(int paramInt, long paramLong);
+    void contentTypeFound(String contentType);
 
-    void finishedMessage(int paramInt);
+    void ageFound(String age);
 
-    AbstractParser getCurrentParserState();
+    void setHeader(String key, String value);
+
+    void finishedMessage(int charactersInMessage, long currentTimeStamp);
+
+    void finishedMessage(int charactersInMessage);
+
+    boolean statusLineFound(int statusCode, String protocol);
 
     String getParsedRequestMethod();
 
     HttpTransactionState getHttpTransactionState();
 
     void appendBody(String body);
-
-    void contentTypeFound(String contentType);
-
-    void ageFound(String age);
-
-    void networkLibFound(String networkLib);
-
-    void setHeader(String key, String value);
-
-    // 下面四个函数是ty自定义的，
-    void tyIdFound(String paramString);
-
-    void libTypeFound(String libTypeFound);
-
-    void setAppData(String appData);
-
-    void setCdnVendorName(String cdnVendorName);
 }

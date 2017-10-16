@@ -43,15 +43,16 @@ public class HttpRequestLineParser extends AbstractParser {
      * Accept-Encoding: gzip
      * User-Agent: okhttp/3.8.0
      *
-     * @param buffer CharBuffer
+     * @param charBuffer CharBuffer
      * @return boolean
      */
     @Override
-    public boolean parse(CharBuffer buffer) {
-        String[] requestLine = buffer.toString().split(" ");
+    public boolean parse(CharBuffer charBuffer) {
+        String[] requestLine = charBuffer.toString().split(" ");
         if (requestLine.length != 3) {
             return false;
         }
+        // requestMethod httpPath
         getHandler().requestLineFound(requestLine[0], requestLine[1]);
         return true;
     }

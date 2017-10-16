@@ -7,7 +7,6 @@ import com.hello2mao.xlogging.okhttp.XLoggingInterceptor;
 import com.hello2mao.xlogging.okhttp.XSocketFactory;
 import com.hello2mao.xlogging.okhttp.util.Util;
 import com.hello2mao.xlogging.urlconnection.ssl.Ssl;
-import com.hello2mao.xlogging.urlconnection.tcp.tcpv1.TcpV1;
 import com.hello2mao.xlogging.urlconnection.tcp.tcpv2.TcpV2;
 import com.hello2mao.xlogging.xlog.AndroidXLog;
 import com.hello2mao.xlogging.xlog.XLog;
@@ -91,7 +90,8 @@ public class XLogging {
         // 注：对5.0以下版本的支持在XLogging v1.1.0版本实现了，
         // 但考虑到维护成本，从v1.2.0开始只支持Android5.0及以上
         if (Build.VERSION.SDK_INT < 24) { // < Android 7.0
-            tcpInstalled = TcpV1.install();
+//            tcpInstalled = TcpV1.install();
+            tcpInstalled = true;
         } else { // >= Android 7.0
             tcpInstalled = TcpV2.install();
         }

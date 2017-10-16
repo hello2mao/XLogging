@@ -20,7 +20,7 @@ public class HttpBodyParser extends AbstractParser {
     }
 
     @Override
-    public boolean parse(CharBuffer paramCharBuffer) {
+    public boolean parse(CharBuffer charBuffer) {
         return true;
     }
 
@@ -35,7 +35,7 @@ public class HttpBodyParser extends AbstractParser {
     @Override
     public boolean add(int data) {
         if (data == -1) {
-            getHandler().setNextParserState(NoopLineParser.DEFAULT);
+            getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
         this.count += 1;
@@ -49,9 +49,9 @@ public class HttpBodyParser extends AbstractParser {
                 getHandler().appendBody(body.toString());
             }
             getHandler().finishedMessage(getCharactersInMessage());
-            AbstractParser parser = getHandler().getInitialParsingState();
+            AbstractParser parser = getHandler().getInitialParser();
             // 重置parser
-            getHandler().setNextParserState(parser);
+            getHandler().setNextParser(parser);
             return true;
         }
         this.currentTimeStamp = System.currentTimeMillis();
@@ -61,7 +61,7 @@ public class HttpBodyParser extends AbstractParser {
     @Override
     public int addBlock(byte[] buffer, int offset, int count) {
         if (count == -1) {
-            getHandler().setNextParserState(NoopLineParser.DEFAULT);
+            getHandler().setNextParser(NoopLineParser.DEFAULT);
             return -1;
         }
         if (this.count + count < this.contentLength) {
@@ -72,14 +72,14 @@ public class HttpBodyParser extends AbstractParser {
         offset = this.contentLength - this.count;
         this.charactersInMessage += offset;
         getHandler().finishedMessage(getCharactersInMessage());
-        getHandler().setNextParserState(getHandler().getInitialParsingState());
+        getHandler().setNextParser(getHandler().getInitialParser());
         return offset;
     }
 
     @Override
     public void close() {
         getHandler().finishedMessage(getCharactersInMessage());
-        getHandler().setNextParserState(NoopLineParser.DEFAULT);
+        getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
 
     public int getContentLength()

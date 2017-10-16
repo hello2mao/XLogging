@@ -25,17 +25,11 @@ public abstract class HttpHeaderParser extends AbstractParser {
 
     protected abstract AbstractParser nextParserAfterEndOfHeader();
 
-    private boolean isEndOfHeaderSection() {
-        int i = buffer.length;
-        return i == 0 || (i == 1 && buffer.charArray[0] == '\r');
-    }
-
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
-        if (this.parsedEndOfHeader) {
+        if (parsedEndOfHeader) {
             return nextParserAfterEndOfHeader();
-        }
-        else {
+        } else {
             buffer.length = 0;
         }
         return this;
@@ -82,8 +76,9 @@ public abstract class HttpHeaderParser extends AbstractParser {
                 handler.ageFound(value);
             }
             handler.setHeader(key, value);
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException e) {
             parsedSuccess = false;
+            e.printStackTrace();
         }
         return parsedSuccess;
     }

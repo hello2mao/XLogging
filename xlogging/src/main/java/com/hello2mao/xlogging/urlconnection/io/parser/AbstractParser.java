@@ -8,7 +8,6 @@ public abstract class AbstractParser {
 
     private HttpParserHandler handler;
     private int maxBufferSize;
-    private static final int UNSET_INT_VALUE = -1;
     int charactersInMessage;
     long currentTimeStamp;
     protected CharBuffer buffer;
@@ -83,7 +82,7 @@ public abstract class AbstractParser {
     public void add(byte[] buffer, int offset, int count) {
         int j;
         for (int i = addBlock(buffer, offset, count); i > 0 && i < count; i += j) {
-            j = handler.getCurrentParserState().addBlock(buffer, offset + i, count - i);
+            j = handler.getCurrentParser().addBlock(buffer, offset + i, count - i);
             if (j <= 0) {
                 break;
             }
@@ -128,7 +127,7 @@ public abstract class AbstractParser {
 
     public abstract AbstractParser nextParserAfterSuccessfulParse();
 
-    public abstract boolean parse(CharBuffer buffer);
+    public abstract boolean parse(CharBuffer charBuffer);
 
     private void reachedEOF() {
         getHandler().setNextParserState(NoopLineParser.DEFAULT);
