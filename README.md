@@ -4,40 +4,11 @@ XLogging
 ![](https://img.shields.io/badge/release-v1.1.0-blue.svg)
 ![](https://img.shields.io/badge/license-Apache%202-red.svg)
 
-XLogging is an enhanced network monitor for Android URLConnection/OkHttp/HttpClient.
+XLogging is an enhanced network monitor SDK for Android URLConnection/OkHttp/HttpClient.
 
 Feature
 -------------
-* Network Lib
-  * URLConnection: TODO
-  * OkHttp
-  * HttpClient: TODO
 
-* DNS
-  * DNS lookup time
-  * DNS lookup results
-  * DNS lookup error
-
-* TCP
-  * TCP connect time
-  * TCP connect error
-
-* SSL
-  * TODO
-
-* HTTP
-  * Http + Https
-  * URL
-  * Http header
-  * Http methdod
-  * Http body
-  * Http status code
-  * Http error
-  * Http protocol
-  * Http request+response
-  * Http bytes send
-  * Http bytes received
-  * Http response time
 
 Quick Start
 -------------
