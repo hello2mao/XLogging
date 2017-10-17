@@ -4,15 +4,12 @@ public class HttpTransactionData {
 
     // Basic Info
     private String url;
+    private String ipAddress;
     private String requestMethod;
     private int statusCode;
     private long bytesSent;
     private long bytesReceived;
-    private String carrier;
-    private String wanType;
     private String serverIP;
-    private String contentType;
-    private String protocol;
 
     // Time
     private long dnsStartTime;
@@ -23,47 +20,34 @@ public class HttpTransactionData {
     private long sslElapse;
     private long requestStartTime;
     private long requestElapse;
-    private long firstPkgElapse;
-    private long responseEndTime;
+    private long firstPackageElapse;
+    private long responseStartTime;
+    private long responseElapse;
 
     // AssistData
-    private String urlParams;
-    private String netException;
-    private String age;
+    private String query;
+    private String exception;
     private boolean socketReuse;
     private int port;
 
-    public HttpTransactionData(HttpTransactionState transactionState) {
+    public HttpTransactionData() {
+        this.dnsStartTime = -1;
+        this.dnsElapse = -1;
+        this.tcpStartTime = -1;
+        this.tcpElapse = -1;
+        this.sslStartTime = -1;
+        this.sslElapse = -1;
+        this.requestStartTime = -1;
+        this.requestElapse = -1;
+        this.firstPackageElapse = -1;
+        this.responseStartTime = -1;
+        this.responseElapse = -1;
+        this.socketReuse = false;
+    }
 
-        // Basic Info
-        this.url = transactionState.getUrl();
-        this.requestMethod = transactionState.getRequestMethod();
-        this.statusCode = transactionState.getStatusCode();
-        this.bytesSent = transactionState.getBytesSent();
-        this.bytesReceived = transactionState.getBytesReceived();
-        this.carrier = "";
-        this.wanType = transactionState.getWanType();
-        this.serverIP = transactionState.getServerIP();
-        this.contentType = transactionState.getContentType();
-        this.protocol = transactionState.getProtocol();
-
-        // Time
-        this.dnsStartTime = 0;
-        this.dnsElapse = 0;
-        this.tcpStartTime = transactionState.getTcpStartTime();
-        this.tcpElapse = transactionState.getTcpConnectTime();
-        this.sslStartTime = transactionState.getSslStartTime();
-        this.sslElapse = transactionState.getSslHandshakeTime();
-        this.requestStartTime = transactionState.getStartTime();
-        this.requestElapse = transactionState.getRequestElapse();
-        this.firstPkgElapse = transactionState.getFirstPkgTime();
-        this.responseEndTime = transactionState.getResponseEndTime();
-
-        // AssistData
-        this.urlParams = transactionState.getUrlParams();
-        this.netException = transactionState.getException();
-        this.age = transactionState.getAge();
-        this.socketReuse = transactionState.getSocketReusability() > 1;
-        this.port = transactionState.getPort();
+    public HttpTransactionData(HttpTransactionState httpTransactionState) {
+        this();
+        this.url = httpTransactionState.getUrl();
+        this.ipAddress =
     }
 }

@@ -20,8 +20,8 @@ public class HttpTransactionState {
     private long sslElapse;
     private long requestStartTime;
     private long requestElapse;
-    private long firstPkgElapse;
-    private long responseEndTime;
+    private long responseStartTime;
+    private long responseElapse;
 
     private String url;
     private String requestMethod;
