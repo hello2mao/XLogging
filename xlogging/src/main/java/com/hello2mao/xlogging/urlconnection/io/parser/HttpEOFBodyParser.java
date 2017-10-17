@@ -1,7 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 public class HttpEOFBodyParser extends AbstractParser {
 
@@ -19,7 +19,7 @@ public class HttpEOFBodyParser extends AbstractParser {
     public boolean add(int data) {
         if (data == -1) {
             getHandler().finishedMessage(getCharactersInMessage());
-            getHandler().setNextParserState(NoopLineParser.DEFAULT);
+            getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
         this.charactersInMessage += 1;
@@ -32,7 +32,7 @@ public class HttpEOFBodyParser extends AbstractParser {
     public int addBlock(byte[] buffer, int offset, int count) {
         if (count == -1) {
             getHandler().finishedMessage(getCharactersInMessage());
-            getHandler().setNextParserState(NoopLineParser.DEFAULT);
+            getHandler().setNextParser(NoopLineParser.DEFAULT);
             return -1;
         }
         this.charactersInMessage += count;
@@ -53,7 +53,7 @@ public class HttpEOFBodyParser extends AbstractParser {
     @Override
     public void close() {
         getHandler().finishedMessage(getCharactersInMessage());
-        getHandler().setNextParserState(NoopLineParser.DEFAULT);
+        getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
 
     @Override

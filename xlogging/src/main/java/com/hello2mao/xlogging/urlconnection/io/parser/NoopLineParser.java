@@ -1,7 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 public class NoopLineParser extends AbstractParser {
 

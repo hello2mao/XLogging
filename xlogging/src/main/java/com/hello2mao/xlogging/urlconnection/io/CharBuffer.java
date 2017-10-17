@@ -1,4 +1,4 @@
-package com.hello2mao.xlogging.urlconnection;
+package com.hello2mao.xlogging.urlconnection.io;
 
 public class CharBuffer {
 

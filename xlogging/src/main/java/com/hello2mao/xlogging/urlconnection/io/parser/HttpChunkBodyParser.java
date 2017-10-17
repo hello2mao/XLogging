@@ -1,7 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 public class HttpChunkBodyParser extends AbstractParser {
     private int chunkLength;
@@ -45,7 +45,7 @@ public class HttpChunkBodyParser extends AbstractParser {
                 this.getHandler().appendBody(bodyContent.toString());
             }
             getHandler().finishedMessage(this.getCharactersInMessage());
-            getHandler().setNextParserState(NoopLineParser.DEFAULT);
+            getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
         ++this.charactersInMessage;
@@ -58,14 +58,14 @@ public class HttpChunkBodyParser extends AbstractParser {
                     getHandler().appendBody(bodyContent.toString());
                 }
                 sizeParser.setCharactersInMessage(this.getCharactersInMessage());
-                getHandler().setNextParserState(this.sizeParser);
+                getHandler().setNextParser(this.sizeParser);
                 return true;
             }
             if (this.count == this.chunkLength + 2 && character != '\n') {
                 if (bodyContent != null) {
                     getHandler().appendBody(bodyContent.toString());
                 }
-                getHandler().setNextParserState(NoopLineParser.DEFAULT);
+                getHandler().setNextParser(NoopLineParser.DEFAULT);
                 return true;
             }
         }
@@ -90,7 +90,7 @@ public class HttpChunkBodyParser extends AbstractParser {
     @Override
     public void close() {
         getHandler().finishedMessage(getCharactersInMessage(), currentTimeStamp);
-        getHandler().setNextParserState(NoopLineParser.DEFAULT);
+        getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
 
     @Override

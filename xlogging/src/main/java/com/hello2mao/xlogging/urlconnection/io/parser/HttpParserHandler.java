@@ -14,21 +14,15 @@ public interface HttpParserHandler {
 
     void hostNameFound(String host);
 
-    void contentTypeFound(String contentType);
+    void statusLineFound(int statusCode);
 
-    void ageFound(String age);
-
-    void setHeader(String key, String value);
-
-    void finishedMessage(int charactersInMessage, long currentTimeStamp);
+    void appendBody(String body);
 
     void finishedMessage(int charactersInMessage);
 
-    boolean statusLineFound(int statusCode, String protocol);
-
-    String getParsedRequestMethod();
+    void finishedMessage(int charactersInMessage, long currentTimeStamp);
 
     HttpTransactionState getHttpTransactionState();
 
-    void appendBody(String body);
+    String getParsedRequestMethod();
 }

@@ -4,12 +4,10 @@ package com.hello2mao.xlogging.urlconnection.io;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.hello2mao.xlogging.urlconnection.HttpTransactionsCache;
 import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkErrorUtil;
-import com.hello2mao.xlogging.urlconnection.NetworkTransactionUtil;
-import com.hello2mao.xlogging.urlconnection.SocketDescriptor;
-import com.hello2mao.xlogging.urlconnection.TcpDataCache;
 import com.hello2mao.xlogging.urlconnection.io.parser.AbstractParser;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpParserHandler;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpStatusLineParser;
@@ -22,9 +20,9 @@ import com.hello2mao.xlogging.util.URLUtil;
 import com.hello2mao.xlogging.xlog.XLog;
 import com.hello2mao.xlogging.xlog.XLogManager;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
@@ -34,24 +32,17 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     private InputStream inputStream;
     private MonitoredSocketInterface monitoredSocket;
     private int readCount;
-    private Map<String, String> responseHeader;
     private AbstractParser responseParser;
     private HttpTransactionState httpTransactionState;
-    private SocketDescriptor socketDescriptor;
+    private FileDescriptor fd;
     private StreamListenerManager streamListenerManager;
 
-    public ParsingInputStream(MonitoredSocketInterface monitoredSocket,
-                              InputStream inputStream, SocketDescriptor socketDescriptor) {
+    public ParsingInputStream(MonitoredSocketInterface monitoredSocket, InputStream inputStream) {
         this.monitoredSocket = monitoredSocket;
         this.inputStream = inputStream;
-        this.socketDescriptor = socketDescriptor;
         this.responseParser = getInitialParser();
         this.streamListenerManager = new StreamListenerManager();
         this.readCount = 0;
-    }
-
-    public void setSocketDescriptor(SocketDescriptor socketDescriptor) {
-        this.socketDescriptor = socketDescriptor;
     }
 
     @Override
@@ -199,7 +190,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
                 currentHttpTransactionState.getRequestStartTime() - currentHttpTransactionState.getRequestElapse());
         currentHttpTransactionState.setStatusCode(statusCode);
         currentHttpTransactionState.setProtocol(protocol);
-        return !TextUtils.isEmpty(currentHttpTransactionState.getUrl());
+        return !TextUtils.isEmpty(currentHttpTransactionState.getHost());
     }
 
     @Override
@@ -218,7 +209,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         }
         try {
             if (readCount >= 1) {
-                NetworkTransactionUtil.setNetWorkTransactionState(monitoredSocket, httpTransactionState);
+                HttpTransactionsCache.setNetWorkTransactionState(monitoredSocket, httpTransactionState);
             }
             this.httpTransactionState.setWanType(Agent.getImpl().getNetworkWanType());
             this.httpTransactionState.setEndTime();
@@ -327,6 +318,10 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
             httpTransactionState = new HttpTransactionState(monitoredSocket.dequeueHttpTransactionState());
         }
         return httpTransactionState;
+    }
+
+    public void setFd(FileDescriptor fd) {
+        this.fd = fd;
     }
 
     public boolean isDelegateSame(InputStream inputStream) {

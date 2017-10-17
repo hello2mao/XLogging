@@ -1,55 +1,50 @@
 package com.hello2mao.xlogging.urlconnection;
 
-import android.text.TextUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
-
+/**
+ * 记录HTTP(S)事务中所有数据的类
+ */
 public class HttpTransactionState {
 
-    // Time
-    // DNS时间->TCP建连时间->SSL握手时间->请求时间->响应时间->接收时间
-    private long dnsStartTime;
-    private long dnsElapse;
-    private long tcpStartTime;
-    private long tcpElapse;
-    private long sslStartTime;
-    private long sslElapse;
-    private long requestStartTime;
-    private long requestElapse;
-    private long responseStartTime;
-    private long responseElapse;
-
-    private String url;
+    // Basic Info
+    private String host;
+    private String ipAddress;
+    private String scheme;
+    private String httpPath;
     private String requestMethod;
     private int statusCode;
     private long bytesSent;
     private long bytesReceived;
-    private String carrier;
-    private String wanType;
-    private String contentType;
-    private String protocol;
-    private UrlBuilder urlBuilder;
 
+    // Timing
+    // DNS查询->TCP建连->SSL握手->请求->响应->接收
+    // (1)DNS查询时间=dnsLookupEndTime-dnsLookupStartTime
+    // (2)TCP建连时间=tcpConnectEndTime-tcpConnectStartTime
+    // (3)SSL握手时间=sslHandshakeEndTime-sslHandshakeStartTime
+    // (4)请求时间=requestEndTime-requestStartTime
+    // (5)响应时间=responseStartTime-requestEndTime
+    // (6)首包时间=请求时间+响应时间
+    // (7)接收时间=responseEndTime-responseStartTime
+    private long dnsLookupStartTime;
+    private long dnsLookupEndTime;
+    private long tcpConnectStartTime;
+    private long tcpConnectEndTime;
+    private long sslHandshakeStartTime;
+    private long sslHandshakeEndTime;
+    private long requestStartTime;
+    private long requestEndTime;
+    private long responseStartTime;
+    private long responseEndTime;
 
+    // Optional
+    private String exception;
+    private boolean socketReuse;
 
-    private String urlParams;
-    private String netException;
-    private String age;
-    private int port;
-
-
-
-    private int socketReusability;
-    private String formattedUrlParams;
+    // Other
     private State state;
 
-    private Map<String, String> requestHeaderParam;
-    private Map<String, String> responseHeaderParam;
-
+    /**
+     * HTTP(S)事务的状态
+     */
     private enum State {
         READY,
         SENT,
@@ -57,82 +52,92 @@ public class HttpTransactionState {
     }
 
     public HttpTransactionState() {
-
-        this.urlBuilder = new UrlBuilder();
-
-
-        this.exception = null;
-        this.socketReusability = 0;
-        this.formattedUrlParams = null;
-        this.urlParams = null;
-
-        this.requestHeaderParam = new ConcurrentHashMap<>();
-        this.responseHeaderParam = new HashMap<>();
-        this.startTime = System.currentTimeMillis();
-        this.carrier = "Other";
+        // Basic Info
+        this.host = "";
+        this.ipAddress = "";
+        this.scheme = "";
+        this.httpPath = "";
+        this.requestMethod = "";
+        this.statusCode = -1;
+        this.bytesSent = -1;
+        this.bytesReceived = -1;
+        // Timing
+        this.dnsLookupStartTime = -1L;
+        this.dnsLookupEndTime = -1L;
+        this.tcpConnectStartTime = -1L;
+        this.tcpConnectEndTime = -1L;
+        this.sslHandshakeStartTime = -1L;
+        this.sslHandshakeEndTime = -1L;
+        this.requestStartTime = -1L;
+        this.requestEndTime = -1L;
+        this.responseStartTime = -1L;
+        this.responseEndTime = -1L;
+        // Optional
+        this.exception = "";
+        this.socketReuse = false;
+        // Other
         this.state = State.READY;
-        this.errorCode = NetworkErrorUtil.exceptionOk();
-        this.requestMethod = RequestMethodType.GET;
-        this.networkLib = NetworkLibType.UNKNOWN;
-        this.dnsElapse = 0;
-        this.ipList = "";
-        this.serverIp = "";
     }
 
-    public HttpTransactionState(HttpTransactionState transactionState) {
+    public HttpTransactionState(HttpTransactionState httpTransactionState) {
         this();
-        try {
-            if (null != transactionState) {
-                this.protocol = transactionState.protocol;
-                this.statusCode = transactionState.statusCode;
-                this.errorCode = transactionState.errorCode;
-                this.bytesSent = transactionState.bytesSent;
-                this.bytesReceived = transactionState.bytesReceived;
-                this.startTime = transactionState.startTime;
-                this.endTime = transactionState.endTime;
-                this.carrier = transactionState.carrier;
-                this.state = transactionState.state;
-                this.contentType = transactionState.contentType;
-                this.exception = transactionState.exception;
-                this.socketReusability = transactionState.socketReusability;
-                this.formattedUrlParams = transactionState.formattedUrlParams;
-                this.urlParams = transactionState.urlParams;
-                this.requestMethod = transactionState.requestMethod;
-                this.networkLib = transactionState.networkLib;
-                this.dnsElapse = transactionState.dnsElapse;
-                this.ipList = transactionState.ipList;
-                this.serverIp = transactionState.serverIp;
-                this.port = transactionState.port;
-                this.tcpStartTime = transactionState.tcpStartTime;
-                this.tcpConnectTime = transactionState.tcpConnectTime;
-                this.sslStartTime = transactionState.sslStartTime;
-                this.sslHandshakeTime = transactionState.sslHandshakeTime;
-                this.responseStartTime = transactionState.responseStartTime;
-                this.wanType = transactionState.wanType;
-                this.cdnVendorName = transactionState.cdnVendorName;
-                this.age = transactionState.age;
-                this.requestEndTime = transactionState.requestEndTime;
-                if (transactionState.urlBuilder != null) {
-                    this.urlBuilder.setHostAddress(transactionState.urlBuilder.getHostAddress());
-                    this.urlBuilder.setHostname(transactionState.urlBuilder.getHostname());
-                    this.urlBuilder.setHttpPath(transactionState.urlBuilder.getHttpPath());
-                    this.urlBuilder.setHostPort(transactionState.urlBuilder.getHostPort());
-                    this.urlBuilder.setScheme(transactionState.urlBuilder.getScheme());
-                }
-                this.requestHeaderParam.putAll(transactionState.requestHeaderParam);
-                this.responseHeaderParam.putAll(transactionState.responseHeaderParam);
-            }
-        } catch (Exception ex) {
-            LOG.error("construce HttpTransactionState error", ex);
-        }
+        // Basic Info
+        this.host = httpTransactionState.getHost();
+        this.ipAddress = httpTransactionState.getIpAddress();
+        this.scheme = httpTransactionState.getScheme();
+        this.httpPath = httpTransactionState.getHttpPath();
+        this.requestMethod = httpTransactionState.getRequestMethod();
+        this.statusCode = httpTransactionState.getStatusCode();
+        this.bytesSent = httpTransactionState.getBytesSent();
+        this.bytesReceived = httpTransactionState.getBytesReceived();
+        // Timing
+        this.dnsLookupStartTime = httpTransactionState.getDnsLookupStartTime();
+        this.dnsLookupEndTime = httpTransactionState.getDnsLookupEndTime();
+        this.tcpConnectStartTime = httpTransactionState.getTcpConnectStartTime();
+        this.tcpConnectEndTime = httpTransactionState.getTcpConnectEndTime();
+        this.sslHandshakeStartTime = httpTransactionState.getSslHandshakeStartTime();
+        this.sslHandshakeEndTime = -httpTransactionState.getSslHandshakeEndTime();
+        this.requestStartTime = httpTransactionState.getRequestStartTime();
+        this.requestEndTime = httpTransactionState.getRequestEndTime();
+        this.responseStartTime = httpTransactionState.getResponseStartTime();
+        this.responseEndTime = httpTransactionState.getResponseEndTime();
+        // Optional
+        this.exception = httpTransactionState.getException();
+        this.socketReuse = httpTransactionState.isSocketReuse();
+        // Other
+        this.state = httpTransactionState.getState();
     }
 
-    public String getUrl() {
-        return url;
+    public String getHost() {
+        return host;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
+    public String getHttpPath() {
+        return httpPath;
+    }
+
+    public void setHttpPath(String httpPath) {
+        this.httpPath = httpPath;
     }
 
     public String getRequestMethod() {
@@ -167,92 +172,52 @@ public class HttpTransactionState {
         this.bytesReceived = bytesReceived;
     }
 
-    public String getCarrier() {
-        return carrier;
+    public long getDnsLookupStartTime() {
+        return dnsLookupStartTime;
     }
 
-    public void setCarrier(String carrier) {
-        this.carrier = carrier;
+    public void setDnsLookupStartTime(long dnsLookupStartTime) {
+        this.dnsLookupStartTime = dnsLookupStartTime;
     }
 
-    public String getWanType() {
-        return wanType;
+    public long getDnsLookupEndTime() {
+        return dnsLookupEndTime;
     }
 
-    public void setWanType(String wanType) {
-        this.wanType = wanType;
+    public void setDnsLookupEndTime(long dnsLookupEndTime) {
+        this.dnsLookupEndTime = dnsLookupEndTime;
     }
 
-    public String getServerIP() {
-        return urlBuilder.getHostAddress();
+    public long getTcpConnectStartTime() {
+        return tcpConnectStartTime;
     }
 
-    public void setServerIP(String serverIP) {
-        urlBuilder.setHostAddress(serverIP);
+    public void setTcpConnectStartTime(long tcpConnectStartTime) {
+        this.tcpConnectStartTime = tcpConnectStartTime;
     }
 
-    public String getContentType() {
-        return contentType;
+    public long getTcpConnectEndTime() {
+        return tcpConnectEndTime;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
+    public void setTcpConnectEndTime(long tcpConnectEndTime) {
+        this.tcpConnectEndTime = tcpConnectEndTime;
     }
 
-    public String getProtocol() {
-        return protocol;
+    public long getSslHandshakeStartTime() {
+        return sslHandshakeStartTime;
     }
 
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
+    public void setSslHandshakeStartTime(long sslHandshakeStartTime) {
+        this.sslHandshakeStartTime = sslHandshakeStartTime;
     }
 
-    public long getDnsStartTime() {
-        return dnsStartTime;
+    public long getSslHandshakeEndTime() {
+        return sslHandshakeEndTime;
     }
 
-    public void setDnsStartTime(long dnsStartTime) {
-        this.dnsStartTime = dnsStartTime;
-    }
-
-    public long getDnsElapse() {
-        return dnsElapse;
-    }
-
-    public void setDnsElapse(long dnsElapse) {
-        this.dnsElapse = dnsElapse;
-    }
-
-    public long getTcpStartTime() {
-        return tcpStartTime;
-    }
-
-    public void setTcpStartTime(long tcpStartTime) {
-        this.tcpStartTime = tcpStartTime;
-    }
-
-    public long getTcpElapse() {
-        return tcpElapse;
-    }
-
-    public void setTcpElapse(long tcpElapse) {
-        this.tcpElapse = tcpElapse;
-    }
-
-    public long getSslStartTime() {
-        return sslStartTime;
-    }
-
-    public void setSslStartTime(long sslStartTime) {
-        this.sslStartTime = sslStartTime;
-    }
-
-    public long getSslElapse() {
-        return sslElapse;
-    }
-
-    public void setSslElapse(long sslElapse) {
-        this.sslElapse = sslElapse;
+    public void setSslHandshakeEndTime(long sslHandshakeEndTime) {
+        this.sslHandshakeEndTime = sslHandshakeEndTime;
     }
 
     public long getRequestStartTime() {
@@ -263,20 +228,20 @@ public class HttpTransactionState {
         this.requestStartTime = requestStartTime;
     }
 
-    public long getRequestElapse() {
-        return requestElapse;
+    public long getRequestEndTime() {
+        return requestEndTime;
     }
 
-    public void setRequestElapse(long requestElapse) {
-        this.requestElapse = requestElapse;
+    public void setRequestEndTime(long requestEndTime) {
+        this.requestEndTime = requestEndTime;
     }
 
-    public long getFirstPkgElapse() {
-        return firstPkgElapse;
+    public long getResponseStartTime() {
+        return responseStartTime;
     }
 
-    public void setFirstPkgElapse(long firstPkgElapse) {
-        this.firstPkgElapse = firstPkgElapse;
+    public void setResponseStartTime(long responseStartTime) {
+        this.responseStartTime = responseStartTime;
     }
 
     public long getResponseEndTime() {
@@ -287,374 +252,54 @@ public class HttpTransactionState {
         this.responseEndTime = responseEndTime;
     }
 
-    public String getUrlParams() {
-        return urlParams;
+    public String getException() {
+        return exception;
     }
 
-    public void setUrlParams(String urlParams) {
-        this.urlParams = urlParams;
+    public void setException(String exception) {
+        this.exception = exception;
     }
 
-    public String getNetException() {
-        return netException;
+    public boolean isSocketReuse() {
+        return socketReuse;
     }
 
-    public void setNetException(String netException) {
-        this.netException = netException;
+    public void setSocketReuse(boolean socketReuse) {
+        this.socketReuse = socketReuse;
     }
 
-    public String getAge() {
-        return age;
+    public State getState() {
+        return state;
     }
 
-    public void setAge(String age) {
-        this.age = age;
+    public void setState(State state) {
+        this.state = state;
     }
 
-    public int getPort() {
-        return port;
+    @Override
+    public String toString() {
+        return "HttpTransactionState{" +
+                "host='" + host + '\'' +
+                ", ipAddress='" + ipAddress + '\'' +
+                ", scheme='" + scheme + '\'' +
+                ", httpPath='" + httpPath + '\'' +
+                ", requestMethod='" + requestMethod + '\'' +
+                ", statusCode=" + statusCode +
+                ", bytesSent=" + bytesSent +
+                ", bytesReceived=" + bytesReceived +
+                ", dnsLookupStartTime=" + dnsLookupStartTime +
+                ", dnsLookupEndTime=" + dnsLookupEndTime +
+                ", tcpConnectStartTime=" + tcpConnectStartTime +
+                ", tcpConnectEndTime=" + tcpConnectEndTime +
+                ", sslHandshakeStartTime=" + sslHandshakeStartTime +
+                ", sslHandshakeEndTime=" + sslHandshakeEndTime +
+                ", requestStartTime=" + requestStartTime +
+                ", requestEndTime=" + requestEndTime +
+                ", responseStartTime=" + responseStartTime +
+                ", responseEndTime=" + responseEndTime +
+                ", exception='" + exception + '\'' +
+                ", socketReuse=" + socketReuse +
+                ", state=" + state +
+                '}';
     }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public void setScheme(UrlBuilder.Scheme scheme) {
-        urlBuilder.setScheme(scheme);
-    }
-
-    public void setHttpPath(String httpPath) {
-        urlBuilder.setHttpPath(httpPath);
-    }
-
-    public void setHost(String host) {
-        urlBuilder.setHostname(host);
-    }
-
-    public void setRequestItemHeaderParam(String key, String value) {
-        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
-            return;
-        }
-        requestHeaderParam.put(key, value);
-    }
-
-    //    private void setFormattedUrlParams(final String formattedUrlParams) {
-//        if (formattedUrlParams != null && formattedUrlParams.length() > 1024) {
-//            this.formattedUrlParams = formattedUrlParams.substring(0, 1024);
-//        } else {
-//            this.formattedUrlParams = formattedUrlParams;
-//        }
-//    }
-//
-//
-//
-//    public void endTransaction() {
-//        if (!this.isComplete()) {
-//            this.state = State.COMPLETE;
-//            this.endTime = System.currentTimeMillis();
-//            TraceMachine.exitMethod();
-//        }
-//    }
-//
-//
-//
-//    public String getUrlParams() {
-//        setFormattedUrlParams(this.urlBuilder.getUrlParams());
-//        return getFormattedUrlParams();
-//    }
-//
-//    private String getFormattedUrlParams() {
-//        return this.formattedUrlParams;
-//    }
-//
-//    public long getStartTime() {
-//        return this.startTime;
-//    }
-//
-//    public void overrideEndTime(long time) {
-//        this.endTime = time;
-//    }
-//
-//    public long getResponseEndTime() {
-//        return this.endTime;
-//    }
-//
-//    public int getRequestElapse() {
-//        return (int) (this.requestEndTime - this.startTime);
-//    }
-//
-//    public long getRequestEndTime() {
-//        return this.requestEndTime;
-//    }
-//
-//    public UrlBuilder getUrlBuilder() {
-//        return this.urlBuilder;
-//    }
-//
-//    public State getState() {
-//        return state;
-//    }
-//
-//    public long getTcpStartTime() {
-//        return tcpStartTime;
-//    }
-//
-//    public int getTcpConnectTime() {
-//        return this.tcpConnectTime;
-//    }
-//
-//    public long getSslStartTime() {
-//        return sslStartTime;
-//    }
-//    public int getSslHandshakeTime() {
-//        return this.sslHandshakeTime;
-//    }
-//
-//    public int getFirstPkgTime() {
-//        return (int) (this.responseStartTime - this.requestEndTime);
-//    }
-//
-//    public int getPort() {
-//        return this.urlBuilder.getHostPort();
-//    }
-//
-//    public String getUrl() {
-//        return this.urlBuilder.getUrl();
-//    }
-//
-//    public String getServerIP() {
-//        return this.urlBuilder.getHostAddress();
-////        return (this.urlBuilder.getHostAddress() == null) ? "" : this.urlBuilder.getHostAddress();
-//    }
-//
-//    public String getHttpPath() {
-//        return urlBuilder.getHttpPath();
-//    }
-//
-//    public boolean isSent() {
-//        return this.state.ordinal() >= State.SENT.ordinal();
-//    }
-//
-//    public boolean isComplete() {
-//        return this.state.ordinal() >= State.COMPLETE.ordinal();
-//    }
-//
-//    public int getStatusCode() {
-//        return this.statusCode;
-//    }
-//
-//    public String getProtocol() {
-//        return this.protocol;
-//    }
-//
-//    public boolean isError() {
-//        return this.statusCode >= 400 || this.statusCode == -1;
-//    }
-//
-//    public int getErrorCode() {
-//        return this.errorCode;
-//    }
-//
-//    public long getBytesSent() {
-//        return this.bytesSent;
-//    }
-//
-//    public long getBytesReceived() {
-//        return this.bytesReceived;
-//    }
-//
-//    public NetworkLibType getNetworkLib() {
-//        return this.networkLib;
-//    }
-//
-//    public String getContentType() {
-//        return this.contentType;
-//    }
-//
-//    public String getAge() {
-//        return age;
-//    }
-//
-//    public String getException() {
-//        return this.exception;
-//    }
-//
-//    public int getDnsElapse() {
-//        return dnsElapse;
-//    }
-//
-//    public int getSocketReusability() {
-//        return socketReusability;
-//    }
-//
-//    public void setWanType(final String wanType) {
-//        this.wanType = wanType;
-//    }
-//
-//    public void setRequestItemHeaderParam(final String key, final String value) {
-//        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
-//            return;
-//        }
-//        this.requestHeaderParam.put(key, value);
-//    }
-//
-//    public void setResponseHeaderParam(final String key, final String value) {
-//        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
-//            return;
-//        }
-//        this.responseHeaderParam.put(key, value);
-//    }
-//
-//    public void setStartTime(final long startTime) {
-//        this.startTime = startTime;
-//    }
-//
-//    public void setEndTime() {
-//        this.endTime = System.currentTimeMillis();
-//    }
-//
-//    public void setRequestEndTime(long requestEndTime) {
-//        this.requestEndTime = requestEndTime;
-//    }
-//
-//    public void setUrlBuilder(UrlBuilder urlBuilder) {
-//        this.urlBuilder = urlBuilder;
-//    }
-//
-//    public void setResponseStartTime(final long responseStartTime) {
-//        this.responseStartTime = responseStartTime;
-//    }
-//
-//    public void setState(int st) {
-//        if (st == State.READY.ordinal()) {
-//            this.state = State.READY;
-//        } else if (st == State.SENT.ordinal()) {
-//            this.state = State.SENT;
-//        } else if (st == State.COMPLETE.ordinal()) {
-//            this.state = State.COMPLETE;
-//        }
-//    }
-//
-//    /**
-//     * 设置运营商
-//     * @param carrier String
-//     */
-//    public void setCarrier(final String carrier) {
-//        if (!this.isSent()) {
-//            TraceMachine.setCurrentTraceParam("carrier", this.carrier = carrier);
-//        } else {
-//            LOG.warning("setCarrier(...) called on TransactionState in " + this.state.toString() + " state");
-//        }
-//    }
-//
-//    public void setTcpStartTime(long tcpStartTime) {
-//        this.tcpStartTime = tcpStartTime;
-//    }
-//
-//    public void setTcpConnectTime(int tcpConnectTime) {
-//        this.tcpConnectTime = tcpConnectTime;
-//    }
-//
-//    public void setSslStartTime(long sslStartTime) {
-//        this.sslStartTime = sslStartTime;
-//    }
-//
-//    public void setSslHandshakeTime(final int sslHandshakeTime) {
-//        this.sslHandshakeTime = sslHandshakeTime;
-//    }
-//
-//    public void setAddress(final String address) {
-//        this.urlBuilder.setHostAddress(address);
-//    }
-//
-//    public void setPort(final int port) {
-//        this.urlBuilder.setHostPort(port);
-//    }
-//
-//    public void setHttpPath(final String httpPath) {
-//        this.urlBuilder.setHttpPath(httpPath);
-//    }
-//
-//    public void setScheme(final UrlBuilder.Scheme scheme) {
-//        this.urlBuilder.setScheme(scheme);
-//    }
-//
-//    public void setHost(final String host) {
-//        this.urlBuilder.setHostname(host);
-//    }
-//
-//    public void setStatusCode(final int statusCode) {
-//        if (!this.isComplete()) {
-//            this.statusCode = statusCode;
-//
-//        } else {
-//            if (this.statusCode == 0 && statusCode != 0) {
-//                this.statusCode = statusCode;
-//
-//            }
-//            LOG.warning("setStatusCode(...) called on TransactionState in state:" + this.state.toString());
-//        }
-//    }
-//
-//    /**
-//     *
-//     * 设置HTTP协议类型
-//     * @param protocol String
-//     */
-//    public void setProtocol(final String protocol) {
-//        this.protocol = protocol;
-////        TraceMachine.setCurrentTraceParam("protocol", protocol);
-//    }
-//
-//    public void setErrorCode(final int errorCode, final String exception) {
-//        if (!this.isComplete()) {
-//            this.errorCode = errorCode;
-//            this.exception = exception;
-//            LOG.debug("errorCode:" + this.errorCode + ", errorInfo:" + this.exception);
-//
-//        }
-//    }
-//
-//    public void setBytesSent(final long bytesSent) {
-//        if (!this.isComplete()) {
-//            this.bytesSent = bytesSent;
-//            this.state = State.SENT;
-//        }
-//        else {
-//            HttpTransactionState.LOG.warning("setBytesSent(...) called on TransactionState in " + this.state.toString() + " state");
-//        }
-//    }
-//
-//    public void setBytesReceived(final long bytesReceived) {
-//        if (!this.isComplete()) {
-//            this.bytesReceived = bytesReceived;
-//        }
-//        else {
-//            HttpTransactionState.LOG.warning("setBytesReceived(...) called on TransactionState in " + this.state.toString() + " state");
-//        }
-//    }
-//
-//    public void setNetworkLib(final NetworkLibType networkLib) {
-//        this.networkLib = networkLib;
-//    }
-//
-//    public void setContentType(String contentType) {
-//        this.contentType = contentType;
-//    }
-//
-//    public void setAge(String age) {
-//        this.age = age;
-//    }
-//
-//    public void setSocketReusability(int repeatNum) {
-//        this.socketReusability = repeatNum;
-//    }
-//
-//    public void setException(final String exception) {
-//        this.exception = exception;
-//    }
-//
-//    public void setDnsElapse(int dnsElapse) {
-//        this.dnsElapse = dnsElapse;
-//    }
 }

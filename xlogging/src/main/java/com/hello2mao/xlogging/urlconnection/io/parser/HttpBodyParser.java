@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 import junit.framework.Assert;
 

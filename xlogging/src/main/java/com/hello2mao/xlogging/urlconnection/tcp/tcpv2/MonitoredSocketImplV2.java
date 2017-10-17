@@ -1,13 +1,9 @@
 package com.hello2mao.xlogging.urlconnection.tcp.tcpv2;
 
 
-import android.text.TextUtils;
-
 import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+import com.hello2mao.xlogging.urlconnection.HttpTransactionsCache;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
-import com.hello2mao.xlogging.urlconnection.TcpDataCache;
-import com.hello2mao.xlogging.urlconnection.SocketDescriptor;
-import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.harvest.Harvest;
 import com.hello2mao.xlogging.urlconnection.io.ParsingInputStream;
 import com.hello2mao.xlogging.urlconnection.io.ParsingOutputStream;
@@ -66,12 +62,10 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private SocketImpl delegate;
     private ParsingInputStream parsingInputStream;
     private ParsingOutputStream parsingOutputStream;
-    private SocketDescriptor socketDescriptor;
     private final Queue<HttpTransactionState> queue;
-    private String serverIP;
-    private long tcpStartTime;
-    private long tcpElapse;
-
+    private String ipAddress;
+    private long tcpConnectStartTime;
+    private long tcpConnectEndTime;
 
     static {
         try {
@@ -112,7 +106,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         if (socketImpl == null) {
             throw new NullPointerException("delegate was null");
         }
-        this.serverIP = "";
+        this.ipAddress = "";
         this.queue = new LinkedList<>();
         this.delegate = socketImpl;
         syncFromDelegate();
@@ -200,7 +194,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             log.verbose("MonitoredSocketImplV2: unsafeInstrumentInputStream DelegateSame");
             return parsingInputStream;
         }
-        this.parsingInputStream = new ParsingInputStream(this, inputStream, socketDescriptor);
+        this.parsingInputStream = new ParsingInputStream(this, inputStream);
         parsingInputStream.addStreamListener(new StreamListener() {
             @Override
             public void streamComplete(StreamEvent streamEvent) {
@@ -244,15 +238,9 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     @Override
     public HttpTransactionState createHttpTransactionState() {
         HttpTransactionState httpTransactionState = new HttpTransactionState();
-        httpTransactionState.setServerIP(serverIP);
-        httpTransactionState.setPort(port);
-        if (port == 443) {
-            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
-        } else {
-            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
-        }
-        httpTransactionState.setTcpStartTime(tcpStartTime);
-        httpTransactionState.setTcpElapse(tcpElapse);
+        httpTransactionState.setIpAddress(ipAddress);
+        httpTransactionState.setTcpConnectStartTime(tcpConnectStartTime);
+        httpTransactionState.setTcpConnectEndTime(tcpConnectEndTime);
         return httpTransactionState;
     }
 
@@ -302,21 +290,18 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     @Override
     protected void connect(SocketAddress socketAddress, int timeout) throws IOException {
         try {
-            String host = "";
             if (socketAddress instanceof InetSocketAddress) {
                 // inetSocketAddress="ip.taobao.com/42.120.226.92:80" URLConnection/OkHttp3
                 // inetSocketAddress="/42.120.226.92:80" HttpClient
                 InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
-                host = URLUtil.getHost(inetSocketAddress);
-                this.serverIP = URLUtil.getIpAddress(inetSocketAddress);
+                this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
             }
-            this.tcpStartTime = System.currentTimeMillis();
+            this.tcpConnectStartTime = System.currentTimeMillis();
             invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
-            this.tcpElapse = System.currentTimeMillis() - tcpStartTime;
-            if (port == 443 && !TextUtils.isEmpty(host)) {
-                this.socketDescriptor = new SocketDescriptor(fd, getInetAddress(), port, localport);
-                parsingInputStream.setSocketDescriptor(socketDescriptor);
-                TcpDataCache.addTcpData(socketDescriptor, tcpStartTime, tcpElapse);
+            this.tcpConnectEndTime = System.currentTimeMillis();
+            if (port == 443 ) {
+                HttpTransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
+                parsingInputStream.setFd(fd);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -363,7 +348,9 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     @Override
     protected void close() throws IOException {
         invokeThrowsIOException(CLOSE_IDX, new Object[0]);
-        TcpDataCache.removeTcpData(socketDescriptor);
+        if (HttpTransactionsCache.getTcpData(fd) != null) {
+            HttpTransactionsCache.removeTcpData(fd);
+        }
         if (parsingInputStream != null) {
             parsingInputStream.notifySocketClosing();
         }
@@ -419,7 +406,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             error(e);
             throw e;
         }
-
     }
 
     @Override

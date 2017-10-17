@@ -1,7 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 public class NewlineLineParser extends AbstractParser {
     private AbstractParser nextParserAfterNewline;
@@ -17,14 +17,14 @@ public class NewlineLineParser extends AbstractParser {
     {
         if (data == -1)
         {
-            getHandler().setNextParserState(NoopLineParser.DEFAULT);
+            getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
         this.charactersInMessage += 1;
         if ((char) data == '\n')
         {
             this.nextParserAfterNewline.setCharactersInMessage(getCharactersInMessage());
-            getHandler().setNextParserState(this.nextParserAfterNewline);
+            getHandler().setNextParser(this.nextParserAfterNewline);
             return true;
         }
         return false;

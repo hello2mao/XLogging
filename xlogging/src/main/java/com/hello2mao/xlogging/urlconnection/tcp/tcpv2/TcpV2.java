@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection.tcp.tcpv2;
 
-
 import com.hello2mao.xlogging.util.ReflectionUtil;
 import com.hello2mao.xlogging.xlog.XLog;
 import com.hello2mao.xlogging.xlog.XLogManager;

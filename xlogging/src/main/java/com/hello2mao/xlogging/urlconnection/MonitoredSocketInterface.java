@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.urlconnection;
 
-
 public interface MonitoredSocketInterface {
 
     HttpTransactionState createHttpTransactionState();

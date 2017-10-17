@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 public class HttpChunkSizeParser extends AbstractParser {
 
@@ -61,9 +61,8 @@ public class HttpChunkSizeParser extends AbstractParser {
 
     @Override
     public void close() {
-        log.debug("HttpChunkSizeParser close");
         getHandler().finishedMessage(getCharactersInMessage(), currentTimeStamp);
-        getHandler().setNextParserState(NoopLineParser.DEFAULT);
+        getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
 
     public int getParsedChunkSize() {

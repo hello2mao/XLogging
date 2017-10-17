@@ -1,7 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 /**
  * Http Header parser
@@ -69,13 +69,7 @@ public abstract class HttpHeaderParser extends AbstractParser {
             } else if (!hasParsedHost && key.equalsIgnoreCase("host")) {
                 hasParsedHost = true;
                 handler.hostNameFound(value);
-            } else if (!isContentTypeSet && key.equalsIgnoreCase("content-type")) {
-                isContentTypeSet= true;
-                handler.contentTypeFound(value);
-            } else if (key.equalsIgnoreCase("Age")) {
-                handler.ageFound(value);
             }
-            handler.setHeader(key, value);
         } catch (NumberFormatException e) {
             parsedSuccess = false;
             e.printStackTrace();

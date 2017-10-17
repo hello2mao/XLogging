@@ -1,11 +1,7 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
-
-/**
- * request对应的输出流使用的第一个解析器，解析出本次请求的协议（HTTP or HTTPS or else）以及请求资源路径httpPath
- */
 public class HttpRequestLineParser extends AbstractParser {
 
     private static final int MAX_LINE_LENGTH = 2048;

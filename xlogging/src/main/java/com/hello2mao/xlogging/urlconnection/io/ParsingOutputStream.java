@@ -1,11 +1,9 @@
 package com.hello2mao.xlogging.urlconnection.io;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
-import com.hello2mao.xlogging.urlconnection.UrlBuilder;
 import com.hello2mao.xlogging.urlconnection.io.parser.AbstractParser;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpParserHandler;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpRequestLineParser;
@@ -99,6 +97,18 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
         }
     }
 
+    private void addBytesToParser(byte[] buffer, int offset, int byteCount) {
+        try {
+            requestParser.add(buffer, offset, byteCount);
+        } catch (ThreadDeath e) {
+            throw e;
+        } catch (Throwable e) {
+            // 不抛异常，而是把解析器设为Noop，从而减少由于XLogging自身的解析异常对APP的影响
+            this.requestParser = NoopLineParser.DEFAULT;
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public AbstractParser getInitialParser() {
         return new HttpRequestLineParser(this);
@@ -114,29 +124,19 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
         this.requestParser = parser;
     }
 
-    private void addBytesToParser(byte[] buffer, int offset, int byteCount) {
-        try {
-            requestParser.add(buffer, offset, byteCount);
-        } catch (ThreadDeath e) {
-            throw e;
-        } catch (Throwable e) {
-            // 不抛异常，而是把解析器设为Noop，从而减少由于XLogging自身的解析异常对APP的影响
-            this.requestParser = NoopLineParser.DEFAULT;
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void requestLineFound(String requestMethod, String httpPath) {
         HttpTransactionState httpTransactionState = getHttpTransactionState();
         httpTransactionState.setRequestMethod(requestMethod);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {
-            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
+            httpTransactionState.setScheme("https");
+        } else {
+            // FIXME:
+            httpTransactionState.setScheme("http");
         }
         httpTransactionState.setHttpPath(httpPath);
         monitoredSocket.enqueueHttpTransactionState(httpTransactionState);
     }
-
 
     @Override
     public void hostNameFound(String host) {
@@ -144,43 +144,8 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     @Override
-    public void contentTypeFound(String contentType) {
+    public void statusLineFound(int statusCode) {
         // ignore
-    }
-
-    @Override
-    public void ageFound(String age) {
-        // ignore
-    }
-
-    @Override
-    public void setHeader(String key, String value) {
-        if (!TextUtils.isEmpty(value)) {
-            getHttpTransactionState().setRequestItemHeaderParam(key, value);
-        }
-    }
-
-    @Override
-    public void finishedMessage(int charactersInMessage) {
-        HttpTransactionState httpTransactionState = getHttpTransactionState();
-        httpTransactionState.setBytesSent(charactersInMessage);
-        httpTransactionState.setRequestElapse(System.currentTimeMillis() - httpTransactionState.getRequestStartTime());
-    }
-
-    @Override
-    public void finishedMessage(int charactersInMessage, long currentTimeStamp) {
-        finishedMessage(charactersInMessage);
-    }
-
-    @Override
-    public boolean statusLineFound(int statusCode, String protocol) {
-        // ignore
-        return true;
-    }
-
-    @Override
-    public String getParsedRequestMethod() {
-        return getHttpTransactionState().getRequestMethod();
     }
 
     @Override
@@ -189,11 +154,28 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     @Override
+    public void finishedMessage(int charactersInMessage) {
+        HttpTransactionState httpTransactionState = getHttpTransactionState();
+        httpTransactionState.setBytesSent(charactersInMessage);
+        httpTransactionState.setRequestEndTime(System.currentTimeMillis());
+    }
+
+    @Override
+    public void finishedMessage(int charactersInMessage, long currentTimeStamp) {
+        finishedMessage(charactersInMessage);
+    }
+
+    @Override
     public HttpTransactionState getHttpTransactionState() {
         if (httpTransactionState == null) {
             this.httpTransactionState = monitoredSocket.createHttpTransactionState();
         }
         return httpTransactionState;
+    }
+
+    @Override
+    public String getParsedRequestMethod() {
+        return getHttpTransactionState().getRequestMethod();
     }
 
     public boolean isDelegateSame(OutputStream outputStream) {

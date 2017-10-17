@@ -1,16 +1,19 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
-import com.hello2mao.xlogging.urlconnection.CharBuffer;
+import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import junit.framework.Assert;
 
 public abstract class AbstractParser {
 
+    protected static final XLog log = XLogManager.getAgentLog();
+    protected CharBuffer buffer;
+    protected int charactersInMessage;
+    protected long currentTimeStamp;
     private HttpParserHandler handler;
     private int maxBufferSize;
-    int charactersInMessage;
-    long currentTimeStamp;
-    protected CharBuffer buffer;
 
     public AbstractParser(AbstractParser parser) {
         initialize(parser.handler, parser.charactersInMessage);
@@ -36,19 +39,19 @@ public abstract class AbstractParser {
      * @return boolean
      */
     public boolean add(int oneByte) {
-        if (oneByte == -1) {
-            // 流结束
+        if (oneByte == -1) { // -1表示流结束了
             reachedEOF();
             return true;
         }
-        charactersInMessage += 1;
+        this.charactersInMessage += 1;
         char character = (char) oneByte;
         AbstractParser parser;
-        if (character == '\n') { // 遇到换行符，则进行解析，会调用相应parser
+        if (character == '\n') { // 遇到换行符就进行解析，会调用相应parser，即一行一解析
             if (parse(buffer)) { // 对缓冲的buffer进行解析
                 // 解析成功，则获取下个parser
                 parser = nextParserAfterSuccessfulParse();
             } else {
+                // 解析失败，则设为Noop
                 parser = NoopLineParser.DEFAULT;
             }
         } else if (buffer.length < maxBufferSize) { // 不是换行符，且buffer大小在max内，则缓存在buffer
@@ -67,7 +70,7 @@ public abstract class AbstractParser {
         }
         Assert.assertNotNull(parser);
         if (parser != this) {
-            handler.setNextParserState(parser);
+            handler.setNextParser(parser);
         }
         return parser != this;
     }
@@ -106,8 +109,7 @@ public abstract class AbstractParser {
         return i;
     }
 
-    public CharBuffer getBuffer()
-    {
+    public CharBuffer getBuffer() {
         return buffer;
     }
 
@@ -130,7 +132,7 @@ public abstract class AbstractParser {
     public abstract boolean parse(CharBuffer charBuffer);
 
     private void reachedEOF() {
-        getHandler().setNextParserState(NoopLineParser.DEFAULT);
+        getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
 
     void setCharactersInMessage(int charactersInMessage) {
@@ -143,7 +145,7 @@ public abstract class AbstractParser {
 
     public void close() {
         if (handler != null) {
-            handler.setNextParserState(NoopLineParser.DEFAULT);
+            handler.setNextParser(NoopLineParser.DEFAULT);
         }
     }
 }

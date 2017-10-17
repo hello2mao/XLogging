@@ -47,7 +47,7 @@ public class HttpTransactionData {
 
     public HttpTransactionData(HttpTransactionState httpTransactionState) {
         this();
-        this.url = httpTransactionState.getUrl();
+        this.url = httpTransactionState.getHost();
         this.ipAddress =
     }
 }
