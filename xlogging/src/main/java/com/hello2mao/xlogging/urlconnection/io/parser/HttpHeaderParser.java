@@ -27,10 +27,12 @@ public abstract class HttpHeaderParser extends AbstractParser {
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
         if (parsedEndOfHeader) {
+            // 解析玩HTTP头，则nextParser
             return nextParserAfterEndOfHeader();
         } else {
             buffer.length = 0;
         }
+        // 没有解析玩HTTP头，则继续解析
         return this;
     }
 

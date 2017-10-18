@@ -40,6 +40,7 @@ public abstract class AbstractParser {
      */
     public boolean add(int oneByte) {
         if (oneByte == -1) { // -1表示流结束了
+            log.warning("AbstractParser: add oneByte reachedEOF");
             reachedEOF();
             return true;
         }
