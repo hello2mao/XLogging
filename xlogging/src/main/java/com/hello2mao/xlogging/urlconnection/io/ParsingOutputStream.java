@@ -2,7 +2,7 @@ package com.hello2mao.xlogging.urlconnection.io;
 
 import android.support.annotation.NonNull;
 
-import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.io.parser.AbstractParser;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpParserHandler;
@@ -25,7 +25,7 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     private OutputStream outputStream;
     private MonitoredSocketInterface monitoredSocket;
     private AbstractParser requestParser;
-    private HttpTransactionState httpTransactionState;
+    private TransactionState transactionState;
     private StreamListenerManager streamListenerManager;
 
     public ParsingOutputStream(MonitoredSocketInterface monitoredSocket,
@@ -126,21 +126,21 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
 
     @Override
     public void requestLineFound(String requestMethod, String httpPath) {
-        HttpTransactionState httpTransactionState = getHttpTransactionState();
-        httpTransactionState.setRequestMethod(requestMethod);
+        TransactionState transactionState = getTransactionState();
+        transactionState.setRequestMethod(requestMethod);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {
-            httpTransactionState.setScheme("https");
+            transactionState.setScheme("https");
         } else {
             // FIXME:
-            httpTransactionState.setScheme("http");
+            transactionState.setScheme("http");
         }
-        httpTransactionState.setHttpPath(httpPath);
-        monitoredSocket.enqueueHttpTransactionState(httpTransactionState);
+        transactionState.setHttpPath(httpPath);
+        monitoredSocket.enqueueHttpTransactionState(transactionState);
     }
 
     @Override
     public void hostNameFound(String host) {
-        getHttpTransactionState().setHost(host);
+        getTransactionState().setHost(host);
     }
 
     @Override
@@ -155,9 +155,9 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
 
     @Override
     public void finishedMessage(int charactersInMessage) {
-        HttpTransactionState httpTransactionState = getHttpTransactionState();
-        httpTransactionState.setBytesSent(charactersInMessage);
-        httpTransactionState.setRequestEndTime(System.currentTimeMillis());
+        TransactionState transactionState = getTransactionState();
+        transactionState.setBytesSent(charactersInMessage);
+        transactionState.setRequestEndTime(System.currentTimeMillis());
     }
 
     @Override
@@ -165,17 +165,16 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
         finishedMessage(charactersInMessage);
     }
 
-    @Override
-    public HttpTransactionState getHttpTransactionState() {
-        if (httpTransactionState == null) {
-            this.httpTransactionState = monitoredSocket.createHttpTransactionState();
+    public TransactionState getTransactionState() {
+        if (transactionState == null) {
+            this.transactionState = monitoredSocket.createHttpTransactionState();
         }
-        return httpTransactionState;
+        return transactionState;
     }
 
     @Override
     public String getParsedRequestMethod() {
-        return getHttpTransactionState().getRequestMethod();
+        return getTransactionState().getRequestMethod();
     }
 
     public boolean isDelegateSame(OutputStream outputStream) {
@@ -183,11 +182,11 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     private void notifyStreamComplete() {
-        streamListenerManager.notifyStreamComplete(new StreamEvent(this, getHttpTransactionState()));
+        streamListenerManager.notifyStreamComplete(new StreamEvent(this, getTransactionState()));
     }
 
     private void notifyStreamError(Exception e) {
-        streamListenerManager.notifyStreamError(new StreamEvent(this, getHttpTransactionState(), e));
+        streamListenerManager.notifyStreamError(new StreamEvent(this, getTransactionState(), e));
     }
 
     @Override

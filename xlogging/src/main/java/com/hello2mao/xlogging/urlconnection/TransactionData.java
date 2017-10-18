@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.urlconnection;
 
-public class HttpTransactionData {
+public class TransactionData {
 
     // Basic Info
     private String url;
@@ -30,7 +30,7 @@ public class HttpTransactionData {
     private boolean socketReuse;
     private int port;
 
-    public HttpTransactionData() {
+    public TransactionData() {
         this.dnsStartTime = -1;
         this.dnsElapse = -1;
         this.tcpStartTime = -1;
@@ -45,9 +45,9 @@ public class HttpTransactionData {
         this.socketReuse = false;
     }
 
-    public HttpTransactionData(HttpTransactionState httpTransactionState) {
+    public TransactionData(TransactionState transactionState) {
         this();
-        this.url = httpTransactionState.getHost();
+        this.url = transactionState.getHost();
         this.ipAddress =
     }
 }

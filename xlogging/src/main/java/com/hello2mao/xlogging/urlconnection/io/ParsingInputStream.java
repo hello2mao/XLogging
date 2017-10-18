@@ -4,8 +4,8 @@ package com.hello2mao.xlogging.urlconnection.io;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.hello2mao.xlogging.urlconnection.HttpTransactionsCache;
-import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+import com.hello2mao.xlogging.urlconnection.TransactionsCache;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.NetworkErrorUtil;
 import com.hello2mao.xlogging.urlconnection.io.parser.AbstractParser;
@@ -33,7 +33,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     private MonitoredSocketInterface monitoredSocket;
     private int readCount;
     private AbstractParser responseParser;
-    private HttpTransactionState httpTransactionState;
+    private TransactionState transactionState;
     private FileDescriptor fd;
     private StreamListenerManager streamListenerManager;
 
@@ -147,6 +147,17 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         }
     }
 
+    private void addBufferToParser(byte[] buffer, int offset, int read) {
+        try {
+            responseParser.add(buffer, offset, read);
+        } catch (ThreadDeath e) {
+            throw e;
+        } catch (Throwable t) {
+            responseParser = NoopLineParser.DEFAULT;
+            t.printStackTrace();
+        }
+    }
+
     @Override
     public AbstractParser getInitialParser() {
         return new HttpStatusLineParser(this);
@@ -167,30 +178,30 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         // ignore
     }
 
-    private void addBufferToParser(byte[] buffer, int offset, int read) {
-        try {
-            responseParser.add(buffer, offset, read);
-        } catch (ThreadDeath e) {
-            throw e;
-        } catch (Throwable t) {
-            responseParser = NoopLineParser.DEFAULT;
-            t.printStackTrace();
-        }
+    @Override
+    public void hostNameFound(String host) {
+        // ignore
     }
 
     @Override
-    public boolean statusLineFound(int statusCode, String protocol) {
-        HttpTransactionState currentHttpTransactionState = getHttpTransactionState();
+    public void statusLineFound(int statusCode) {
+        TransactionState currentTransactionState = getTransactionState();
         if (readCount >= 1) { // tcp连接复用
-            HttpTransactionState networkTransactionState = new HttpTransactionState();
-            this.httpTransactionState = networkTransactionState;
-            currentHttpTransactionState = networkTransactionState;
+            TransactionState newTransactionState = new TransactionState();
+            this.transactionState = newTransactionState;
+            currentTransactionState = newTransactionState;
         }
-        currentHttpTransactionState.setFirstPkgElapse(System.currentTimeMillis() -
-                currentHttpTransactionState.getRequestStartTime() - currentHttpTransactionState.getRequestElapse());
-        currentHttpTransactionState.setStatusCode(statusCode);
-        currentHttpTransactionState.setProtocol(protocol);
-        return !TextUtils.isEmpty(currentHttpTransactionState.getHost());
+        currentTransactionState.setFirstPkgElapse(System.currentTimeMillis() -
+                currentTransactionState.getRequestStartTime() - currentTransactionState.getRequestElapse());
+        currentTransactionState.setStatusCode(statusCode);
+        currentTransactionState.setProtocol(protocol);
+        return !TextUtils.isEmpty(currentTransactionState.getHost());
+    }
+
+
+    @Override
+    public void appendBody(String body) {
+        // ignore
     }
 
     @Override
@@ -200,33 +211,33 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
 
     @Override
     public void finishedMessage(int bytesReceived, long currentTime) {
-        if (httpTransactionState == null) {
+        if (transactionState == null) {
             return;
         }
-        httpTransactionState.setBytesReceived(bytesReceived);
+        transactionState.setBytesReceived(bytesReceived);
         if (currentTime > 0L) {
-            httpTransactionState.overrideEndTime(currentTime);
+            transactionState.overrideEndTime(currentTime);
         }
         try {
             if (readCount >= 1) {
-                HttpTransactionsCache.setNetWorkTransactionState(monitoredSocket, httpTransactionState);
+                TransactionsCache.setNetWorkTransactionState(monitoredSocket, transactionState);
             }
-            this.httpTransactionState.setWanType(Agent.getImpl().getNetworkWanType());
-            this.httpTransactionState.setEndTime();
-            this.httpTransactionState.setSocketReusability(this.readCount++);
-            this.httpTransactionState.endTransaction();
+            this.transactionState.setWanType(Agent.getImpl().getNetworkWanType());
+            this.transactionState.setEndTime();
+            this.transactionState.setSocketReusability(this.readCount++);
+            this.transactionState.endTransaction();
             int connectTime = 0;
-            if (TextUtils.isEmpty(this.httpTransactionState.getIpAddress())
-                    && this.httpTransactionState.getUrlBuilder() != null) {
+            if (TextUtils.isEmpty(this.transactionState.getIpAddress())
+                    && this.transactionState.getUrlBuilder() != null) {
                 final String ipAddress = URLUtil.getIpAddress(
-                                URLUtil.getHost(this.httpTransactionState.getUrlBuilder().getHostname()));
+                                URLUtil.getHost(this.transactionState.getUrlBuilder().getHostname()));
                 if (!TextUtils.isEmpty(ipAddress)) {
-                    this.httpTransactionState.setAddress(ipAddress);
+                    this.transactionState.setAddress(ipAddress);
                 }
             }
             LOG.debug("inputV2 finished readCount is:" + readCount);
             if (this.readCount == 1) {
-                if (this.httpTransactionState.getPort() == 443) {
+                if (this.transactionState.getPort() == 443) {
                     if (socketDescriptor == null) {
                         LOG.warning("no fd found in inputStreamV2!");
                         return;
@@ -238,13 +249,13 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
                     }
                     connectTime = connectTimeObj;
                 } else {
-                    connectTime = this.httpTransactionState.getTcpHandShakeTime();
+                    connectTime = this.transactionState.getTcpHandShakeTime();
                 }
             }
-            httpTransactionState.setTcpHandShakeTime(connectTime);
+            transactionState.setTcpHandShakeTime(connectTime);
             // FIXME: URL过滤逻辑，未实现
-            int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.httpTransactionState.getSslHandShakeTime());
-            httpTransactionState.setSslHandShakeTime(sslHandShakeTime);
+            int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.transactionState.getSslHandShakeTime());
+            transactionState.setSslHandShakeTime(sslHandShakeTime);
             LOG.debug("network data V1 finished");
             notifyStreamComplete();
         } catch (Exception e) {
@@ -253,56 +264,9 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         }
     }
 
-    @Override
-    public void appendBody(String body) {
-    }
-
-    @Override
-    public void contentTypeFound(String substring) {
-        NetworkTransactionState currentHttpTransactionState = getNetworkTransactionStateNN();
-        if (currentHttpTransactionState != null) {
-            final int index = substring.indexOf(";");
-            if (index > 0 && index < substring.length()) {
-                substring = substring.substring(0, index);
-            }
-            currentHttpTransactionState.setContentType(substring);
-        }
-    }
-
-    @Override
-    public void ageFound(String age) {
-        final NetworkTransactionState networkTransactionState = this.getNetworkTransactionStateNN();
-        if (networkTransactionState != null) {
-            networkTransactionState.setAge(age);
-        }
-    }
-
-    @Override
-    public void networkLibFound(String networkLibFound) {
-    }
-
-    @Override
-    public void setHeader(String key, String value) {
-        NetworkTransactionState currentHttpTransactionState = getNetworkTransactionStateNN();
-        if (currentHttpTransactionState != null && !TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
-            currentHttpTransactionState.setResponseHeaderParam(key, value);
-        }
-    }
 
 
-    @Override
-    public String getParsedRequestMethod() {
-        NetworkTransactionState currentHttpTransactionState = getNetworkTransactionStateNN();
-        String requestMethod = null;
-        if (currentHttpTransactionState != null) {
-            requestMethod = currentHttpTransactionState.getRequestMethod();
-        }
-        return requestMethod;
-    }
 
-    @Override
-    public void hostNameFound(String paramString) {
-    }
 
     public InputStream getDelegate()
     {
@@ -311,13 +275,22 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
 
 
 
-    @Override
-    public HttpTransactionState getHttpTransactionState() {
-        if (httpTransactionState == null) {
+    public TransactionState getTransactionState() {
+        if (transactionState == null) {
             // FIXME:为啥需要“拷贝”一个？
-            httpTransactionState = new HttpTransactionState(monitoredSocket.dequeueHttpTransactionState());
+            transactionState = new TransactionState(monitoredSocket.dequeueHttpTransactionState());
         }
-        return httpTransactionState;
+        return transactionState;
+    }
+
+    @Override
+    public String getParsedRequestMethod() {
+        TransactionState currentTransactionState = getTransactionState();
+        String requestMethod = null;
+        if (currentTransactionState != null) {
+            requestMethod = currentTransactionState.getRequestMethod();
+        }
+        return requestMethod;
     }
 
     public void setFd(FileDescriptor fd) {
@@ -329,19 +302,19 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     }
 
     public void notifySocketClosing() {
-        if (this.httpTransactionState != null &&
-                this.httpTransactionState.getErrorCode() == NetworkErrorUtil.exceptionOk() &&
+        if (this.transactionState != null &&
+                this.transactionState.getErrorCode() == NetworkErrorUtil.exceptionOk() &&
                 this.responseParser != null) {
             this.responseParser.close();
         }
     }
 
     private void notifyStreamComplete() {
-        streamListenerManager.notifyStreamComplete(new StreamEvent(this, getHttpTransactionState()));
+        streamListenerManager.notifyStreamComplete(new StreamEvent(this, getTransactionState()));
     }
 
     private void notifyStreamError(Exception e) {
-        streamListenerManager.notifyStreamError(new StreamEvent(this, getHttpTransactionState(), e));
+        streamListenerManager.notifyStreamError(new StreamEvent(this, getTransactionState(), e));
     }
 
     @Override

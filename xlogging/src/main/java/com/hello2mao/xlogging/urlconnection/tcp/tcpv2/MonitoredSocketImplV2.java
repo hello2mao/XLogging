@@ -1,9 +1,10 @@
 package com.hello2mao.xlogging.urlconnection.tcp.tcpv2;
 
 
-import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
-import com.hello2mao.xlogging.urlconnection.HttpTransactionsCache;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
+import com.hello2mao.xlogging.urlconnection.TcpData;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
+import com.hello2mao.xlogging.urlconnection.TransactionsCache;
 import com.hello2mao.xlogging.urlconnection.harvest.Harvest;
 import com.hello2mao.xlogging.urlconnection.io.ParsingInputStream;
 import com.hello2mao.xlogging.urlconnection.io.ParsingOutputStream;
@@ -62,7 +63,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private SocketImpl delegate;
     private ParsingInputStream parsingInputStream;
     private ParsingOutputStream parsingOutputStream;
-    private final Queue<HttpTransactionState> queue;
+    private final Queue<TransactionState> queue;
     private String ipAddress;
     private long tcpConnectStartTime;
     private long tcpConnectEndTime;
@@ -198,12 +199,12 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         parsingInputStream.addStreamListener(new StreamListener() {
             @Override
             public void streamComplete(StreamEvent streamEvent) {
-                Harvest.addHttpTransactionData(streamEvent.getHttpTransactionState());
+                Harvest.addHttpTransactionData(streamEvent.getTransactionState());
             }
 
             @Override
             public void streamError(StreamEvent streamEvent) {
-                Harvest.addHttpTransactionDataAndError(streamEvent.getHttpTransactionState(),
+                Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
                         streamEvent.getException());
             }
         });
@@ -228,7 +229,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
             @Override
             public void streamError(StreamEvent streamEvent) {
-                Harvest.addHttpTransactionDataAndError(streamEvent.getHttpTransactionState(),
+                Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
                         streamEvent.getException());
             }
         });
@@ -236,36 +237,36 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    public HttpTransactionState createHttpTransactionState() {
-        HttpTransactionState httpTransactionState = new HttpTransactionState();
-        httpTransactionState.setIpAddress(ipAddress);
-        httpTransactionState.setTcpConnectStartTime(tcpConnectStartTime);
-        httpTransactionState.setTcpConnectEndTime(tcpConnectEndTime);
-        return httpTransactionState;
+    public TransactionState createHttpTransactionState() {
+        TransactionState transactionState = new TransactionState();
+        transactionState.setIpAddress(ipAddress);
+        transactionState.setTcpConnectStartTime(tcpConnectStartTime);
+        transactionState.setTcpConnectEndTime(tcpConnectEndTime);
+        return transactionState;
     }
 
     @Override
-    public void enqueueHttpTransactionState(HttpTransactionState httpTransactionState) {
+    public void enqueueHttpTransactionState(TransactionState transactionState) {
         synchronized (queue) {
-            queue.add(httpTransactionState);
+            queue.add(transactionState);
         }
     }
 
     @Override
-    public HttpTransactionState dequeueHttpTransactionState() {
+    public TransactionState dequeueHttpTransactionState() {
         synchronized (queue) {
             return queue.poll();
         }
     }
 
     public void error(Exception exception) {
-        HttpTransactionState httpTransactionState;
+        TransactionState transactionState;
         if (parsingInputStream != null) {
-            httpTransactionState = parsingInputStream.getHttpTransactionState();
+            transactionState = parsingInputStream.getTransactionState();
         } else {
-            httpTransactionState = createHttpTransactionState();
+            transactionState = createHttpTransactionState();
         }
-        Harvest.addHttpTransactionDataAndError(httpTransactionState, exception);
+        Harvest.addHttpTransactionDataAndError(transactionState, exception);
     }
 
     /* 以下是对SocketImpl的override */
@@ -300,7 +301,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
             this.tcpConnectEndTime = System.currentTimeMillis();
             if (port == 443 ) {
-                HttpTransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
+                TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
                 parsingInputStream.setFd(fd);
             }
         } catch (IOException e) {
@@ -348,8 +349,8 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     @Override
     protected void close() throws IOException {
         invokeThrowsIOException(CLOSE_IDX, new Object[0]);
-        if (HttpTransactionsCache.getTcpData(fd) != null) {
-            HttpTransactionsCache.removeTcpData(fd);
+        if (TransactionsCache.getTcpData(fd) != null) {
+            TransactionsCache.removeTcpData(fd);
         }
         if (parsingInputStream != null) {
             parsingInputStream.notifySocketClosing();

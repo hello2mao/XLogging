@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.urlconnection.io.parser;
 
-import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
 
 public interface HttpParserHandler {
 
@@ -16,13 +16,14 @@ public interface HttpParserHandler {
 
     void statusLineFound(int statusCode);
 
+    // 记录大小max=1024
     void appendBody(String body);
 
     void finishedMessage(int charactersInMessage);
 
     void finishedMessage(int charactersInMessage, long currentTimeStamp);
 
-    HttpTransactionState getHttpTransactionState();
+    TransactionState getTransactionState();
 
     String getParsedRequestMethod();
 }

@@ -21,9 +21,9 @@ public class HttpChunkBodyParser extends AbstractParser {
 
     private boolean isStatusError() {
         try {
-            if (bodyContent == null && getHandler().getHttpTransactionState() != null
-                    && (getHandler().getHttpTransactionState().getStatusCode() >= 400
-                    || getHandler().getHttpTransactionState().getStatusCode() == -1)) {
+            if (bodyContent == null && getHandler().getTransactionState() != null
+                    && (getHandler().getTransactionState().getStatusCode() >= 400
+                    || getHandler().getTransactionState().getStatusCode() == -1)) {
                 return true;
             }
         } catch (Exception e) {

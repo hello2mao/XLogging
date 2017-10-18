@@ -4,7 +4,7 @@ package com.hello2mao.xlogging.urlconnection.ssl;
 import com.android.org.conscrypt.OpenSSLSocketImplWrapper;
 import com.android.org.conscrypt.SSLParametersImpl;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
-import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.io.ioV1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.io.ioV1.HttpResponseParsingInputStreamV1;
 
@@ -21,7 +21,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     private HttpResponseParsingInputStreamV1 inputStream;
     private HttpRequestParsingOutputStreamV1 outputStream;
     private int sslHandshakeTime;
-    private final Queue<HttpTransactionState> queue;
+    private final Queue<TransactionState> queue;
 
     protected MonitoredOpenSSLSocketImplWrapper(Socket socket, String host, int port,
                                                 boolean autoClose, SSLParametersImpl sslParametersImpl)
@@ -32,30 +32,30 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     }
 
     @Override
-    public HttpTransactionState createNetworkTransactionState() {
-        HttpTransactionState httpTransactionState = new HttpTransactionState();
+    public TransactionState createNetworkTransactionState() {
+        TransactionState transactionState = new TransactionState();
         int port = this.getPort();
-        httpTransactionState.setPort(port);
+        transactionState.setPort(port);
         if (port == 443) {
-            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTPS);
+            transactionState.setScheme(UrlBuilder.Scheme.HTTPS);
         } else {
-            httpTransactionState.setScheme(UrlBuilder.Scheme.HTTP);
+            transactionState.setScheme(UrlBuilder.Scheme.HTTP);
         }
-        httpTransactionState.setSslHandShakeTime(sslHandshakeTime);
-        return httpTransactionState;
+        transactionState.setSslHandShakeTime(sslHandshakeTime);
+        return transactionState;
     }
 
     @Override
-    public HttpTransactionState dequeueNetworkTransactionState() {
+    public TransactionState dequeueNetworkTransactionState() {
         synchronized (queue) {
             return queue.poll();
         }
     }
 
     @Override
-    public void enqueueNetworkTransactionState(HttpTransactionState httpTransactionState) {
+    public void enqueueNetworkTransactionState(TransactionState transactionState) {
         synchronized (queue) {
-            queue.add(httpTransactionState);
+            queue.add(transactionState);
         }
     }
 

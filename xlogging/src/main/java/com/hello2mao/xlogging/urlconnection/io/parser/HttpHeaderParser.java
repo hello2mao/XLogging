@@ -16,7 +16,6 @@ public abstract class HttpHeaderParser extends AbstractParser {
     private boolean hasParsedHost = false;
     private boolean isContentLengthSet = false;
     private int parsedContentLength;
-    private boolean isContentTypeSet = false;
     private boolean parsedEndOfHeader = false;
 
     public HttpHeaderParser(AbstractParser parser) {

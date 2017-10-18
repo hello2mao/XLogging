@@ -1,22 +1,22 @@
 package com.hello2mao.xlogging.urlconnection.listener;
 
-import com.hello2mao.xlogging.urlconnection.HttpTransactionState;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
 
 import java.util.EventObject;
 
 public class StreamEvent extends EventObject {
 
     private Exception exception;
-    private HttpTransactionState httpTransactionState;
+    private TransactionState transactionState;
 
-    public StreamEvent(Object source, HttpTransactionState httpTransactionState) {
+    public StreamEvent(Object source, TransactionState transactionState) {
         super(source);
-        this.httpTransactionState = httpTransactionState;
+        this.transactionState = transactionState;
     }
 
-    public StreamEvent(Object source, HttpTransactionState httpTransactionState, Exception exception) {
+    public StreamEvent(Object source, TransactionState transactionState, Exception exception) {
         super(source);
-        this.httpTransactionState = httpTransactionState;
+        this.transactionState = transactionState;
         this.exception = exception;
     }
 
@@ -24,8 +24,8 @@ public class StreamEvent extends EventObject {
         return exception;
     }
 
-    public HttpTransactionState getHttpTransactionState() {
-        return httpTransactionState;
+    public TransactionState getTransactionState() {
+        return transactionState;
     }
 
     public boolean isError() {

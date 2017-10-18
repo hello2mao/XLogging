@@ -5,6 +5,7 @@ import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 public class HttpRequestLineParser extends AbstractParser {
 
     private static final int MAX_LINE_LENGTH = 2048;
+    private static final int INITIAL_BUFFER_SIZE = 64;
 
     public HttpRequestLineParser(HttpParserHandler parserHandler) {
         super(parserHandler);
@@ -12,7 +13,7 @@ public class HttpRequestLineParser extends AbstractParser {
 
     @Override
     protected int getInitialBufferSize() {
-        return 64;
+        return INITIAL_BUFFER_SIZE;
     }
 
     @Override

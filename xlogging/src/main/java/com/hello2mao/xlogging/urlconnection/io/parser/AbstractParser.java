@@ -109,11 +109,7 @@ public abstract class AbstractParser {
         return i;
     }
 
-    public CharBuffer getBuffer() {
-        return buffer;
-    }
-
-    int getCharactersInMessage() {
+    protected int getCharactersInMessage() {
         return charactersInMessage;
     }
 
@@ -135,7 +131,7 @@ public abstract class AbstractParser {
         getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
 
-    void setCharactersInMessage(int charactersInMessage) {
+    protected void setCharactersInMessage(int charactersInMessage) {
         this.charactersInMessage = charactersInMessage;
     }
 

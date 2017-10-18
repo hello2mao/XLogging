@@ -3,7 +3,7 @@ package com.hello2mao.xlogging.urlconnection;
 /**
  * 记录HTTP(S)事务中所有数据的类
  */
-public class HttpTransactionState {
+public class TransactionState {
 
     // Basic Info
     private String host;
@@ -51,7 +51,7 @@ public class HttpTransactionState {
         COMPLETE
     }
 
-    public HttpTransactionState() {
+    public TransactionState() {
         // Basic Info
         this.host = "";
         this.ipAddress = "";
@@ -79,33 +79,49 @@ public class HttpTransactionState {
         this.state = State.READY;
     }
 
-    public HttpTransactionState(HttpTransactionState httpTransactionState) {
+    public TransactionState(TransactionState transactionState) {
         this();
         // Basic Info
-        this.host = httpTransactionState.getHost();
-        this.ipAddress = httpTransactionState.getIpAddress();
-        this.scheme = httpTransactionState.getScheme();
-        this.httpPath = httpTransactionState.getHttpPath();
-        this.requestMethod = httpTransactionState.getRequestMethod();
-        this.statusCode = httpTransactionState.getStatusCode();
-        this.bytesSent = httpTransactionState.getBytesSent();
-        this.bytesReceived = httpTransactionState.getBytesReceived();
+        this.host = transactionState.getHost();
+        this.ipAddress = transactionState.getIpAddress();
+        this.scheme = transactionState.getScheme();
+        this.httpPath = transactionState.getHttpPath();
+        this.requestMethod = transactionState.getRequestMethod();
+        this.statusCode = transactionState.getStatusCode();
+        this.bytesSent = transactionState.getBytesSent();
+        this.bytesReceived = transactionState.getBytesReceived();
         // Timing
-        this.dnsLookupStartTime = httpTransactionState.getDnsLookupStartTime();
-        this.dnsLookupEndTime = httpTransactionState.getDnsLookupEndTime();
-        this.tcpConnectStartTime = httpTransactionState.getTcpConnectStartTime();
-        this.tcpConnectEndTime = httpTransactionState.getTcpConnectEndTime();
-        this.sslHandshakeStartTime = httpTransactionState.getSslHandshakeStartTime();
-        this.sslHandshakeEndTime = -httpTransactionState.getSslHandshakeEndTime();
-        this.requestStartTime = httpTransactionState.getRequestStartTime();
-        this.requestEndTime = httpTransactionState.getRequestEndTime();
-        this.responseStartTime = httpTransactionState.getResponseStartTime();
-        this.responseEndTime = httpTransactionState.getResponseEndTime();
+        this.dnsLookupStartTime = transactionState.getDnsLookupStartTime();
+        this.dnsLookupEndTime = transactionState.getDnsLookupEndTime();
+        this.tcpConnectStartTime = transactionState.getTcpConnectStartTime();
+        this.tcpConnectEndTime = transactionState.getTcpConnectEndTime();
+        this.sslHandshakeStartTime = transactionState.getSslHandshakeStartTime();
+        this.sslHandshakeEndTime = -transactionState.getSslHandshakeEndTime();
+        this.requestStartTime = transactionState.getRequestStartTime();
+        this.requestEndTime = transactionState.getRequestEndTime();
+        this.responseStartTime = transactionState.getResponseStartTime();
+        this.responseEndTime = transactionState.getResponseEndTime();
         // Optional
-        this.exception = httpTransactionState.getException();
-        this.socketReuse = httpTransactionState.isSocketReuse();
+        this.exception = transactionState.getException();
+        this.socketReuse = transactionState.isSocketReuse();
         // Other
-        this.state = httpTransactionState.getState();
+        this.state = transactionState.getState();
+    }
+
+    public TransactionData end() {
+        return toTransactionData();
+    }
+
+    private TransactionData toTransactionData() {
+        return new TransactionData();
+    }
+
+    public boolean isComplete() {
+        return state.ordinal() >= State.COMPLETE.ordinal();
+    }
+
+    public boolean isSent() {
+        return state.ordinal() >= State.SENT.ordinal();
     }
 
     public String getHost() {
@@ -278,7 +294,7 @@ public class HttpTransactionState {
 
     @Override
     public String toString() {
-        return "HttpTransactionState{" +
+        return "TransactionState{" +
                 "host='" + host + '\'' +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", scheme='" + scheme + '\'' +
