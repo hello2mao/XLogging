@@ -64,13 +64,4 @@ public class HttpChunkSizeParser extends AbstractParser {
         getHandler().finishedMessage(getCharactersInMessage(), currentTimeStamp);
         getHandler().setNextParser(NoopLineParser.DEFAULT);
     }
-
-    public int getParsedChunkSize() {
-        return this.parsedChunkSize;
-    }
-
-    public void setParsedChunkSize(final int parsedChunkSize) {
-        this.parsedChunkSize = parsedChunkSize;
-    }
-
 }

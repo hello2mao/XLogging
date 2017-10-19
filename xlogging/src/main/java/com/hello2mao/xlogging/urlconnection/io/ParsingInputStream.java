@@ -185,17 +185,16 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
 
     @Override
     public void statusLineFound(int statusCode) {
-        TransactionState currentTransactionState = getTransactionState();
+        TransactionState currentTransactionState;
         if (readCount >= 1) { // tcp连接复用
             TransactionState newTransactionState = new TransactionState();
             this.transactionState = newTransactionState;
             currentTransactionState = newTransactionState;
+        } else {
+            currentTransactionState = getTransactionState();
         }
-        currentTransactionState.setFirstPkgElapse(System.currentTimeMillis() -
-                currentTransactionState.getRequestStartTime() - currentTransactionState.getRequestElapse());
+        currentTransactionState.setResponseStartTime(System.currentTimeMillis());
         currentTransactionState.setStatusCode(statusCode);
-        currentTransactionState.setProtocol(protocol);
-        return !TextUtils.isEmpty(currentTransactionState.getHost());
     }
 
 
@@ -216,12 +215,11 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         }
         transactionState.setBytesReceived(bytesReceived);
         if (currentTime > 0L) {
-            transactionState.overrideEndTime(currentTime);
+            transactionState.setResponseEndTime(currentTime);
         }
-        try {
-            if (readCount >= 1) {
-                TransactionsCache.setNetWorkTransactionState(monitoredSocket, transactionState);
-            }
+        if (readCount >= 1) {
+            TransactionsCache.setNetWorkTransactionState(monitoredSocket, transactionState);
+        }
             this.transactionState.setWanType(Agent.getImpl().getNetworkWanType());
             this.transactionState.setEndTime();
             this.transactionState.setSocketReusability(this.readCount++);
@@ -235,7 +233,6 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
                     this.transactionState.setAddress(ipAddress);
                 }
             }
-            LOG.debug("inputV2 finished readCount is:" + readCount);
             if (this.readCount == 1) {
                 if (this.transactionState.getPort() == 443) {
                     if (socketDescriptor == null) {
@@ -252,29 +249,14 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
                     connectTime = this.transactionState.getTcpHandShakeTime();
                 }
             }
-            transactionState.setTcpHandShakeTime(connectTime);
-            // FIXME: URL过滤逻辑，未实现
-            int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.transactionState.getSslHandShakeTime());
-            transactionState.setSslHandShakeTime(sslHandShakeTime);
-            LOG.debug("network data V1 finished");
-            notifyStreamComplete();
-        } catch (Exception e) {
-            LOG.error("Caught error while finishedMessage in ParsingInputStream:" + e.getMessage());
-            // FIXME: 这里可能会报错，需要处理
-        }
+        transactionState.setTcpHandShakeTime(connectTime);
+        // FIXME: URL过滤逻辑，未实现
+        int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.transactionState.getSslHandShakeTime());
+        transactionState.setSslHandShakeTime(sslHandShakeTime);
+        notifyStreamComplete();
     }
 
-
-
-
-
-    public InputStream getDelegate()
-    {
-        return this.inputStream;
-    }
-
-
-
+    @Override
     public TransactionState getTransactionState() {
         if (transactionState == null) {
             // FIXME:为啥需要“拷贝”一个？
@@ -302,10 +284,9 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     }
 
     public void notifySocketClosing() {
-        if (this.transactionState != null &&
-                this.transactionState.getErrorCode() == NetworkErrorUtil.exceptionOk() &&
-                this.responseParser != null) {
-            this.responseParser.close();
+        if (transactionState != null && TextUtils.isEmpty(transactionState.getException()) &&
+                responseParser != null) {
+            responseParser.close();
         }
     }
 

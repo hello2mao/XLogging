@@ -1,4 +1,4 @@
-package com.hello2mao.xlogging.urlconnection.harvest;
+package com.hello2mao.xlogging.harvest;
 
 import com.hello2mao.xlogging.urlconnection.TransactionState;
 
