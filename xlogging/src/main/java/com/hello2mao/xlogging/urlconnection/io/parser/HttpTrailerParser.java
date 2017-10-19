@@ -41,7 +41,7 @@ public class HttpTrailerParser extends AbstractParser {
     public AbstractParser nextParserAfterSuccessfulParse() {
         if (this.foundEmptyLine) {
             getHandler().finishedMessage(getCharactersInMessage());
-            return getHandler().getInitialParsingState();
+            return getHandler().getInitialParser();
         }
         this.buffer.length = 0;
         return this;

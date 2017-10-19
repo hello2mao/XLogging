@@ -47,7 +47,7 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
         if (notAllowedToHaveMessageBody()) {
             log.debug("nextParserAfterEndOfHeader notAllowedToHaveMessageBody");
             getHandler().finishedMessage(getCharactersInMessage());
-            parser = getHandler().getInitialParsingState();
+            parser = getHandler().getInitialParser();
         } else if (isChunkedTransferEncoding()) {
             log.debug("nextParserAfterEndOfHeader isChunkedTransferEncoding");
             parser = new HttpChunkSizeParser(this);
@@ -57,12 +57,12 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
                 parser = new HttpBodyParser(this, getContentLength());
             } else {
                 getHandler().finishedMessage(getCharactersInMessage());
-                parser = getHandler().getInitialParsingState();
+                parser = getHandler().getInitialParser();
             }
         } else if (getHandler().getParsedRequestMethod().equals("CONNECT")) {
             log.debug("nextParserAfterEndOfHeader getParsedRequestMethod");
             getHandler().finishedMessage(getCharactersInMessage());
-            parser= getHandler().getInitialParsingState();
+            parser= getHandler().getInitialParser();
         } else {
             log.debug("nextParserAfterEndOfHeader EOFBodyParser");
             parser = new HttpEOFBodyParser(this);
