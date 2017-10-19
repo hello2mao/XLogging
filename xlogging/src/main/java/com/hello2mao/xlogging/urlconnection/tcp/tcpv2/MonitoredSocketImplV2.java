@@ -237,7 +237,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    public TransactionState createHttpTransactionState() {
+    public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
         transactionState.setIpAddress(ipAddress);
         transactionState.setTcpConnectStartTime(tcpConnectStartTime);
@@ -246,14 +246,14 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    public void enqueueHttpTransactionState(TransactionState transactionState) {
+    public void enqueueTransactionState(TransactionState transactionState) {
         synchronized (queue) {
             queue.add(transactionState);
         }
     }
 
     @Override
-    public TransactionState dequeueHttpTransactionState() {
+    public TransactionState dequeueTransactionState() {
         synchronized (queue) {
             return queue.poll();
         }
@@ -264,7 +264,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         if (parsingInputStream != null) {
             transactionState = parsingInputStream.getTransactionState();
         } else {
-            transactionState = createHttpTransactionState();
+            transactionState = createTransactionState();
         }
         Harvest.addHttpTransactionDataAndError(transactionState, exception);
     }

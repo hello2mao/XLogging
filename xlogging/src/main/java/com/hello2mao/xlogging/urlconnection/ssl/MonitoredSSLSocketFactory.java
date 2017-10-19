@@ -2,6 +2,8 @@ package com.hello2mao.xlogging.urlconnection.ssl;
 
 import com.android.org.conscrypt.SSLParametersImpl;
 import com.hello2mao.xlogging.util.ReflectionUtil;
+import com.hello2mao.xlogging.xlog.XLog;
+import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -10,8 +12,9 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocketFactory;
 
-public class MonitoredSSLSocketFactory extends BaseSSLSocketFactory {
-    
+public class MonitoredSSLSocketFactory extends SSLSocketFactory {
+
+    private static final XLog log = XLogManager.getAgentLog();
     private SSLParametersImpl sslParameters;
     private SSLSocketFactory delegate;
 
@@ -37,27 +40,32 @@ public class MonitoredSSLSocketFactory extends BaseSSLSocketFactory {
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        return new MonitoredOpenSSLSocketImpl(host, port, localHost, localPort, cloneSSLParameters(sslParameters));
+        log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-2");
+        return delegate.createSocket(host, port, localHost, localPort);
     }
 
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-        return new MonitoredOpenSSLSocketImpl(host, port, cloneSSLParameters(sslParameters));
+        log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-3");
+        return delegate.createSocket(host, port);
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        return new MonitoredOpenSSLSocketImpl(host, port, cloneSSLParameters(sslParameters));
+        log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-4");
+        return delegate.createSocket(host, port);
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        return new MonitoredOpenSSLSocketImpl(address, port, localAddress, localPort, cloneSSLParameters(sslParameters));
+        log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-5");
+        return delegate.createSocket(address, port, localAddress, localPort);
     }
 
     @Override
     public Socket createSocket() throws IOException {
-        return new MonitoredOpenSSLSocketImpl(cloneSSLParameters(sslParameters));
+        log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-6");
+        return delegate.createSocket();
     }
 
     private static SSLParametersImpl getParameters(SSLSocketFactory sslSocketFactory) {
@@ -82,10 +90,4 @@ public class MonitoredSSLSocketFactory extends BaseSSLSocketFactory {
             return null;
         }
     }
-
-    @Override
-    public SSLSocketFactory getDelegate() {
-        return delegate;
-    }
-
 }

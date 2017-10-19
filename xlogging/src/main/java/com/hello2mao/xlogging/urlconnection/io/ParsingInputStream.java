@@ -278,7 +278,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     public TransactionState getTransactionState() {
         if (transactionState == null) {
             // FIXME:为啥需要“拷贝”一个？
-            transactionState = new TransactionState(monitoredSocket.dequeueHttpTransactionState());
+            transactionState = new TransactionState(monitoredSocket.dequeueTransactionState());
         }
         return transactionState;
     }

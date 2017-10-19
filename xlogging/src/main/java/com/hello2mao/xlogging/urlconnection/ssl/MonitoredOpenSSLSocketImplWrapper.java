@@ -5,6 +5,8 @@ import com.android.org.conscrypt.OpenSSLSocketImplWrapper;
 import com.android.org.conscrypt.SSLParametersImpl;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.TransactionState;
+import com.hello2mao.xlogging.urlconnection.io.ParsingInputStream;
+import com.hello2mao.xlogging.urlconnection.io.ParsingOutputStream;
 import com.hello2mao.xlogging.urlconnection.io.ioV1.HttpRequestParsingOutputStreamV1;
 import com.hello2mao.xlogging.urlconnection.io.ioV1.HttpResponseParsingInputStreamV1;
 
@@ -18,8 +20,8 @@ import java.util.Queue;
 public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         implements MonitoredSocketInterface {
 
-    private HttpResponseParsingInputStreamV1 inputStream;
-    private HttpRequestParsingOutputStreamV1 outputStream;
+    private ParsingInputStream inputStream;
+    private ParsingOutputStream outputStream;
     private int sslHandshakeTime;
     private final Queue<TransactionState> queue;
 
@@ -32,7 +34,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     }
 
     @Override
-    public TransactionState createNetworkTransactionState() {
+    public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
         int port = this.getPort();
         transactionState.setPort(port);

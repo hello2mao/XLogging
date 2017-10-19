@@ -135,7 +135,7 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
             transactionState.setScheme("http");
         }
         transactionState.setHttpPath(httpPath);
-        monitoredSocket.enqueueHttpTransactionState(transactionState);
+        monitoredSocket.enqueueTransactionState(transactionState);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
 
     public TransactionState getTransactionState() {
         if (transactionState == null) {
-            this.transactionState = monitoredSocket.createHttpTransactionState();
+            this.transactionState = monitoredSocket.createTransactionState();
         }
         return transactionState;
     }

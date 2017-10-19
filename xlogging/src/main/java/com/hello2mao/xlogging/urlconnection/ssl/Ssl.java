@@ -10,21 +10,18 @@ import javax.net.ssl.SSLSocketFactory;
 public class Ssl {
 
     private static final XLog log = XLogManager.getAgentLog();
-    private static boolean installed = false;
 
     public static boolean install() {
-        if (installed) {
+        SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+        if (defaultSSLSocketFactory != null && defaultSSLSocketFactory instanceof MonitoredSSLSocketFactory) {
+            log.info("Already install MonitoredSSLSocketFactory");
             return true;
         }
-        SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
         try {
             HttpsURLConnection.setDefaultSSLSocketFactory(new MonitoredSSLSocketFactory(defaultSSLSocketFactory));
-            return installed = true;
-        } catch (ThreadDeath threadDeath) {
-            log.error("Caught error while Ssl install", threadDeath);
-            throw threadDeath;
-        } catch (Throwable t) {
-            log.error("Caught error while Ssl install", t);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
