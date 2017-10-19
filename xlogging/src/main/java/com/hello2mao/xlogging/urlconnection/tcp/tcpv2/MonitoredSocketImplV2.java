@@ -5,7 +5,7 @@ import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.TcpData;
 import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.TransactionsCache;
-import com.hello2mao.xlogging.urlconnection.harvest.Harvest;
+import com.hello2mao.xlogging.harvest.Harvest;
 import com.hello2mao.xlogging.urlconnection.io.ParsingInputStream;
 import com.hello2mao.xlogging.urlconnection.io.ParsingOutputStream;
 import com.hello2mao.xlogging.urlconnection.listener.StreamEvent;
