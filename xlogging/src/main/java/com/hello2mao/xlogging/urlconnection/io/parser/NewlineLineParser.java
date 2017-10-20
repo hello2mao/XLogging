@@ -4,25 +4,22 @@ package com.hello2mao.xlogging.urlconnection.io.parser;
 import com.hello2mao.xlogging.urlconnection.io.CharBuffer;
 
 public class NewlineLineParser extends AbstractParser {
+
     private AbstractParser nextParserAfterNewline;
 
-    public NewlineLineParser(AbstractParser parser)
-    {
+    public NewlineLineParser(AbstractParser parser) {
         super(parser);
         this.nextParserAfterNewline = parser;
     }
 
     @Override
-    public boolean add(int data)
-    {
-        if (data == -1)
-        {
+    public boolean add(int data) {
+        if (data == -1) {
             getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
         this.charactersInMessage += 1;
-        if ((char) data == '\n')
-        {
+        if ((char) data == '\n') {
             this.nextParserAfterNewline.setCharactersInMessage(getCharactersInMessage());
             getHandler().setNextParser(this.nextParserAfterNewline);
             return true;
@@ -43,24 +40,17 @@ public class NewlineLineParser extends AbstractParser {
     }
 
     @Override
-    public AbstractParser nextParserAfterBufferFull()
-    {
-//        Assert.is(false);
+    public AbstractParser nextParserAfterBufferFull() {
         return this;
     }
 
     @Override
-    public AbstractParser nextParserAfterSuccessfulParse()
-    {
-//        Assert.is(false);
+    public AbstractParser nextParserAfterSuccessfulParse() {
         return this;
     }
 
     @Override
-    public boolean parse(CharBuffer paramCharBuffer)
-    {
-//        CustomLog.d(CustomLog.defaultTag, "NewlineLineParser parse");
-//        Assert.is(false);
+    public boolean parse(CharBuffer paramCharBuffer) {
         return true;
     }
 }

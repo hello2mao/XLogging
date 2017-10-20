@@ -26,7 +26,7 @@ public class HttpStatusLineParser extends AbstractParser {
         if (split.length >= 3) {
             try {
                 parsedStatusCode = Integer.parseInt(split[1]);
-                getHandler().statusLineFound(parsedStatusCode, split[0]);
+                getHandler().statusLineFound(parsedStatusCode);
                 return true;
             } catch (NumberFormatException e) {
                 e.printStackTrace();

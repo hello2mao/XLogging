@@ -73,8 +73,8 @@ public class MonitoredSSLSocketFactory extends SSLSocketFactory {
         try {
             sslParametersImpl = (SSLParametersImpl) ReflectionUtil.getFieldFromObject(
                     ReflectionUtil.getFieldFromClass(sslSocketFactory.getClass(), SSLParametersImpl.class), sslSocketFactory);
-        } catch (Throwable t) {
-            log.error("Caught error while MonitoredSSLSocketFactory getParameters", t);
+        } catch (Exception e) {
+            e.printStackTrace();
             sslParametersImpl = null;
         }
         return cloneSSLParameters(sslParametersImpl);
@@ -85,8 +85,8 @@ public class MonitoredSSLSocketFactory extends SSLSocketFactory {
             Method declaredMethod = SSLParametersImpl.class.getDeclaredMethod("clone", (Class<?>[]) new Class[0]);
             declaredMethod.setAccessible(true);
             return (SSLParametersImpl) declaredMethod.invoke(sslParametersImpl);
-        } catch (Throwable t) {
-            log.error("Caught error while MonitoredSSLSocketFactory getParameters", t);
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

@@ -17,6 +17,8 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import static android.R.attr.port;
+
 public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         implements MonitoredSocketInterface {
 
@@ -36,26 +38,19 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     @Override
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
-        int port = this.getPort();
-        transactionState.setPort(port);
-        if (port == 443) {
-            transactionState.setScheme(UrlBuilder.Scheme.HTTPS);
-        } else {
-            transactionState.setScheme(UrlBuilder.Scheme.HTTP);
-        }
-        transactionState.setSslHandShakeTime(sslHandshakeTime);
+        transactionState.setSslHandshakeStartTime();
         return transactionState;
     }
 
     @Override
-    public TransactionState dequeueNetworkTransactionState() {
+    public TransactionState dequeueTransactionState() {
         synchronized (queue) {
             return queue.poll();
         }
     }
 
     @Override
-    public void enqueueNetworkTransactionState(TransactionState transactionState) {
+    public void enqueueTransactionState(TransactionState transactionState) {
         synchronized (queue) {
             queue.add(transactionState);
         }
@@ -70,7 +65,6 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             log.debug("MonitoredOpenSSLSocketImplWrapper startHandshake:" + sslHandshakeTime);
         } catch (IOException e) {
             log.error("Caught error while MonitoredOpenSSLSocketImplWrapper startHandshake: ", e);
-
             throw e;
         }
     }
