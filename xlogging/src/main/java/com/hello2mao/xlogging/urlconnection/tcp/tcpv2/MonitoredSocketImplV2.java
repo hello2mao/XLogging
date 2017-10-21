@@ -1,15 +1,14 @@
 package com.hello2mao.xlogging.urlconnection.tcp.tcpv2;
 
 
+import com.hello2mao.xlogging.harvest.Harvest;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
 import com.hello2mao.xlogging.urlconnection.TcpData;
 import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.TransactionsCache;
-import com.hello2mao.xlogging.harvest.Harvest;
+import com.hello2mao.xlogging.urlconnection.io.IOInstrument;
 import com.hello2mao.xlogging.urlconnection.io.ParsingInputStream;
 import com.hello2mao.xlogging.urlconnection.io.ParsingOutputStream;
-import com.hello2mao.xlogging.urlconnection.listener.StreamEvent;
-import com.hello2mao.xlogging.urlconnection.listener.StreamListener;
 import com.hello2mao.xlogging.util.ReflectionUtil;
 import com.hello2mao.xlogging.util.URLUtil;
 import com.hello2mao.xlogging.xlog.XLog;
@@ -186,56 +185,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         return null;
     }
 
-    private InputStream unsafeInstrumentInputStream(InputStream inputStream) {
-        if (inputStream == null) {
-            log.verbose("MonitoredSocketImplV2: inputSteam is null");
-            return null;
-        }
-        if ((this.parsingInputStream != null) && (this.parsingInputStream.isDelegateSame(inputStream))) {
-            log.verbose("MonitoredSocketImplV2: unsafeInstrumentInputStream DelegateSame");
-            return parsingInputStream;
-        }
-        this.parsingInputStream = new ParsingInputStream(this, inputStream);
-        parsingInputStream.addStreamListener(new StreamListener() {
-            @Override
-            public void streamComplete(StreamEvent streamEvent) {
-                Harvest.addHttpTransactionData(streamEvent.getTransactionState());
-            }
-
-            @Override
-            public void streamError(StreamEvent streamEvent) {
-                Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
-                        streamEvent.getException());
-            }
-        });
-        return parsingInputStream;
-    }
-
-    private OutputStream unsafeInstrumentOutputStream(OutputStream outputStream) {
-        if (outputStream == null) {
-            log.verbose("MonitoredSocketImplV2: outputStream is null");
-            return null;
-        }
-        if (parsingOutputStream != null && parsingOutputStream.isDelegateSame(outputStream)) {
-            log.verbose("MonitoredSocketImplV2: unsafeInstrumentOutputStream DelegateSame");
-            return parsingOutputStream;
-        }
-        this.parsingOutputStream = new ParsingOutputStream(this, outputStream);
-        parsingOutputStream.addStreamListener(new StreamListener() {
-            @Override
-            public void streamComplete(StreamEvent streamEvent) {
-                // do nothing for parsingOutputStream
-            }
-
-            @Override
-            public void streamError(StreamEvent streamEvent) {
-                Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
-                        streamEvent.getException());
-            }
-        });
-        return parsingOutputStream;
-    }
-
     @Override
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
@@ -327,14 +276,18 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected InputStream getInputStream() throws IOException {
-        return unsafeInstrumentInputStream(
-                (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]));
+        this.parsingInputStream = IOInstrument.instrumentInputStream(this,
+                (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]),
+                parsingInputStream);
+        return parsingInputStream;
     }
 
     @Override
     protected OutputStream getOutputStream() throws IOException {
-        return unsafeInstrumentOutputStream(
-                (OutputStream) invokeThrowsIOException(GET_OUTPUT_STREAM_IDX, new Object[0]));
+        this.parsingOutputStream = IOInstrument.instrumentOutputStream(this,
+                (OutputStream) invokeThrowsIOException(GET_OUTPUT_STREAM_IDX, new Object[0]),
+                parsingOutputStream);
+        return parsingOutputStream;
     }
 
     @Override

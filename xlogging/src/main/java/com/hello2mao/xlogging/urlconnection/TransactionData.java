@@ -44,10 +44,4 @@ public class TransactionData {
         this.responseElapse = -1;
         this.socketReuse = false;
     }
-
-    public TransactionData(TransactionState transactionState) {
-        this();
-        this.url = transactionState.getHost();
-        this.ipAddress =
-    }
 }

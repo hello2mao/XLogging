@@ -4,10 +4,8 @@ package com.hello2mao.xlogging.urlconnection.io;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.hello2mao.xlogging.urlconnection.TransactionsCache;
-import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.MonitoredSocketInterface;
-import com.hello2mao.xlogging.urlconnection.NetworkErrorUtil;
+import com.hello2mao.xlogging.urlconnection.TransactionState;
 import com.hello2mao.xlogging.urlconnection.io.parser.AbstractParser;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpParserHandler;
 import com.hello2mao.xlogging.urlconnection.io.parser.HttpStatusLineParser;
@@ -16,15 +14,12 @@ import com.hello2mao.xlogging.urlconnection.listener.StreamEvent;
 import com.hello2mao.xlogging.urlconnection.listener.StreamListener;
 import com.hello2mao.xlogging.urlconnection.listener.StreamListenerManager;
 import com.hello2mao.xlogging.urlconnection.listener.StreamListenerSource;
-import com.hello2mao.xlogging.util.URLUtil;
 import com.hello2mao.xlogging.xlog.XLog;
 import com.hello2mao.xlogging.xlog.XLogManager;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class ParsingInputStream extends InputStream implements HttpParserHandler, StreamListenerSource {
 
@@ -213,46 +208,45 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         if (transactionState == null) {
             return;
         }
-        transactionState.setBytesReceived(bytesReceived);
-        if (currentTime > 0L) {
-            transactionState.setResponseEndTime(currentTime);
-        }
-        if (readCount >= 1) {
-            TransactionsCache.setNetWorkTransactionState(monitoredSocket, transactionState);
-        }
-            this.transactionState.setWanType(Agent.getImpl().getNetworkWanType());
-            this.transactionState.setEndTime();
-            this.transactionState.setSocketReusability(this.readCount++);
-            this.transactionState.endTransaction();
-            int connectTime = 0;
-            if (TextUtils.isEmpty(this.transactionState.getIpAddress())
-                    && this.transactionState.getUrlBuilder() != null) {
-                final String ipAddress = URLUtil.getIpAddress(
-                                URLUtil.getHost(this.transactionState.getUrlBuilder().getHostname()));
-                if (!TextUtils.isEmpty(ipAddress)) {
-                    this.transactionState.setAddress(ipAddress);
-                }
-            }
-            if (this.readCount == 1) {
-                if (this.transactionState.getPort() == 443) {
-                    if (socketDescriptor == null) {
-                        LOG.warning("no fd found in inputStreamV2!");
-                        return;
-                    }
-                    Integer connectTimeObj = TcpDataCache.connectMap.get(socketDescriptor);
-                    if (connectTimeObj == null) {
-                        LOG.debug("no fd found on SSLSocket in inputStreamV2");
-                        return;
-                    }
-                    connectTime = connectTimeObj;
-                } else {
-                    connectTime = this.transactionState.getTcpHandShakeTime();
-                }
-            }
-        transactionState.setTcpHandShakeTime(connectTime);
-        // FIXME: URL过滤逻辑，未实现
-        int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.transactionState.getSslHandShakeTime());
-        transactionState.setSslHandShakeTime(sslHandShakeTime);
+//        transactionState.setBytesReceived(bytesReceived);
+//        if (currentTime > 0L) {
+//            transactionState.setResponseEndTime(currentTime);
+//        }
+//        if (readCount >= 1) {
+//            TransactionsCache.setNetWorkTransactionState(monitoredSocket, transactionState);
+//        }
+//            this.transactionState.setEndTime();
+//            this.transactionState.setSocketReusability(this.readCount++);
+//            this.transactionState.endTransaction();
+//            int connectTime = 0;
+//            if (TextUtils.isEmpty(this.transactionState.getIpAddress())
+//                    && this.transactionState.getUrlBuilder() != null) {
+//                final String ipAddress = URLUtil.getIpAddress(
+//                                URLUtil.getHost(this.transactionState.getUrlBuilder().getHostname()));
+//                if (!TextUtils.isEmpty(ipAddress)) {
+//                    this.transactionState.setAddress(ipAddress);
+//                }
+//            }
+//            if (this.readCount == 1) {
+//                if (this.transactionState.getPort() == 443) {
+//                    if (socketDescriptor == null) {
+//                        LOG.warning("no fd found in inputStreamV2!");
+//                        return;
+//                    }
+//                    Integer connectTimeObj = TcpDataCache.connectMap.get(socketDescriptor);
+//                    if (connectTimeObj == null) {
+//                        LOG.debug("no fd found on SSLSocket in inputStreamV2");
+//                        return;
+//                    }
+//                    connectTime = connectTimeObj;
+//                } else {
+//                    connectTime = this.transactionState.getTcpHandShakeTime();
+//                }
+//            }
+//        transactionState.setTcpHandShakeTime(connectTime);
+//        // FIXME: URL过滤逻辑，未实现
+//        int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.transactionState.getSslHandShakeTime());
+//        transactionState.setSslHandShakeTime(sslHandShakeTime);
         notifyStreamComplete();
     }
 
