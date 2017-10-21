@@ -2,78 +2,15 @@ package com.hello2mao.xlogging;
 
 import android.os.Build;
 
-import com.hello2mao.xlogging.okhttp.XDns;
-import com.hello2mao.xlogging.okhttp.XLoggingInterceptor;
-import com.hello2mao.xlogging.okhttp.XSocketFactory;
-import com.hello2mao.xlogging.okhttp.util.Util;
-import com.hello2mao.xlogging.urlconnection.ssl.Ssl;
-import com.hello2mao.xlogging.urlconnection.tcp.tcpv2.TcpV2;
-import com.hello2mao.xlogging.xlog.AndroidXLog;
-import com.hello2mao.xlogging.xlog.XLog;
-import com.hello2mao.xlogging.xlog.XLogManager;
-
-import okhttp3.OkHttpClient;
+import com.hello2mao.xlogging.log.AndroidXLog;
+import com.hello2mao.xlogging.log.XLog;
+import com.hello2mao.xlogging.log.XLogManager;
+import com.hello2mao.xlogging.ssl.Ssl;
+import com.hello2mao.xlogging.tcpv2.TcpV2;
 
 public class XLogging {
 
     private static final XLog log = XLogManager.getAgentLog();
-
-    public enum Level {
-
-        /**
-         * Logs request and response lines.
-         *
-         * <p>Example:
-         * <pre>{@code
-         * --> POST /greeting HTTP/1.1 (3-byte body)
-         *
-         * <-- 200 OK (22ms, 6-byte body)
-         * }</pre>
-         */
-        BASIC,
-
-        /**
-         * Logs request and response lines and their respective headers.
-         *
-         * <p>Example:
-         * <pre>{@code
-         * --> POST /greeting HTTP/1.1
-         * Host: example.com
-         * Content-Type: plain/text
-         * Content-Length: 3
-         * ==> END POST
-         *
-         * <-- 200 OK (22ms)
-         * Content-Type: plain/text
-         * Content-Length: 6
-         * <== END HTTP
-         * }</pre>
-         */
-        HEADERS,
-
-        /**
-         * Logs request and response lines and their respective headers and bodies (if present).
-         *
-         * <p>Example:
-         * <pre>{@code
-         * --> POST /greeting HTTP/1.1
-         * Host: example.com
-         * Content-Type: plain/text
-         * Content-Length: 3
-         *
-         * Hi?
-         * ==> END GET
-         *
-         * <-- HTTP/1.1 200 OK (22ms)
-         * Content-Type: plain/text
-         * Content-Length: 6
-         *
-         * Hello!
-         * <== END HTTP
-         * }</pre>
-         */
-        BODY
-    }
 
     public static void install() {
 
@@ -105,58 +42,4 @@ public class XLogging {
             log.error("XLogging install failed!");
         }
     }
-
-    /**
-     * OkHttp install
-     *
-     * @param builder OkHttpClient.Builder
-     * @return OkHttpClient
-     */
-    public static OkHttpClient enableOkHttp(OkHttpClient.Builder builder) {
-        return enableOkHttp(builder.build());
-    }
-
-    /**
-     * OkHttp install
-     *
-     * @param builder OkHttpClient.Builder
-     * @param level Level
-     * @return OkHttpClient
-     */
-    public static OkHttpClient enableOkHttp(OkHttpClient.Builder builder, Level level) {
-        return enableOkHttp(builder.build(), level);
-    }
-
-    /**
-     * OkHttp install
-     *
-     * @param client OkHttpClient
-     * @return OkHttpClient
-     */
-    public static OkHttpClient enableOkHttp(OkHttpClient client) {
-        return enableOkHttp(client, Level.BASIC);
-    }
-
-    /**
-     * OkHttp install
-     *
-     * @param client OkHttpClient
-     * @param level Level
-     * @return OkHttpClient
-     */
-    public static OkHttpClient enableOkHttp(OkHttpClient client, Level level) {
-        if (Util.isInstalled(client)) {
-            return client;
-        }
-        OkHttpClient.Builder originBuilder = client.newBuilder();
-        originBuilder.addNetworkInterceptor(new XLoggingInterceptor(level));
-        originBuilder.dns(new XDns(client.dns()));
-        originBuilder.socketFactory(new XSocketFactory(client.socketFactory()));
-//        originBuilder.sslSocketFactory(new XSSLSocketFactory(client.sslSocketFactory()));
-        return originBuilder.build();
-    }
-
-
-
-
 }

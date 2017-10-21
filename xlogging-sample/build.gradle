@@ -21,6 +21,7 @@ android {
     lintOptions {
         abortOnError false
     }
+    useLibrary 'org.apache.http.legacy'
 }
 
 
@@ -53,4 +54,6 @@ dependencies {
     // butterknife
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    // eventbus
+    compile 'org.greenrobot:eventbus:3.0.0'
 }

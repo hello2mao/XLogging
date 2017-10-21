@@ -7,37 +7,78 @@ public class BaiduImageBean {
 
 
     /**
-     * tag1 : 美女
-     * tag2 : 全部
-     * totalNum : 16870
-     * start_index : 0
-     * return_number : 2
-     * data : [{"id":"21558403377","setId":"88314","pn":0,"abs":"可爱萝莉清纯照","desc":"",
-     * "tags":["清纯"],"tag":"全部","date":"2016-10-25","like_num":"","is_single":"","fashion_id":"",
-     * "dress_id":"","fushi_obj_num":"","fushi_obj_array":"null","dress_buy_link":"",
-     * "dress_price":"","dress_tag":"","dress_num":"","dress_discount":"","dress_other":"",
-     * "dress_extend_type":"","dress_extend_name":"","children_vote":"","dislike_num":"",
-     * "image_url":"http://b.hiphotos.baidu
-     * .com/image/pic/item/908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg","image_width":860,
-     * "image_height":1199,"download_url":"http://b.hiphotos.baidu
-     * .com/image/pic/item/908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg",
-     * "thumbnail_url":"http://b.hiphotos.baidu
-     * .com/image/w%3D230/sign=8820b194f303738dde4a0b21831bb073
-     * /908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg","thumbnail_width":230,
-     * "thumbnail_height":320,"thumb_large_width":310,"thumb_large_height":432,
-     * "thumb_large_url":"http://b.hiphotos.baidu
-     * .com/image/w%3D310/sign=7bb10d07768da9774e2f802a8051f872
-     * /908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg","site_name":"","site_logo":"",
-     * "site_url":"http://www.kanmx.com","from_url":"http://www.kanmx
-     * .com/mn/p/xiezhen/201409/31465.html","obj_url":"http://www.7lili
-     * .com/uploads/allimg/140915/0114512925-0.jpg","share_url":"http://b.hiphotos.baidu
-     * .com/image/s%3D550%3Bc%3Dwantu%2C8%2C95/sign=a1736326770e0cf3a4f74efe3a7d9122
-     * /908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg?referer=321aa0b1ccea15ce18f9d53927a0",
-     * "download_num":0,"collect_num":0,"start_index":0,"return_number":2,"album_di":"",
-     * "can_album_id":"","album_obj_num":"8","user_id":"3418195","app_id":"","colum":"美女",
-     * "photo_id":"21558403377","is_album":0,"is_vip":0,"from_name":0,"hostname":"www.kanmx.com",
-     * "parent_tag":"","desc_info":"","other_urls":[],"isAdapted":1},{}]
-     */
+         {
+            "tag1": "美女",
+             "tag2": "全部",
+             "totalNum": 16870,
+             "start_index": 0,
+             "return_number": 1,
+             "data": [
+                 {
+                     "id": "21559462259",
+                     "setId": "96349",
+                     "pn": 0,
+                     "abs": "日本清纯美女校花雪地写真",
+                     "desc": "",
+                     "tags": ["清纯"],
+                     "tag": "全部",
+                     "date": "2016-10-25",
+                     "like_num": "",
+                     "is_single": "",
+                     "fashion_id": "",
+                     "dress_id": "",
+                     "fushi_obj_num": "",
+                     "fushi_obj_array": "null",
+                     "dress_buy_link": "",
+                     "dress_price": "",
+                     "dress_tag": "",
+                     "dress_num": "",
+                     "dress_discount": "",
+                     "dress_other": "",
+                     "dress_extend_type": "",
+                     "dress_extend_name": "",
+                     "children_vote": "",
+                     "dislike_num": "",
+                     "image_url": "http://d.hiphotos.baidu.com/image/pic/item/55e736d12f2eb938e81944c7d0628535e5dd6f8a.jpg",
+                     "image_width": 600,
+                     "image_height": 787,
+                     "download_url": "http://d.hiphotos.baidu.com/image/pic/item/55e736d12f2eb938e81944c7d0628535e5dd6f8a.jpg",
+                     "thumbnail_url": "http://d.hiphotos.baidu.com/image/w%3D230/sign=707250b0ccea15ce41eee70a86003a25/55e736d12f2eb938e81944c7d0628535e5dd6f8a.jpg",
+                     "thumbnail_width": 230,
+                     "thumbnail_height": 301,
+                     "thumb_large_width": 310,
+                     "thumb_large_height": 406,
+                     "thumb_large_url": "http://d.hiphotos.baidu.com/image/w%3D310/sign=28fcc2ef10ce36d3a20485310af33a24/55e736d12f2eb938e81944c7d0628535e5dd6f8a.jpg",
+                     "site_name": "",
+                     "site_logo": "",
+                     "site_url": "http://www.kanmx.com",
+                     "from_url": "http://www.kanmx.com/mn/p/xiezhen/201407/30881.html",
+                     "obj_url": "http://www.7lili.com/uploads/allimg/20140611/140241625043W0-2T354.jpg",
+                     "share_url": "http://d.hiphotos.baidu.com/image/s%3D550%3Bc%3Dwantu%2C8%2C95/sign=8eb3a454f6deb48fff69a1dbc0245914/55e736d12f2eb938e81944c7d0628535e5dd6f8a.jpg?referer=efcbda5dc9bf6c81ae2019d8c988",
+                     "download_num": 0,
+                     "collect_num": 0,
+                     "start_index": 0,
+                     "return_number": 1,
+                     "album_di": "",
+                     "can_album_id": "",
+                     "album_obj_num": "12",
+                     "user_id": "3418195",
+                     "app_id": "",
+                     "colum": "美女",
+                     "photo_id": "21559462259",
+                     "is_album": 0,
+                     "is_vip": 0,
+                     "from_name": 0,
+                     "hostname": "www.kanmx.com",
+                     "parent_tag": "",
+                     "desc_info": "",
+                     "other_urls": [],
+                     "isAdapted": 1
+                 },
+                 {}
+            ]
+        }
+     **/
 
     private String tag1;
     private String tag2;
@@ -95,75 +136,6 @@ public class BaiduImageBean {
     }
 
     public static class DataBean {
-        /**
-         * id : 21558403377
-         * setId : 88314
-         * pn : 0
-         * abs : 可爱萝莉清纯照
-         * desc :
-         * tags : ["清纯"]
-         * tag : 全部
-         * date : 2016-10-25
-         * like_num :
-         * is_single :
-         * fashion_id :
-         * dress_id :
-         * fushi_obj_num :
-         * fushi_obj_array : null
-         * dress_buy_link :
-         * dress_price :
-         * dress_tag :
-         * dress_num :
-         * dress_discount :
-         * dress_other :
-         * dress_extend_type :
-         * dress_extend_name :
-         * children_vote :
-         * dislike_num :
-         * image_url : http://b.hiphotos.baidu
-         * .com/image/pic/item/908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg
-         * image_width : 860
-         * image_height : 1199
-         * download_url : http://b.hiphotos.baidu
-         * .com/image/pic/item/908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg
-         * thumbnail_url : http://b.hiphotos.baidu
-         * .com/image/w%3D230/sign=8820b194f303738dde4a0b21831bb073
-         * /908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg
-         * thumbnail_width : 230
-         * thumbnail_height : 320
-         * thumb_large_width : 310
-         * thumb_large_height : 432
-         * thumb_large_url : http://b.hiphotos.baidu
-         * .com/image/w%3D310/sign=7bb10d07768da9774e2f802a8051f872
-         * /908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg
-         * site_name :
-         * site_logo :
-         * site_url : http://www.kanmx.com
-         * from_url : http://www.kanmx.com/mn/p/xiezhen/201409/31465.html
-         * obj_url : http://www.7lili.com/uploads/allimg/140915/0114512925-0.jpg
-         * share_url : http://b.hiphotos.baidu
-         * .com/image/s%3D550%3Bc%3Dwantu%2C8%2C95/sign=a1736326770e0cf3a4f74efe3a7d9122
-         * /908fa0ec08fa513d17b6a2ea386d55fbb2fbd9e2.jpg?referer=321aa0b1ccea15ce18f9d53927a0
-         * download_num : 0
-         * collect_num : 0
-         * start_index : 0
-         * return_number : 2
-         * album_di :
-         * can_album_id :
-         * album_obj_num : 8
-         * user_id : 3418195
-         * app_id :
-         * colum : 美女
-         * photo_id : 21558403377
-         * is_album : 0
-         * is_vip : 0
-         * from_name : 0
-         * hostname : www.kanmx.com
-         * parent_tag :
-         * desc_info :
-         * other_urls : []
-         * isAdapted : 1
-         */
 
         private String id;
         private String setId;
