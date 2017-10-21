@@ -19,6 +19,7 @@ public class IOInstrument {
                                                       OutputStream originOutputStream,
                                                       ParsingOutputStream originParsingOutputStream) {
         if (originOutputStream == null) {
+            log.verbose("instrumentInputStream originOutputStream == null");
             return null;
         }
         if (originParsingOutputStream != null && originParsingOutputStream.isDelegateSame(originOutputStream)) {
@@ -46,6 +47,7 @@ public class IOInstrument {
                                                     InputStream originInputStream,
                                                     ParsingInputStream originParsingInputStream) {
         if (originInputStream == null) {
+            log.verbose("instrumentInputStream originInputStream == null");
             return null;
         }
         if (originParsingInputStream != null && originParsingInputStream.isDelegateSame(originInputStream)) {

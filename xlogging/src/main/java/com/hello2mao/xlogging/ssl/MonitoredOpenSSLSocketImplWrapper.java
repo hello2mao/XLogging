@@ -2,9 +2,9 @@ package com.hello2mao.xlogging.ssl;
 
 import com.android.org.conscrypt.OpenSSLSocketImplWrapper;
 import com.android.org.conscrypt.SSLParametersImpl;
-import com.hello2mao.xlogging.harvest.Harvest;
 import com.hello2mao.xlogging.MonitoredSocketInterface;
 import com.hello2mao.xlogging.TransactionState;
+import com.hello2mao.xlogging.harvest.Harvest;
 import com.hello2mao.xlogging.io.IOInstrument;
 import com.hello2mao.xlogging.io.ParsingInputStream;
 import com.hello2mao.xlogging.io.ParsingOutputStream;
@@ -80,7 +80,11 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             if (firstCallHandshake) {
                 this.sslHandshakeEndTime = System.currentTimeMillis();
             }
-            parsingInputStream.setFd(getFileDescriptor$());
+            if (parsingInputStream != null) {
+                parsingInputStream.setFd(getFileDescriptor$());
+            }
+
+            log.debug("startHandshake: " + getInetAddress() + " " + sslHandshakeStartTime + " " + sslHandshakeEndTime + " " + getFileDescriptor$());
         } catch (IOException e) {
             error(e);
             throw e;
@@ -102,6 +106,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
 
     @Override
     public InputStream getInputStream() throws IOException {
+        log.debug("MonitoredOpenSSLSocketImplWrapper getInputStream(): " + getInetAddress());
         InputStream inputStream;
         try {
             inputStream = super.getInputStream();
@@ -115,6 +120,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
 
     @Override
     public OutputStream getOutputStream() throws IOException {
+        log.debug("MonitoredOpenSSLSocketImplWrapper getOutputStream(): " + getInetAddress());
         OutputStream outputStream;
         try {
             outputStream = super.getOutputStream();

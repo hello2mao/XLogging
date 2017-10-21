@@ -1,8 +1,6 @@
 package com.hello2mao.xlogging.tcpv2;
 
 
-import android.util.Log;
-
 import com.hello2mao.xlogging.MonitoredSocketInterface;
 import com.hello2mao.xlogging.TcpData;
 import com.hello2mao.xlogging.TransactionState;
@@ -253,12 +251,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             this.tcpConnectEndTime = System.currentTimeMillis();
             if (port == 443 ) {
                 TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
-                if (parsingInputStream != null) {
-                    parsingInputStream.setFd(fd);
-                    Log.d("MonitoredSocketImplV2", "connect: setFd");
-                }
             }
-            Log.d("MonitoredSocketImplV2", "connect: " + tcpConnectStartTime + " " + tcpConnectEndTime);
         } catch (IOException e) {
             e.printStackTrace();
             throw  e;

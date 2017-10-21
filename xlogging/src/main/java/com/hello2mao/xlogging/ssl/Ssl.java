@@ -18,6 +18,7 @@ public class Ssl {
             return true;
         }
         try {
+            // FIXME:如果APP主动调用HttpsURLConnection#setSSLSocketFactory()则会覆盖XLogging的
             HttpsURLConnection.setDefaultSSLSocketFactory(new MonitoredSSLSocketFactory(defaultSSLSocketFactory));
             return true;
         } catch (Exception e) {

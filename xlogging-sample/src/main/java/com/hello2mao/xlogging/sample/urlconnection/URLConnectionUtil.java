@@ -33,12 +33,12 @@ public class URLConnectionUtil {
                 try {
                     URL url = new URL(MainActivity.RES_URL);
                     HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-                    connection.setSSLSocketFactory(createSSL());
+//                    connection.setSSLSocketFactory(createSSL());
                     connection.setDoOutput(false);
                     connection.setDoInput(true);
                     connection.setConnectTimeout(10 * 1000);
                     connection.setRequestMethod("GET");
-                    connection.connect();
+//                    connection.connect();
                     StringBuffer sb = new StringBuffer();
                     if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
