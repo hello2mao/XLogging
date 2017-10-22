@@ -7,4 +7,6 @@ public interface MonitoredSocketInterface {
     TransactionState dequeueTransactionState();
 
     void enqueueTransactionState(TransactionState transactionState);
+
+    String getName();
 }

@@ -208,6 +208,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         if (transactionState == null) {
             return;
         }
+        log.debug(transactionState.toString());
 //        transactionState.setBytesReceived(bytesReceived);
 //        if (currentTime > 0L) {
 //            transactionState.setResponseEndTime(currentTime);

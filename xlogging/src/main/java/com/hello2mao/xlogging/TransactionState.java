@@ -68,7 +68,7 @@ public class TransactionState {
         this.tcpConnectEndTime = -1L;
         this.sslHandshakeStartTime = -1L;
         this.sslHandshakeEndTime = -1L;
-        this.requestStartTime = -1L;
+        this.requestStartTime = System.currentTimeMillis();
         this.requestEndTime = -1L;
         this.responseStartTime = -1L;
         this.responseEndTime = -1L;
@@ -96,7 +96,7 @@ public class TransactionState {
         this.tcpConnectStartTime = transactionState.getTcpConnectStartTime();
         this.tcpConnectEndTime = transactionState.getTcpConnectEndTime();
         this.sslHandshakeStartTime = transactionState.getSslHandshakeStartTime();
-        this.sslHandshakeEndTime = -transactionState.getSslHandshakeEndTime();
+        this.sslHandshakeEndTime = transactionState.getSslHandshakeEndTime();
         this.requestStartTime = transactionState.getRequestStartTime();
         this.requestEndTime = transactionState.getRequestEndTime();
         this.responseStartTime = transactionState.getResponseStartTime();
@@ -294,28 +294,28 @@ public class TransactionState {
 
     @Override
     public String toString() {
-        return "TransactionState{" +
-                "host='" + host + '\'' +
-                ", ipAddress='" + ipAddress + '\'' +
-                ", scheme='" + scheme + '\'' +
-                ", httpPath='" + httpPath + '\'' +
-                ", requestMethod='" + requestMethod + '\'' +
-                ", statusCode=" + statusCode +
-                ", bytesSent=" + bytesSent +
-                ", bytesReceived=" + bytesReceived +
-                ", dnsLookupStartTime=" + dnsLookupStartTime +
-                ", dnsLookupEndTime=" + dnsLookupEndTime +
-                ", tcpConnectStartTime=" + tcpConnectStartTime +
-                ", tcpConnectEndTime=" + tcpConnectEndTime +
-                ", sslHandshakeStartTime=" + sslHandshakeStartTime +
-                ", sslHandshakeEndTime=" + sslHandshakeEndTime +
-                ", requestStartTime=" + requestStartTime +
-                ", requestEndTime=" + requestEndTime +
-                ", responseStartTime=" + responseStartTime +
-                ", responseEndTime=" + responseEndTime +
-                ", exception='" + exception + '\'' +
-                ", socketReuse=" + socketReuse +
-                ", state=" + state +
+        return "TransactionState{" + '\n' +
+                "  host='" + host + '\'' + '\n' +
+                "  ipAddress='" + ipAddress + '\'' + '\n' +
+                "  scheme='" + scheme + '\'' + '\n' +
+                "  httpPath='" + httpPath + '\'' + '\n' +
+                "  requestMethod='" + requestMethod + '\'' + '\n' +
+                "  statusCode=" + statusCode + '\n' +
+                "  bytesSent=" + bytesSent + '\n' +
+                "  bytesReceived=" + bytesReceived + '\n' +
+                "  dnsLookupStartTime=" + dnsLookupStartTime + '\n' +
+                "  dnsLookupEndTime=" + dnsLookupEndTime + '\n' +
+                "  tcpConnectStartTime=" + tcpConnectStartTime + '\n' +
+                "  tcpConnectEndTime=" + tcpConnectEndTime + '\n' +
+                "  sslHandshakeStartTime=" + sslHandshakeStartTime + '\n' +
+                "  sslHandshakeEndTime=" + sslHandshakeEndTime + '\n' +
+                "  requestStartTime=" + requestStartTime + '\n' +
+                "  requestEndTime=" + requestEndTime + '\n' +
+                "  responseStartTime=" + responseStartTime + '\n' +
+                "  responseEndTime=" + responseEndTime + '\n' +
+                "  exception='" + exception + '\'' + '\n' +
+                "  socketReuse=" + socketReuse + '\n' +
+                "  state=" + state + '\n' +
                 '}';
     }
 }

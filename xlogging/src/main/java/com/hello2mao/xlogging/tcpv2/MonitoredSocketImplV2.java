@@ -191,6 +191,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         transactionState.setIpAddress(ipAddress);
         transactionState.setTcpConnectStartTime(tcpConnectStartTime);
         transactionState.setTcpConnectEndTime(tcpConnectEndTime);
+        transactionState.setScheme("http");
         return transactionState;
     }
 
@@ -206,6 +207,11 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         synchronized (queue) {
             return queue.poll();
         }
+    }
+
+    @Override
+    public String getName() {
+        return MonitoredSocketImplV2.class.getSimpleName();
     }
 
     public void error(Exception exception) {

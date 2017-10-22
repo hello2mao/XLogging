@@ -130,9 +130,6 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
         transactionState.setRequestMethod(requestMethod);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {
             transactionState.setScheme("https");
-        } else {
-            // FIXME:
-            transactionState.setScheme("http");
         }
         transactionState.setHttpPath(httpPath);
         monitoredSocket.enqueueTransactionState(transactionState);

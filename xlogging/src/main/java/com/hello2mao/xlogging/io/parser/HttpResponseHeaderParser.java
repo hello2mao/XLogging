@@ -43,16 +43,12 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
      */
     protected AbstractParser nextParserAfterEndOfHeader() {
         AbstractParser parser;
-        log.debug("HttextParserAfterEndOfHeader isChunkedTransferEnHeader");
         if (notAllowedToHaveMessageBody()) {
-            log.debug("nextParserAfterEndOfHeader notAllowedToHaveMessageBody");
             getHandler().finishedMessage(getCharactersInMessage());
             parser = getHandler().getInitialParser();
         } else if (isChunkedTransferEncoding()) {
-            log.debug("nextParserAfterEndOfHeader isChunkedTransferEncoding");
             parser = new HttpChunkSizeParser(this);
         } else if (isContentLengthSet()) {
-            log.debug("nextParserAfterEndOfHeader isContentLengthSet");
             if (getContentLength() > 0) {
                 parser = new HttpBodyParser(this, getContentLength());
             } else {
@@ -60,11 +56,9 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
                 parser = getHandler().getInitialParser();
             }
         } else if (getHandler().getParsedRequestMethod().equals("CONNECT")) {
-            log.debug("nextParserAfterEndOfHeader getParsedRequestMethod");
             getHandler().finishedMessage(getCharactersInMessage());
             parser= getHandler().getInitialParser();
         } else {
-            log.debug("nextParserAfterEndOfHeader EOFBodyParser");
             parser = new HttpEOFBodyParser(this);
         }
         return parser;

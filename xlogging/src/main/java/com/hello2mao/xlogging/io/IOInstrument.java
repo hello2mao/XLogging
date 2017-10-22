@@ -40,6 +40,7 @@ public class IOInstrument {
                         streamEvent.getException());
             }
         });
+        log.debug("Unsafe instrument OutputStream for " +  monitoredSocket.getName() + " success!");
         return newParsingOutputStream;
     }
 
@@ -68,6 +69,7 @@ public class IOInstrument {
                         streamEvent.getException());
             }
         });
+        log.debug("Unsafe instrument InputStream for " +  monitoredSocket.getName() + " success!");
         return newParsingInputStream;
     }
 }

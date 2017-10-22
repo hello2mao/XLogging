@@ -42,6 +42,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         TransactionState transactionState = new TransactionState();
         transactionState.setSslHandshakeStartTime(sslHandshakeStartTime);
         transactionState.setSslHandshakeEndTime(sslHandshakeEndTime);
+        transactionState.setScheme("https");
         return transactionState;
     }
 
@@ -57,6 +58,11 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         synchronized (queue) {
             return queue.poll();
         }
+    }
+
+    @Override
+    public String getName() {
+        return MonitoredOpenSSLSocketImplWrapper.class.getSimpleName();
     }
 
     public void error(Exception exception) {
@@ -80,11 +86,6 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             if (firstCallHandshake) {
                 this.sslHandshakeEndTime = System.currentTimeMillis();
             }
-            if (parsingInputStream != null) {
-                parsingInputStream.setFd(getFileDescriptor$());
-            }
-
-            log.debug("startHandshake: " + getInetAddress() + " " + sslHandshakeStartTime + " " + sslHandshakeEndTime + " " + getFileDescriptor$());
         } catch (IOException e) {
             error(e);
             throw e;
@@ -106,7 +107,6 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
 
     @Override
     public InputStream getInputStream() throws IOException {
-        log.debug("MonitoredOpenSSLSocketImplWrapper getInputStream(): " + getInetAddress());
         InputStream inputStream;
         try {
             inputStream = super.getInputStream();
@@ -115,12 +115,14 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             throw e;
         }
         this.parsingInputStream = IOInstrument.instrumentInputStream(this, inputStream, parsingInputStream);
+        if (parsingInputStream != null) {
+            parsingInputStream.setFd(getFileDescriptor$());
+        }
         return parsingInputStream;
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-        log.debug("MonitoredOpenSSLSocketImplWrapper getOutputStream(): " + getInetAddress());
         OutputStream outputStream;
         try {
             outputStream = super.getOutputStream();
