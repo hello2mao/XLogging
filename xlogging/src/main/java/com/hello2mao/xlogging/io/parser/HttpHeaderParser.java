@@ -22,30 +22,11 @@ public abstract class HttpHeaderParser extends AbstractParser {
         super(parser);
     }
 
-    protected abstract AbstractParser nextParserAfterEndOfHeader();
-
-    @Override
-    public AbstractParser nextParserAfterSuccessfulParse() {
-        if (parsedEndOfHeader) {
-            // 解析玩HTTP头，则nextParser
-            return nextParserAfterEndOfHeader();
-        } else {
-            buffer.length = 0;
-        }
-        // 没有解析玩HTTP头，则继续解析
-        return this;
-    }
-
-    @Override
-    public AbstractParser nextParserAfterBufferFull() {
-        buffer.length = 0;
-        return new NewlineLineParser(this);
-    }
-    
     @Override
     public boolean parse(CharBuffer charBuffer) {
         // header与body以\n\r分开，以此来判断是否到达header结尾
         if (buffer.length == 0 || (buffer.length == 1 && buffer.charArray[0] == '\r')) {
+            log.debug("Run parse in HttpHeaderParser: parsedEndOfHeader");
             return parsedEndOfHeader = true;
         }
         boolean parsedSuccess = true;
@@ -56,6 +37,7 @@ public abstract class HttpHeaderParser extends AbstractParser {
             }
             String key = split[0].trim();
             String value = split[1].trim();
+            log.debug("Run parse in HttpHeaderParser: " + charBuffer);
             HttpParserHandler handler = getHandler();
             if (!isContentLengthSet && key.equalsIgnoreCase("content-length")) {
                 int contentLength = Integer.parseInt(value);
@@ -78,6 +60,25 @@ public abstract class HttpHeaderParser extends AbstractParser {
         return parsedSuccess;
     }
 
+    protected abstract AbstractParser nextParserAfterEndOfHeader();
+
+    @Override
+    public AbstractParser nextParserAfterSuccessfulParse() {
+        if (parsedEndOfHeader) {
+            // 解析玩HTTP头，则nextParser
+            return nextParserAfterEndOfHeader();
+        } else {
+            buffer.length = 0;
+        }
+        // 没有解析玩HTTP头，则继续解析
+        return this;
+    }
+
+    @Override
+    public AbstractParser nextParserAfterBufferFull() {
+        buffer.length = 0;
+        return new NewlineLineParser(this);
+    }
 
     @Override
     protected int getInitialBufferSize() {

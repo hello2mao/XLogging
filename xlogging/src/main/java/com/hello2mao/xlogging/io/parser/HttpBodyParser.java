@@ -21,6 +21,7 @@ public class HttpBodyParser extends AbstractParser {
 
     @Override
     public boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in HttpBodyParser");
         return true;
     }
 

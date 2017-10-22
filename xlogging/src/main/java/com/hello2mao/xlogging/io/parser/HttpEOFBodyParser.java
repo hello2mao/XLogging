@@ -11,7 +11,7 @@ public class HttpEOFBodyParser extends AbstractParser {
 
     @Override
     public boolean parse(CharBuffer paramCharBuffer) {
-        log.debug("HttpEOFBodyParser parse");
+        log.debug("Run parse in HttpEOFBodyParser");
         return true;
     }
 

@@ -19,6 +19,12 @@ public class HttpChunkBodyParser extends AbstractParser {
         }
     }
 
+    @Override
+    public boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in HttpChunkBodyParser");
+        return true;
+    }
+
     private boolean isStatusError() {
         try {
             if (bodyContent == null && getHandler().getTransactionState() != null
@@ -44,7 +50,7 @@ public class HttpChunkBodyParser extends AbstractParser {
             if (bodyContent != null) {
                 this.getHandler().appendBody(bodyContent.toString());
             }
-            getHandler().finishedMessage(this.getCharactersInMessage());
+            getHandler().finishedMessage(getCharactersInMessage());
             getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
@@ -80,11 +86,6 @@ public class HttpChunkBodyParser extends AbstractParser {
     @Override
     public AbstractParser nextParserAfterBufferFull() {
         return null;
-    }
-
-    @Override
-    public boolean parse(CharBuffer charBuffer) {
-        return true;
     }
 
     @Override

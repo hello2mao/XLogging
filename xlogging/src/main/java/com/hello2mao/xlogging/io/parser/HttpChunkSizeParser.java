@@ -11,21 +11,8 @@ public class HttpChunkSizeParser extends AbstractParser {
     }
 
     @Override
-    public AbstractParser nextParserAfterSuccessfulParse() {
-        if (parsedChunkSize == 0) {
-            return new HttpTrailerParser(this);
-        }
-        buffer.length = 0;
-        return new HttpChunkBodyParser(this, parsedChunkSize);
-    }
-
-    @Override
-    public AbstractParser nextParserAfterBufferFull() {
-        return NoopLineParser.DEFAULT;
-    }
-
-    @Override
     public final boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in HttpChunkSizeParser");
         int len = charBuffer.length;
         int sep = 0;
         if (len >= 0) {
@@ -47,6 +34,20 @@ public class HttpChunkSizeParser extends AbstractParser {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    @Override
+    public AbstractParser nextParserAfterSuccessfulParse() {
+        if (parsedChunkSize == 0) {
+            return new HttpTrailerParser(this);
+        }
+        buffer.length = 0;
+        return new HttpChunkBodyParser(this, parsedChunkSize);
+    }
+
+    @Override
+    public AbstractParser nextParserAfterBufferFull() {
+        return NoopLineParser.DEFAULT;
     }
 
     @Override

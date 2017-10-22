@@ -10,6 +10,7 @@ import com.hello2mao.xlogging.io.ParsingInputStream;
 import com.hello2mao.xlogging.io.ParsingOutputStream;
 import com.hello2mao.xlogging.log.XLog;
 import com.hello2mao.xlogging.log.XLogManager;
+import com.hello2mao.xlogging.util.URLUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     @Override
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
+        transactionState.setIpAddress(URLUtil.getIpAddress(getInetAddress()));
         transactionState.setSslHandshakeStartTime(sslHandshakeStartTime);
         transactionState.setSslHandshakeEndTime(sslHandshakeEndTime);
         transactionState.setScheme("https");

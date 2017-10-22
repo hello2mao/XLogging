@@ -22,6 +22,7 @@ public class HttpStatusLineParser extends AbstractParser {
 
     @Override
     public boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in HttpStatusLineParser");
         String[] split = charBuffer.toString().split(" ");
         if (split.length >= 3) {
             try {

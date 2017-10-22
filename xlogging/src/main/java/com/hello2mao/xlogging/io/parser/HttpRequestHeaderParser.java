@@ -1,10 +1,18 @@
 package com.hello2mao.xlogging.io.parser;
 
 
+import com.hello2mao.xlogging.io.CharBuffer;
+
 public class HttpRequestHeaderParser extends HttpHeaderParser {
 
     public HttpRequestHeaderParser(AbstractParser parser) {
         super(parser);
+    }
+
+    @Override
+    public boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in HttpRequestHeaderParser");
+        return super.parse(charBuffer);
     }
 
     @Override

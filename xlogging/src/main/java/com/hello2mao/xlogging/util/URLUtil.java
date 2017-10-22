@@ -29,12 +29,11 @@ public class URLUtil {
         }
         try {
             String[] split = inetAddress.toString().split("/");
-            if (split != null && split.length == 2 && !TextUtils.isEmpty(split[1])) {
+            if (split.length == 2 && !TextUtils.isEmpty(split[1])) {
                 return split[1].contains(":") ? split[1].split(":")[0] : split[1];
             }
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return "";
     }

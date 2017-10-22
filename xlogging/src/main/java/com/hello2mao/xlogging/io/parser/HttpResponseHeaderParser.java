@@ -33,6 +33,7 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
 
     @Override
     public boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in HttpResponseHeaderParser");
         return super.parse(charBuffer);
     }
 
@@ -66,8 +67,7 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
 
     private boolean notAllowedToHaveMessageBody() {
         return (getHandler().getParsedRequestMethod().equals("HEAD"))
-                || ((this.parsedStatusCode >= 100) && (this.parsedStatusCode <= 199))
-                || (this.parsedStatusCode == 204)
-                || (this.parsedStatusCode == 304);
+                || ((parsedStatusCode >= 100) && (parsedStatusCode <= 199))
+                || (parsedStatusCode == 204) || (parsedStatusCode == 304);
     }
 }

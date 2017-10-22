@@ -31,6 +31,13 @@ public abstract class AbstractParser {
     }
 
     /**
+     * 对缓存的buffer进行解析
+     * @param charBuffer charBuffer
+     * @return boolean
+     */
+    public abstract boolean parse(CharBuffer charBuffer);
+
+    /**
      * 把单个字节加入缓存buffer进行parser
      *
      * @param oneByte the next byte of data from the stream.
@@ -125,8 +132,6 @@ public abstract class AbstractParser {
     public abstract AbstractParser nextParserAfterBufferFull();
 
     public abstract AbstractParser nextParserAfterSuccessfulParse();
-
-    public abstract boolean parse(CharBuffer charBuffer);
 
     private void reachedEOF() {
         getHandler().setNextParser(NoopLineParser.DEFAULT);
