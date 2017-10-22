@@ -13,25 +13,14 @@ public class HttpTrailerParser extends AbstractParser {
     }
 
     @Override
-    public final boolean parse(CharBuffer paramCharBuffer) {
+    public final boolean parse(CharBuffer charBuffer) {
         log.debug("Run parse in HttpTrailerParser");
-
-        if (paramCharBuffer.subStringTrimmed(paramCharBuffer.length).length() == 0) {}
-        // FIXME
-        for (boolean bool = true;; bool = false) {
-            this.foundEmptyLine = bool;
+        if (charBuffer.subStringTrimmed(charBuffer.length).length() == 0) {
+            this.foundEmptyLine = true;
             return true;
         }
+        return false;
     }
-
-    public boolean isFoundEmptyLine() {
-        return this.foundEmptyLine;
-    }
-
-    public void setFoundEmptyLine(boolean foundEmptyLine) {
-        this.foundEmptyLine = foundEmptyLine;
-    }
-
 
     @Override
     protected int getInitialBufferSize() {
@@ -51,7 +40,7 @@ public class HttpTrailerParser extends AbstractParser {
 
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
-        if (this.foundEmptyLine) {
+        if (foundEmptyLine) {
             getHandler().finishedMessage(getCharactersInMessage());
             return getHandler().getInitialParser();
         }

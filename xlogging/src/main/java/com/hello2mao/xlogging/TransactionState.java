@@ -108,12 +108,11 @@ public class TransactionState {
         this.state = transactionState.getState();
     }
 
-    public TransactionData end() {
-        return toTransactionData();
-    }
-
-    private TransactionData toTransactionData() {
-        return new TransactionData();
+    public void endTransaction() {
+        if (!isComplete()) {
+            this.state = State.COMPLETE;
+            this.responseEndTime = System.currentTimeMillis();
+        }
     }
 
     public boolean isComplete() {
@@ -303,8 +302,8 @@ public class TransactionState {
                 "  statusCode=" + statusCode + '\n' +
                 "  bytesSent=" + bytesSent + '\n' +
                 "  bytesReceived=" + bytesReceived + '\n' +
-                "  dnsLookupStartTime=" + dnsLookupStartTime + '\n' +
-                "  dnsLookupEndTime=" + dnsLookupEndTime + '\n' +
+//                "  dnsLookupStartTime=" + dnsLookupStartTime + '\n' +
+//                "  dnsLookupEndTime=" + dnsLookupEndTime + '\n' +
                 "  tcpConnectStartTime=" + tcpConnectStartTime + '\n' +
                 "  tcpConnectEndTime=" + tcpConnectEndTime + '\n' +
                 "  sslHandshakeStartTime=" + sslHandshakeStartTime + '\n' +

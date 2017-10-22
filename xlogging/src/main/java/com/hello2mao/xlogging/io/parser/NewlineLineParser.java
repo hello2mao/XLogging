@@ -13,6 +13,12 @@ public class NewlineLineParser extends AbstractParser {
     }
 
     @Override
+    public boolean parse(CharBuffer charBuffer) {
+        log.debug("Run parse in NewlineLineParser");
+        return true;
+    }
+
+    @Override
     public boolean add(int data) {
         if (data == -1) {
             getHandler().setNextParser(NoopLineParser.DEFAULT);
@@ -20,8 +26,8 @@ public class NewlineLineParser extends AbstractParser {
         }
         this.charactersInMessage += 1;
         if ((char) data == '\n') {
-            this.nextParserAfterNewline.setCharactersInMessage(getCharactersInMessage());
-            getHandler().setNextParser(this.nextParserAfterNewline);
+            nextParserAfterNewline.setCharactersInMessage(getCharactersInMessage());
+            getHandler().setNextParser(nextParserAfterNewline);
             return true;
         }
         return false;
@@ -47,10 +53,5 @@ public class NewlineLineParser extends AbstractParser {
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
         return this;
-    }
-
-    @Override
-    public boolean parse(CharBuffer paramCharBuffer) {
-        return true;
     }
 }

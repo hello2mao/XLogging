@@ -9,11 +9,12 @@ public class HttpChunkBodyParser extends AbstractParser {
     private HttpChunkSizeParser sizeParser;
     private StringBuilder bodyContent;
 
-    public HttpChunkBodyParser(HttpChunkSizeParser paramHttpChunkSizeParser, int chunkLength) {
-        super(paramHttpChunkSizeParser);
+    public HttpChunkBodyParser(HttpChunkSizeParser sizeParser, int chunkLength) {
+        super(sizeParser);
         this.count = 0;
-        this.sizeParser = paramHttpChunkSizeParser;
+        this.sizeParser = sizeParser;
         this.chunkLength = chunkLength;
+        // StatusCode>=400则记录body
         if (isStatusError()) {
             bodyContent = new StringBuilder();
         }
@@ -28,8 +29,7 @@ public class HttpChunkBodyParser extends AbstractParser {
     private boolean isStatusError() {
         try {
             if (bodyContent == null && getHandler().getTransactionState() != null
-                    && (getHandler().getTransactionState().getStatusCode() >= 400
-                    || getHandler().getTransactionState().getStatusCode() == -1)) {
+                    && getHandler().getTransactionState().getStatusCode() >= 400) {
                 return true;
             }
         } catch (Exception e) {
@@ -39,39 +39,34 @@ public class HttpChunkBodyParser extends AbstractParser {
     }
 
     @Override
-    public boolean add(final int data) {
-        if (this.count >= this.chunkLength + 2) {
+    public boolean add(int oneByte) {
+        if (count >= chunkLength + 2) {
             return false;
         }
         if (bodyContent != null && bodyContent.toString().length() < 1024) {
-            bodyContent.append((char) data);
+            bodyContent.append((char) oneByte);
         }
-        if (data == -1) {
+        // 流结束
+        if (oneByte == -1) {
             if (bodyContent != null) {
-                this.getHandler().appendBody(bodyContent.toString());
+                getHandler().appendBody(bodyContent.toString());
             }
             getHandler().finishedMessage(getCharactersInMessage());
             getHandler().setNextParser(NoopLineParser.DEFAULT);
             return true;
         }
-        ++this.charactersInMessage;
-        final char character = (char) data;
-        ++this.count;
-        if (this.count > this.chunkLength) {
+        ++charactersInMessage;
+        char character = (char) oneByte;
+        ++count;
+        if (count > chunkLength) {
             this.currentTimeStamp = System.currentTimeMillis();
-            if (character == '\n') {
+            if (character == '\n') { // 本次ChunkedBody结束，但整个chunked传输还未结束
+                parse(null);
                 if (bodyContent != null) {
                     getHandler().appendBody(bodyContent.toString());
                 }
-                sizeParser.setCharactersInMessage(this.getCharactersInMessage());
-                getHandler().setNextParser(this.sizeParser);
-                return true;
-            }
-            if (this.count == this.chunkLength + 2 && character != '\n') {
-                if (bodyContent != null) {
-                    getHandler().appendBody(bodyContent.toString());
-                }
-                getHandler().setNextParser(NoopLineParser.DEFAULT);
+                sizeParser.setCharactersInMessage(getCharactersInMessage());
+                getHandler().setNextParser(sizeParser);
                 return true;
             }
         }

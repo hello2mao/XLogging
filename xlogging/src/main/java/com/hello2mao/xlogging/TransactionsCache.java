@@ -39,26 +39,17 @@ public class TransactionsCache {
         return tcpDataCaches.get(fd);
     }
 
-
-
-//    public static void setNetWorkTransactionState(MonitoredSocketInterface monitoredSocket,
-//                                                  TransactionState transactionState) {
-//        TransactionState currentTransactionState = monitoredSocket.dequeueNetworkTransactionState();
-//        if (currentTransactionState != null) {
-//            transactionState.setHttpPath(currentTransactionState.getHttpPath());
-//            transactionState.setHost(currentTransactionState.getUrlBuilder().getHostname());
-//            transactionState.setNetworkLib(currentTransactionState.getNetworkLib());
-//            transactionState.setRequestMethod(currentTransactionState.getRequestMethodType());
-//            transactionState.setStartTime(currentTransactionState.getStartTime());
-//            transactionState.setTyIdRandomInt(currentTransactionState.getTyIdRandomInt());
-//            transactionState.setRequestEndTime(currentTransactionState.getRequestEndTime());
-//            transactionState.setBytesSent(currentTransactionState.getBytesSent());
-//            transactionState.setScheme(currentTransactionState.getUrlBuilder().getScheme());
-//            transactionState.setPort(currentTransactionState.getPort());
-//            transactionState.setAddress(currentTransactionState.getUrlBuilder().getHostAddress());
-//            transactionState.setState(1);
-//        }
-//    }
+    public static void setTransactionState(MonitoredSocketInterface monitoredSocket,
+                                                  TransactionState transactionState) {
+        TransactionState currentTransactionState = monitoredSocket.dequeueTransactionState();
+        if (currentTransactionState != null) {
+            transactionState.setHost(currentTransactionState.getHost());
+            transactionState.setIpAddress(currentTransactionState.getIpAddress());
+            transactionState.setScheme(currentTransactionState.getScheme());
+            transactionState.setHttpPath(currentTransactionState.getHttpPath());
+            transactionState.setRequestMethod(currentTransactionState.getRequestMethod());
+        }
+    }
 
 
 

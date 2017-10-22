@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.hello2mao.xlogging.MonitoredSocketInterface;
+import com.hello2mao.xlogging.TcpData;
 import com.hello2mao.xlogging.TransactionState;
+import com.hello2mao.xlogging.TransactionsCache;
 import com.hello2mao.xlogging.io.parser.AbstractParser;
 import com.hello2mao.xlogging.io.parser.HttpParserHandler;
 import com.hello2mao.xlogging.io.parser.HttpStatusLineParser;
@@ -195,7 +197,9 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
 
     @Override
     public void appendBody(String body) {
-        // ignore
+        if (getTransactionState().getStatusCode() >= 400) {
+            log.debug("status code >= 400, body: " + body);
+        }
     }
 
     @Override
@@ -208,48 +212,26 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         if (transactionState == null) {
             return;
         }
+        readCount++;
+        if (readCount > 1) {
+            transactionState.setSocketReuse(true);
+            TransactionsCache.setTransactionState(monitoredSocket, transactionState);
+        }
         transactionState.setBytesReceived(bytesReceived);
+        transactionState.endTransaction();
         if (currentTime > 0L) {
+            // Override
             transactionState.setResponseEndTime(currentTime);
         }
-        log.debug(transactionState.toString());
-
-
-//        if (readCount >= 1) {
-//            TransactionsCache.setNetWorkTransactionState(monitoredSocket, transactionState);
-//        }
-//            this.transactionState.setEndTime();
-//            this.transactionState.setSocketReusability(this.readCount++);
-//            this.transactionState.endTransaction();
-//            int connectTime = 0;
-//            if (TextUtils.isEmpty(this.transactionState.getIpAddress())
-//                    && this.transactionState.getUrlBuilder() != null) {
-//                final String ipAddress = URLUtil.getIpAddress(
-//                                URLUtil.getHost(this.transactionState.getUrlBuilder().getHostname()));
-//                if (!TextUtils.isEmpty(ipAddress)) {
-//                    this.transactionState.setAddress(ipAddress);
-//                }
-//            }
-//            if (this.readCount == 1) {
-//                if (this.transactionState.getPort() == 443) {
-//                    if (socketDescriptor == null) {
-//                        LOG.warning("no fd found in inputStreamV2!");
-//                        return;
-//                    }
-//                    Integer connectTimeObj = TcpDataCache.connectMap.get(socketDescriptor);
-//                    if (connectTimeObj == null) {
-//                        LOG.debug("no fd found on SSLSocket in inputStreamV2");
-//                        return;
-//                    }
-//                    connectTime = connectTimeObj;
-//                } else {
-//                    connectTime = this.transactionState.getTcpHandShakeTime();
-//                }
-//            }
-//        transactionState.setTcpHandShakeTime(connectTime);
-//        // FIXME: URL过滤逻辑，未实现
-//        int sslHandShakeTime =  ((this.readCount > 1) ? 0 : this.transactionState.getSslHandShakeTime());
-//        transactionState.setSslHandShakeTime(sslHandShakeTime);
+        if (readCount == 1 && transactionState.getScheme().equals("https")) {
+            TcpData tcpData = TransactionsCache.getTcpData(fd);
+            if (tcpData != null) {
+                transactionState.setTcpConnectStartTime(tcpData.getTcpConnectStartTime());
+                transactionState.setTcpConnectEndTime(tcpData.getTcpConnectEndTime());
+            } else {
+                log.warning("No TcpData for https in cache!");
+            }
+        }
         notifyStreamComplete();
     }
 

@@ -24,7 +24,7 @@ public abstract class HttpHeaderParser extends AbstractParser {
 
     @Override
     public boolean parse(CharBuffer charBuffer) {
-        // header与body以\n\r分开，以此来判断是否到达header结尾
+        // header与body以\r\n分开，buffer.charArray[0] == '\r'则到达header结尾
         if (buffer.length == 0 || (buffer.length == 1 && buffer.charArray[0] == '\r')) {
             log.debug("Run parse in HttpHeaderParser: parsedEndOfHeader");
             return parsedEndOfHeader = true;

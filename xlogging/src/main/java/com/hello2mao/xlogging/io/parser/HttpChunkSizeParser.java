@@ -5,6 +5,7 @@ import com.hello2mao.xlogging.io.CharBuffer;
 public class HttpChunkSizeParser extends AbstractParser {
 
     private int parsedChunkSize = -1;
+    private static final int INITIAL_BUFFER_SIZE = 16;
 
     public HttpChunkSizeParser(AbstractParser parser) {
         super(parser);
@@ -13,23 +14,10 @@ public class HttpChunkSizeParser extends AbstractParser {
     @Override
     public final boolean parse(CharBuffer charBuffer) {
         log.debug("Run parse in HttpChunkSizeParser");
-        int len = charBuffer.length;
-        int sep = 0;
-        if (len >= 0) {
-            int i = 0;
-            while (i < len) {
-                if (charBuffer.charArray[i] == ';') {
-                    sep = i;
-                    break;
-                }
-                ++i;
-            }
-        }
-        if (sep == 0) {
-            sep = len;
-        }
         try {
-            this.parsedChunkSize = Integer.parseInt(charBuffer.subStringTrimmed(sep), 16);
+            // 第一部分是十六进制表示的块长度
+            // 当为0时，chunked传输结束
+            this.parsedChunkSize = Integer.parseInt(charBuffer.subStringTrimmed(charBuffer.length), 16);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -39,6 +27,7 @@ public class HttpChunkSizeParser extends AbstractParser {
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
         if (parsedChunkSize == 0) {
+            // 整个chunk传输完成
             return new HttpTrailerParser(this);
         }
         buffer.length = 0;
@@ -52,7 +41,7 @@ public class HttpChunkSizeParser extends AbstractParser {
 
     @Override
     protected int getInitialBufferSize() {
-        return 16;
+        return INITIAL_BUFFER_SIZE;
     }
 
     @Override
