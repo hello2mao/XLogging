@@ -39,6 +39,12 @@ public class TransactionsCache {
         return tcpDataCaches.get(fd);
     }
 
+    /**
+     * 拷贝部分指标
+     *
+     * @param monitoredSocket MonitoredSocketInterface
+     * @param transactionState TransactionState
+     */
     public static void setTransactionState(MonitoredSocketInterface monitoredSocket,
                                                   TransactionState transactionState) {
         TransactionState currentTransactionState = monitoredSocket.dequeueTransactionState();
@@ -48,6 +54,8 @@ public class TransactionsCache {
             transactionState.setScheme(currentTransactionState.getScheme());
             transactionState.setHttpPath(currentTransactionState.getHttpPath());
             transactionState.setRequestMethod(currentTransactionState.getRequestMethod());
+            transactionState.setBytesSent(currentTransactionState.getBytesSent());
+            transactionState.setRequestEndTime(currentTransactionState.getRequestEndTime());
         }
     }
 
