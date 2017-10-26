@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.util;
 
-
 import android.text.TextUtils;
 
 import java.net.InetAddress;
