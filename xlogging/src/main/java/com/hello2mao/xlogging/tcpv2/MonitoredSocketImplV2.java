@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.tcpv2;
 
-
 import com.hello2mao.xlogging.MonitoredSocketInterface;
 import com.hello2mao.xlogging.TcpData;
 import com.hello2mao.xlogging.TransactionState;
