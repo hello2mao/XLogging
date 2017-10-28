@@ -1,6 +1,7 @@
 package com.hello2mao.xlogging.sample.okhttp.api;
 
 
+import com.hello2mao.xlogging.sample.MainActivity;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 
 import retrofit2.http.GET;
@@ -9,7 +10,7 @@ import rx.Observable;
 
 public interface BaiduImageApis {
 
-    String HOST = "https://image.baidu.com/";
+    String BASE_URL = MainActivity.RES_SCHEME + "://" + MainActivity.RES_HOST;
 
     // https://image.baidu.com/channel/listjson?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8
     // 返回格式为json

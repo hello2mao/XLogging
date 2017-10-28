@@ -36,7 +36,7 @@ public class RetrofitHelper {
 
     private void init() {
         initOkHttp();
-        baiduImageApis = getApiService(BaiduImageApis.HOST, BaiduImageApis.class);
+        baiduImageApis = getApiService(BaiduImageApis.BASE_URL, BaiduImageApis.class);
     }
 
     private void initOkHttp() {

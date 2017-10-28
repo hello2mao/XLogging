@@ -33,12 +33,12 @@ public class OkHttpUtil {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-
+                        throwable.printStackTrace();
                     }
                 }, new Action0() {
                     @Override
                     public void call() {
-
+                        // ignore
                     }
                 });
     }

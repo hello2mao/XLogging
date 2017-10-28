@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 
+import com.hello2mao.xlogging.TransactionData;
 import com.hello2mao.xlogging.XLogging;
+import com.hello2mao.xlogging.XLoggingCallback;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 import com.hello2mao.xlogging.sample.httpclient.HttpClientUtil;
 import com.hello2mao.xlogging.sample.okhttp.OkHttpUtil;
@@ -22,6 +24,12 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String RES_SCHEME = "https";
+    public static final String RES_HOST = "image.baidu.com";
+    public static final String RES_PATH = "/channel/listjson";
+    public static final String RES_QUERY = "?pn=0&rn=10&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
+    public static final String RES_URL = RES_SCHEME + "://" + RES_HOST + RES_PATH + RES_QUERY;
+
     @BindView(R.id.iv_pic)
     ImageView ivPic;
     @BindView(R.id.URLConnection)
@@ -31,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.HttpClient)
     RadioButton rbHttpClient;
 
-    public static final String RES_URL = "https://image.baidu.com/channel/listjson?pn=0&rn=10&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +46,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ButterKnife.bind(this);
         // 安装XLogging
-        XLogging.install();
+//        XLogging.install();
+        // 安装带回调的XLogging
+        XLogging.install(new XLoggingCallback() {
+            @Override
+            public void handle(TransactionData transactionData) {
+                System.out.println(transactionData.toString());
+            }
+        });
 
 
         showPic();
@@ -82,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BaiduImageBean baiduImageBean) {
+        // 主线程更新UI，使用Eventbus
 //        Glide.with(getApplicationContext())
 //                .load(baiduImageBean.getData().get(new Random().nextInt(10)).getImage_url())
 //                .crossFade()
