@@ -23,23 +23,41 @@ public class MonitoredSSLSocketFactory extends SSLSocketFactory {
         this.sslParameters = getParameters(ssLSocketFactory);
     }
 
-    @Override
-    public String[] getDefaultCipherSuites() {
-        return delegate.getDefaultCipherSuites();
+    private static SSLParametersImpl getParameters(SSLSocketFactory sslSocketFactory) {
+        SSLParametersImpl sslParametersImpl;
+        try {
+            sslParametersImpl = (SSLParametersImpl) ReflectionUtil.getFieldFromObject(
+                    ReflectionUtil.getFieldFromClass(sslSocketFactory.getClass(),
+                            SSLParametersImpl.class), sslSocketFactory);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sslParametersImpl = null;
+        }
+        return cloneSSLParameters(sslParametersImpl);
+    }
+
+    private static SSLParametersImpl cloneSSLParameters(SSLParametersImpl sslParametersImpl) {
+        try {
+            Method declaredMethod = SSLParametersImpl.class.getDeclaredMethod("clone",
+                    (Class<?>[]) new Class[0]);
+            declaredMethod.setAccessible(true);
+            return (SSLParametersImpl) declaredMethod.invoke(sslParametersImpl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public String[] getSupportedCipherSuites() {
-        return delegate.getSupportedCipherSuites();
+    public Socket createSocket(Socket socket, String host, int port, boolean autoClose)
+            throws IOException {
+        return new MonitoredOpenSSLSocketImplWrapper(socket, host, port, autoClose,
+                cloneSSLParameters(sslParameters));
     }
 
     @Override
-    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException {
-        return new MonitoredOpenSSLSocketImplWrapper(socket, host, port, autoClose, cloneSSLParameters(sslParameters));
-    }
-
-    @Override
-    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
+            throws IOException {
         log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-2");
         return delegate.createSocket(host, port, localHost, localPort);
     }
@@ -57,7 +75,8 @@ public class MonitoredSSLSocketFactory extends SSLSocketFactory {
     }
 
     @Override
-    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress,
+                               int localPort) throws IOException {
         log.warning("Unexpected, MonitoredSSLSocketFactory createSocket-5");
         return delegate.createSocket(address, port, localAddress, localPort);
     }
@@ -68,26 +87,15 @@ public class MonitoredSSLSocketFactory extends SSLSocketFactory {
         return delegate.createSocket();
     }
 
-    private static SSLParametersImpl getParameters(SSLSocketFactory sslSocketFactory) {
-        SSLParametersImpl sslParametersImpl;
-        try {
-            sslParametersImpl = (SSLParametersImpl) ReflectionUtil.getFieldFromObject(
-                    ReflectionUtil.getFieldFromClass(sslSocketFactory.getClass(), SSLParametersImpl.class), sslSocketFactory);
-        } catch (Exception e) {
-            e.printStackTrace();
-            sslParametersImpl = null;
-        }
-        return cloneSSLParameters(sslParametersImpl);
+    @Override
+    public String[] getDefaultCipherSuites() {
+        return delegate.getDefaultCipherSuites();
     }
 
-    private static SSLParametersImpl cloneSSLParameters(SSLParametersImpl sslParametersImpl) {
-        try {
-            Method declaredMethod = SSLParametersImpl.class.getDeclaredMethod("clone", (Class<?>[]) new Class[0]);
-            declaredMethod.setAccessible(true);
-            return (SSLParametersImpl) declaredMethod.invoke(sslParametersImpl);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    @Override
+    public String[] getSupportedCipherSuites() {
+        return delegate.getSupportedCipherSuites();
     }
+
+
 }

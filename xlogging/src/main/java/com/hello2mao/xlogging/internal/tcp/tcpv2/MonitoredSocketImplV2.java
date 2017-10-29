@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -63,6 +64,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private ParsingOutputStream parsingOutputStream;
     private final Queue<TransactionState> queue;
     private String ipAddress;
+    private String host;
     private long tcpConnectStartTime;
     private long tcpConnectEndTime;
 
@@ -105,9 +107,12 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         if (socketImpl == null) {
             throw new NullPointerException("delegate was null");
         }
-        this.ipAddress = "";
         this.queue = new LinkedList<>();
         this.delegate = socketImpl;
+        this.ipAddress = "";
+        this.host = "";
+        this.tcpConnectStartTime = -1L;
+        this.tcpConnectEndTime = -1L;
         syncFromDelegate();
     }
 
@@ -176,17 +181,32 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         syncToDelegate();
         try {
             return (T) methods[index].invoke(delegate, params);
+        } catch (IllegalAccessException | IllegalArgumentException | ClassCastException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            Throwable targetException = e.getTargetException();
+            if (targetException == null) {
+                throw new RuntimeException(e);
+            }
+            if (targetException instanceof Exception) {
+                throw (Exception)targetException;
+            }
+            if (targetException instanceof Error) {
+                throw (Error) targetException;
+            }
+            throw new RuntimeException(targetException);
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         } finally {
             syncFromDelegate();
         }
-        return null;
     }
 
     @Override
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
+        transactionState.setHost(host);
         transactionState.setIpAddress(ipAddress);
         transactionState.setTcpConnectStartTime(tcpConnectStartTime);
         transactionState.setTcpConnectEndTime(tcpConnectEndTime);
@@ -214,6 +234,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     public void error(Exception exception) {
+        // TODO:
         TransactionState transactionState;
         if (parsingInputStream != null) {
             transactionState = parsingInputStream.getTransactionState();
@@ -232,13 +253,13 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected void connect(String host, int port) throws IOException {
-        log.info("Unexpected MonitoredSocketImplV2: tcpElapse-1");
+        log.warning("Unexpected MonitoredSocketImplV2: connect-1");
         invokeThrowsIOException(CONNECT_STRING_INT_IDX, new Object[] { host, port});
     }
 
     @Override
     protected void connect(InetAddress inetAddress, int port) throws IOException {
-        log.info("Unexpected MonitoredSocketImplV2: tcpElapse-2");
+        log.warning("Unexpected MonitoredSocketImplV2: connect-2");
         invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
     }
 
@@ -250,6 +271,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
                 // inetSocketAddress="/42.120.226.92:80" HttpClient
                 InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
                 this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
+                this.host = URLUtil.getHost(inetSocketAddress);
             }
             this.tcpConnectStartTime = System.currentTimeMillis();
             invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
@@ -279,14 +301,6 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
-    protected InputStream getInputStream() throws IOException {
-        this.parsingInputStream = IOInstrument.instrumentInputStream(this,
-                (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]),
-                parsingInputStream);
-        return parsingInputStream;
-    }
-
-    @Override
     protected OutputStream getOutputStream() throws IOException {
         this.parsingOutputStream = IOInstrument.instrumentOutputStream(this,
                 (OutputStream) invokeThrowsIOException(GET_OUTPUT_STREAM_IDX, new Object[0]),
@@ -295,12 +309,16 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     @Override
+    protected InputStream getInputStream() throws IOException {
+        this.parsingInputStream = IOInstrument.instrumentInputStream(this,
+                (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]),
+                parsingInputStream);
+        return parsingInputStream;
+    }
+
+    @Override
     protected int available() throws IOException {
-        Integer localInteger = (Integer) invokeThrowsIOException(AVAILABLE_IDX, new Object[0]);
-        if (localInteger == null) {
-            throw new RuntimeException("Received a null Integer");
-        }
-        return localInteger;
+        return (Integer) invokeThrowsIOException(AVAILABLE_IDX, new Object[0]);
     }
 
     @Override

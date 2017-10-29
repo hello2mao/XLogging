@@ -116,7 +116,8 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             error(e);
             throw e;
         }
-        this.parsingInputStream = IOInstrument.instrumentInputStream(this, inputStream, parsingInputStream);
+        this.parsingInputStream = IOInstrument.instrumentInputStream(this,
+                inputStream, parsingInputStream);
         if (parsingInputStream != null) {
             parsingInputStream.setFd(getFileDescriptor$());
         }
@@ -132,7 +133,8 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             error(e);
             throw e;
         }
-        this.parsingOutputStream = IOInstrument.instrumentOutputStream(this, outputStream, parsingOutputStream);
+        this.parsingOutputStream = IOInstrument.instrumentOutputStream(this,
+                outputStream, parsingOutputStream);
         return parsingOutputStream;
     }
 

@@ -9,7 +9,7 @@ public class TransactionState {
     private String host;
     private String ipAddress;
     private String scheme;
-    private String httpPath;
+    private String pathAndQuery;
     private String requestMethod;
     private int statusCode;
     private long bytesSent;
@@ -56,7 +56,7 @@ public class TransactionState {
         this.host = "";
         this.ipAddress = "";
         this.scheme = "";
-        this.httpPath = "";
+        this.pathAndQuery = "";
         this.requestMethod = "";
         this.statusCode = -1;
         this.bytesSent = -1;
@@ -68,7 +68,7 @@ public class TransactionState {
         this.tcpConnectEndTime = -1L;
         this.sslHandshakeStartTime = -1L;
         this.sslHandshakeEndTime = -1L;
-        this.requestStartTime = System.currentTimeMillis();
+        this.requestStartTime = -1L;
         this.requestEndTime = -1L;
         this.responseStartTime = -1L;
         this.responseEndTime = -1L;
@@ -85,7 +85,7 @@ public class TransactionState {
         this.host = transactionState.getHost();
         this.ipAddress = transactionState.getIpAddress();
         this.scheme = transactionState.getScheme();
-        this.httpPath = transactionState.getHttpPath();
+        this.pathAndQuery = transactionState.getPathAndQuery();
         this.requestMethod = transactionState.getRequestMethod();
         this.statusCode = transactionState.getStatusCode();
         this.bytesSent = transactionState.getBytesSent();
@@ -147,12 +147,12 @@ public class TransactionState {
         this.scheme = scheme;
     }
 
-    public String getHttpPath() {
-        return httpPath;
+    public String getPathAndQuery() {
+        return pathAndQuery;
     }
 
-    public void setHttpPath(String httpPath) {
-        this.httpPath = httpPath;
+    public void setPathAndQuery(String pathAndQuery) {
+        this.pathAndQuery = pathAndQuery;
     }
 
     public String getRequestMethod() {
@@ -297,7 +297,7 @@ public class TransactionState {
                 "  host='" + host + '\'' + '\n' +
                 "  ipAddress='" + ipAddress + '\'' + '\n' +
                 "  scheme='" + scheme + '\'' + '\n' +
-                "  httpPath='" + httpPath + '\'' + '\n' +
+                "  pathAndQuery='" + pathAndQuery + '\'' + '\n' +
                 "  requestMethod='" + requestMethod + '\'' + '\n' +
                 "  statusCode=" + statusCode + '\n' +
                 "  bytesSent=" + bytesSent + '\n' +

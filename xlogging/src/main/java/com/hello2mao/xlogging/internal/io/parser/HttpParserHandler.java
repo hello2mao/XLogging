@@ -10,7 +10,7 @@ public interface HttpParserHandler {
 
     void setNextParser(AbstractParser parser);
 
-    void requestLineFound(String requestMethod, String httpPath);
+    void requestLineFound(String requestMethod, String pathAndQuery);
 
     void hostNameFound(String host);
 

@@ -12,15 +12,16 @@ public class TcpV1 {
 
     public static boolean install() {
         if (installed) {
-            log.debug("createSocketImplFactory is initialized V1");
+            log.debug("Already install MonitoredSocketImplV1");
             return true;
         }
-        final MonitoredSocketImplFactoryV1 socketImplFactory = new MonitoredSocketImplFactoryV1();
+        MonitoredSocketImplFactoryV1 socketImplFactory = new MonitoredSocketImplFactoryV1();
         try {
             Socket.setSocketImplFactory(socketImplFactory);
             installed = true;
             return true;
         } catch (Throwable t) {
+            t.printStackTrace();
             return installed;
         }
     }

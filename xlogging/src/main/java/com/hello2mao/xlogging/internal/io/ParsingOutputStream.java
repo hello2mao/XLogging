@@ -125,13 +125,14 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     @Override
-    public void requestLineFound(String requestMethod, String httpPath) {
+    public void requestLineFound(String requestMethod, String pathAndQuery) {
         TransactionState transactionState = getTransactionState();
+        transactionState.setRequestStartTime(System.currentTimeMillis());
         transactionState.setRequestMethod(requestMethod);
+        transactionState.setPathAndQuery(pathAndQuery);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {
             transactionState.setScheme("https");
         }
-        transactionState.setHttpPath(httpPath);
         monitoredSocket.enqueueTransactionState(transactionState);
     }
 
