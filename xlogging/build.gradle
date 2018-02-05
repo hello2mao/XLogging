@@ -2,12 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 27
     defaultConfig {
         // Android 5.0
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 2
         versionName "2.0.0"
     }
@@ -23,7 +22,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:appcompat-v7:27.0.2'
     provided 'com.squareup.okhttp3:okhttp:3.9.0'
     provided 'com.bugvm:bugvm-rt:1.0.5'
 }
@@ -32,7 +31,7 @@ publish {
     userOrg = 'hello2mao'
     groupId = 'com.hello2mao'   // compile引用时的第1部分groupId
     artifactId = 'xlogging'     // compile引用时的第2部分项目名
-    publishVersion = '2.0.0'    // compile引用时的第3部分版本号
+    publishVersion = android.defaultConfig.versionName    // compile引用时的第3部分版本号
     desc = 'An enhanced network monitor SDK for Android.'
     website = 'https://github.com/hello2mao/XLogging'
 }
