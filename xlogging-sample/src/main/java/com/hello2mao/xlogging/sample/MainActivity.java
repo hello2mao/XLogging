@@ -43,10 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ButterKnife.bind(this);
-        // 安装XLogging
-//        XLogging.install();
+
         // 安装带回调的XLogging
         XLogging.install(new XLoggingCallback() {
             @Override
