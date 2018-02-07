@@ -18,7 +18,7 @@ public class OkHttpUtil {
 
     public static void showPic(final Context context, final ImageView imageView) {
         // https://image.baidu.com/channel/listjson?pn=0&rn=10&tag1=美女&tag2=全部&ftags=校花&ie=utf8
-        RetrofitHelper.getInstance().fetchBaiduImageInfo(0, 10, "美女", "全部", "校花", "utf8")
+        RetrofitHelper.getInstance().fetchBaiduImageInfo(0, 30, "美女", "全部", "校花", "utf8")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<BaiduImageBean>() {
