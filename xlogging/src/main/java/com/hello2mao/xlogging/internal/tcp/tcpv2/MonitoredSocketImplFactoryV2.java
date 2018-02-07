@@ -23,18 +23,16 @@ public class MonitoredSocketImplFactoryV2 implements SocketImplFactory {
     @Override
     public SocketImpl createSocketImpl() {
         SocketImpl socketImpl = null;
-        // 已经有socketImplFactory，但不是XLogging监控，则安装XLogging监控
         if (delegateFactory != null) {
             socketImpl = delegateFactory.createSocketImpl();
-        }
-        // 没有socketImplFactory即还未安装XLogging监控，则安装
-        if (socketImpl == null) {
+        } else {
             try {
                 // 先保存socketImplFactory
                 Field socketImplFactoryField = ReflectionUtil.getFieldFromClass(Socket.class,
                         SocketImplFactory.class);
                 socketImplFactoryField.setAccessible(true);
                 SocketImplFactory socketImplFactory = (SocketImplFactory) socketImplFactoryField.get(null);
+
                 // socketImplFactory置null，
                 // 否则下面获取socketImpl时会调用MonitoredSocketImplFactoryV2的createSocketImpl而发生错误
                 socketImplFactoryField.set(null, null);

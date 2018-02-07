@@ -270,7 +270,9 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
                 // inetSocketAddress="ip.taobao.com/42.120.226.92:80" URLConnection/OkHttp3
                 // inetSocketAddress="/42.120.226.92:80" HttpClient
                 InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
+                // 42.120.226.92
                 this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
+                // ip.taobao.com
                 this.host = URLUtil.getHost(inetSocketAddress);
             }
             this.tcpConnectStartTime = System.currentTimeMillis();

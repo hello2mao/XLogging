@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.internal.io;
 
-
 import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
 import com.hello2mao.xlogging.internal.harvest.Harvest;
 import com.hello2mao.xlogging.internal.listener.StreamEvent;
