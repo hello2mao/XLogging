@@ -4,7 +4,7 @@ package com.hello2mao.xlogging.internal.io;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
+import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.TcpData;
 import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.TransactionsCache;
@@ -27,14 +27,14 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
 
     private static final XLog log = XLogManager.getAgentLog();
     private InputStream inputStream;
-    private MonitoredSocketInterface monitoredSocket;
+    private MonitoredSocket monitoredSocket;
     private int readCount;
     private AbstractParser responseParser;
     private TransactionState transactionState;
     private FileDescriptor fd;
     private StreamListenerManager streamListenerManager;
 
-    public ParsingInputStream(MonitoredSocketInterface monitoredSocket, InputStream inputStream) {
+    public ParsingInputStream(MonitoredSocket monitoredSocket, InputStream inputStream) {
         this.monitoredSocket = monitoredSocket;
         this.inputStream = inputStream;
         this.responseParser = getInitialParser();

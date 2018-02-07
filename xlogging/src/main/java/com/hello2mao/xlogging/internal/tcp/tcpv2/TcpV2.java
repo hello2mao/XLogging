@@ -13,8 +13,9 @@ public class TcpV2 {
     private static final XLog log = XLogManager.getAgentLog();
 
     /**
-     * 安装tcp流监控
-     * @return 是否安装成功
+     * Install tcp monitor v2
+     *
+     * @return boolean
      */
     public static boolean install() {
         try {
@@ -22,17 +23,19 @@ public class TcpV2 {
                     SocketImplFactory.class);
             SocketImplFactory socketImplFactory = ReflectionUtil.getValueOfField(
                     socketImplFactoryField, null);
-            // 已经安装监控，则返回
+            // already install,return
             if (socketImplFactory != null && socketImplFactory
                     instanceof MonitoredSocketImplFactoryV2) {
                 log.info("Already install MonitoredSocketImplFactoryV2");
                 return true;
             }
-            if (socketImplFactory == null) { // 没有socketImplFactory即还未安装监控，则安装
-                // 正常情况下，走这~
+            // not install any SocketImplFactory,then install XLogging
+            if (socketImplFactory == null) {
+                // Mostly,go here
                 Socket.setSocketImplFactory(new MonitoredSocketImplFactoryV2());
-            } else { // 已经有socketImplFactory，但不是XLogging监控，则安装XLogging监控
-                // 只能通过反射安装，不然会报throw new SocketIOException("factory already defined");
+            } else { // Already install other SocketImplFactory, wrap it with XLogging
+                // Install SocketImplFactory by reflect,
+                // or throw new SocketIOException("factory already defined");
                 socketImplFactoryField.setAccessible(true);
                 socketImplFactoryField.set(null, new MonitoredSocketImplFactoryV2(socketImplFactory));
             }

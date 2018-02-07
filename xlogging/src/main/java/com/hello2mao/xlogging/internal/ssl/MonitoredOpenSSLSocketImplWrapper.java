@@ -2,7 +2,7 @@ package com.hello2mao.xlogging.internal.ssl;
 
 import com.android.org.conscrypt.OpenSSLSocketImplWrapper;
 import com.android.org.conscrypt.SSLParametersImpl;
-import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
+import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.harvest.Harvest;
 import com.hello2mao.xlogging.internal.io.IOInstrument;
@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
-        implements MonitoredSocketInterface {
+        implements MonitoredSocket {
 
     private static final XLog log = XLogManager.getAgentLog();
     private ParsingInputStream parsingInputStream;

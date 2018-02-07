@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.internal.io;
 
-import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
+import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.harvest.Harvest;
 import com.hello2mao.xlogging.internal.listener.StreamEvent;
 import com.hello2mao.xlogging.internal.listener.StreamListener;
@@ -14,7 +14,7 @@ public class IOInstrument {
 
     private static final XLog log = XLogManager.getAgentLog();
 
-    public static ParsingOutputStream instrumentOutputStream(MonitoredSocketInterface monitoredSocket,
+    public static ParsingOutputStream instrumentOutputStream(MonitoredSocket monitoredSocket,
                                                       OutputStream originOutputStream,
                                                       ParsingOutputStream originParsingOutputStream) {
         if (originOutputStream == null) {
@@ -43,7 +43,7 @@ public class IOInstrument {
         return newParsingOutputStream;
     }
 
-    public static ParsingInputStream instrumentInputStream(MonitoredSocketInterface monitoredSocket,
+    public static ParsingInputStream instrumentInputStream(MonitoredSocket monitoredSocket,
                                                     InputStream originInputStream,
                                                     ParsingInputStream originParsingInputStream) {
         if (originInputStream == null) {

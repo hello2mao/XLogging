@@ -42,10 +42,10 @@ public class TransactionsCache {
     /**
      * 拷贝部分指标
      *
-     * @param monitoredSocket MonitoredSocketInterface
+     * @param monitoredSocket MonitoredSocket
      * @param transactionState TransactionState
      */
-    public static void setTransactionState(MonitoredSocketInterface monitoredSocket,
+    public static void setTransactionState(MonitoredSocket monitoredSocket,
                                                   TransactionState transactionState) {
         TransactionState currentTransactionState = monitoredSocket.dequeueTransactionState();
         if (currentTransactionState != null) {

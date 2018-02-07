@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.internal;
 
-public interface MonitoredSocketInterface {
+public interface MonitoredSocket {
 
     TransactionState createTransactionState();
 

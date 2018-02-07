@@ -2,7 +2,7 @@ package com.hello2mao.xlogging.internal.io;
 
 import android.support.annotation.NonNull;
 
-import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
+import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.io.parser.AbstractParser;
 import com.hello2mao.xlogging.internal.io.parser.HttpParserHandler;
@@ -23,12 +23,12 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
 
     private static final XLog log = XLogManager.getAgentLog();
     private OutputStream outputStream;
-    private MonitoredSocketInterface monitoredSocket;
+    private MonitoredSocket monitoredSocket;
     private AbstractParser requestParser;
     private TransactionState transactionState;
     private StreamListenerManager streamListenerManager;
 
-    public ParsingOutputStream(MonitoredSocketInterface monitoredSocket,
+    public ParsingOutputStream(MonitoredSocket monitoredSocket,
                                OutputStream outputStream) {
         this.monitoredSocket = monitoredSocket;
         this.outputStream = outputStream;

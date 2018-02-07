@@ -10,6 +10,11 @@ public class TcpV1 {
     private static final XLog log = XLogManager.getAgentLog();
     private static boolean installed = false;
 
+    /**
+     * Install tcp monitor v1
+     *
+     * @return boolean
+     */
     public static boolean install() {
         if (installed) {
             log.debug("Already install MonitoredSocketImplV1");

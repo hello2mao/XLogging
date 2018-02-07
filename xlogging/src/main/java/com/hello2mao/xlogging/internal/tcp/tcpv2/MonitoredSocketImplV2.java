@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.internal.tcp.tcpv2;
 
-import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
+import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.TcpData;
 import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.TransactionsCache;
@@ -29,7 +29,7 @@ import java.net.SocketImpl;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocketInterface {
+public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket {
 
     private static final XLog log = XLogManager.getAgentLog();
     private static final int ACCEPT_IDX = 0;

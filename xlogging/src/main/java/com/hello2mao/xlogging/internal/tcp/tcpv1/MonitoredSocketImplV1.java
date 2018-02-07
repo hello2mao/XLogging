@@ -1,6 +1,6 @@
 package com.hello2mao.xlogging.internal.tcp.tcpv1;
 
-import com.hello2mao.xlogging.internal.MonitoredSocketInterface;
+import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.TcpData;
 import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.TransactionsCache;
@@ -22,7 +22,7 @@ import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredSocketInterface {
+public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredSocket {
 
     private static final XLog log = XLogManager.getAgentLog();
     private ParsingInputStream parsingInputStream;
@@ -69,30 +69,56 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
 
     private void error(Exception e) {
         // TODO
+        e.printStackTrace();
     }
-    
+
+    /**
+     * connect-1
+     *
+     * @param host String
+     * @param port int
+     * @throws IOException IOException
+     */
     @Override
     public void connect(String host, int port) throws IOException {
         try {
             super.connect(host, port);
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         }
+        // FIXME:
         log.warning("MonitoredSocketImplV1 unexpected connect-1");
     }
 
+    /**
+     * connect-2
+     *
+     * @param inetAddress InetAddress
+     * @param port int
+     * @throws IOException IOException
+     */
     @Override
     public void connect(InetAddress inetAddress, int port) throws IOException {
         try {
             super.connect(inetAddress, port);
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         }
+        // FIXME:
         log.warning("MonitoredSocketImplV1 unexpected connect-2:");
     }
 
+    /**
+     * connect-3
+     *
+     * @param socketAddress SocketAddress
+     * @param timeout int
+     * @throws IOException IOException
+     */
     @Override
     public void connect(SocketAddress socketAddress, int timeout) throws IOException {
         if (socketAddress instanceof InetSocketAddress) {
@@ -108,6 +134,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.connect(socketAddress, timeout);
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         }
@@ -123,9 +150,11 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             outputStream = super.getOutputStream();
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         }
+        // wrap origin OutputStream
         this.parsingOutputStream = IOInstrument.instrumentOutputStream(this,
                 outputStream, parsingOutputStream);
         return parsingOutputStream;
@@ -137,9 +166,11 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             inputStream = super.getInputStream();
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         }
+        // wrap origin InputStream
         this.parsingInputStream = IOInstrument.instrumentInputStream(this,
                 inputStream, parsingInputStream);
         return parsingInputStream;
@@ -150,6 +181,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.close();
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         }
@@ -166,6 +198,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             return super.getOption(option);
         } catch (SocketException e) {
+            // record error
             error(e);
             throw e;
         }
@@ -176,6 +209,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.setOption(optID, value);
         } catch (SocketException e) {
+            // record error
             error(e);
             throw e;
         }
