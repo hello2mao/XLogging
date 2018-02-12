@@ -5,6 +5,14 @@ import java.lang.reflect.Field;
 
 public class ReflectionUtil {
 
+    /**
+     * getFieldFromClass
+     *
+     * @param clazz Class<?>
+     * @param fieldClazz Class<?>
+     * @return Field
+     * @throws Exception Exception
+     */
     public static Field getFieldFromClass(Class<?> clazz, Class<?> fieldClazz) throws Exception {
         Field[] declaredFields = clazz.getDeclaredFields();
         Field field = null;
@@ -23,7 +31,17 @@ public class ReflectionUtil {
         field.setAccessible(true);
         return field;
     }
-    
+
+    /**
+     * getValueOfField
+     *
+     * @param field  Field
+     * @param c C
+     * @param <C> C
+     * @param <F> F
+     * @return F
+     * @throws Exception Exception
+     */
     public static <C, F> F getValueOfField(Field field, C c) throws Exception {
         Object value;
         if (field == null) {

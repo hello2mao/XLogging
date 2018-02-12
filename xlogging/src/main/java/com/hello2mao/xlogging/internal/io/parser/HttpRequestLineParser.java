@@ -2,6 +2,9 @@ package com.hello2mao.xlogging.internal.io.parser;
 
 import com.hello2mao.xlogging.internal.io.CharBuffer;
 
+/**
+ * Http Request Line Parser
+ */
 public class HttpRequestLineParser extends AbstractParser {
 
     private static final int MAX_LINE_LENGTH = 2048;
@@ -12,7 +15,7 @@ public class HttpRequestLineParser extends AbstractParser {
     }
 
     /**
-     * request head 示例：
+     * request head demo：
      * GET /channel/listjson?pn=0&rn=3&tag1=%E7%BE%8E%E5%A5%B3&tag2=%E5%85%A8%E9%83%A8&ftags=%E6%A0%A1%E8%8A%B1&ie=utf8 HTTP/1.1
      * Host: image.baidu.com
      * Connection: Keep-Alive
@@ -29,8 +32,11 @@ public class HttpRequestLineParser extends AbstractParser {
         if (requestLine.length != 3) {
             return false;
         }
-        // requestMethod httpPath
-        getHandler().requestLineFound(requestLine[0], requestLine[1]);
+        // requestMethod pathAndQuery protocol
+        getHandler().requestLineFound(requestLine[0], requestLine[1], requestLine[2]);
+        log.debug("Collect requestMethod=" + requestLine[0] + '\n'
+                + "        pathAndQuery=" + requestLine[1] + '\n'
+                + "        protocol=" + requestLine[2]);
         return true;
     }
 
@@ -51,7 +57,7 @@ public class HttpRequestLineParser extends AbstractParser {
 
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
-        // 接下来进行Http请求头的解析
+        // next: parse http header
         return new HttpRequestHeaderParser(this);
     }
 

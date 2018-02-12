@@ -28,7 +28,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     private ParsingInputStream parsingInputStream;
     private ParsingOutputStream parsingOutputStream;
     private final Queue<TransactionState> queue;
-    private String ipAddress;
+    private String ip;
     private String host;
     private long tcpConnectStartTime;
     private long tcpConnectEndTime;
@@ -41,7 +41,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
         transactionState.setHost(host);
-        transactionState.setIpAddress(ipAddress);
+        transactionState.setIp(ip);
         transactionState.setTcpConnectStartTime(tcpConnectStartTime);
         transactionState.setTcpConnectEndTime(tcpConnectEndTime);
         transactionState.setScheme("http");
@@ -72,6 +72,8 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         e.printStackTrace();
     }
 
+    /* Below is Override PlainSocketImpl */
+
     /**
      * connect-1
      *
@@ -84,7 +86,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.connect(host, port);
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -104,7 +106,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.connect(inetAddress, port);
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -126,19 +128,23 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
             // inetSocketAddress="/42.120.226.92:80" HttpClient
             InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
             // 42.120.226.92
-            this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
+            this.ip = URLUtil.getIp(inetSocketAddress);
+            log.debug("Collect ip=" + ip);
             // ip.taobao.com
             this.host = URLUtil.getHost(inetSocketAddress);
+            log.debug("Collect host=" + host);
         }
         this.tcpConnectStartTime = System.currentTimeMillis();
         try {
             super.connect(socketAddress, timeout);
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
         this.tcpConnectEndTime = System.currentTimeMillis();
+        log.debug("Collect tcpConnectTime="
+                + (tcpConnectEndTime - tcpConnectStartTime) + "ms");
         if (port == 443 ) {
             TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
         }
@@ -150,7 +156,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             outputStream = super.getOutputStream();
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -166,7 +172,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             inputStream = super.getInputStream();
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -181,7 +187,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.close();
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -198,7 +204,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             return super.getOption(option);
         } catch (SocketException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -209,7 +215,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         try {
             super.setOption(optID, value);
         } catch (SocketException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }

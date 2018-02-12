@@ -7,8 +7,9 @@ public class TransactionState {
 
     // Basic Info
     private String host;
-    private String ipAddress;
+    private String ip;
     private String scheme;
+    private String protocol;
     private String pathAndQuery;
     private String requestMethod;
     private int statusCode;
@@ -54,8 +55,9 @@ public class TransactionState {
     public TransactionState() {
         // Basic Info
         this.host = "";
-        this.ipAddress = "";
+        this.ip = "";
         this.scheme = "";
+        this.protocol = "";
         this.pathAndQuery = "";
         this.requestMethod = "";
         this.statusCode = -1;
@@ -83,8 +85,9 @@ public class TransactionState {
         this();
         // Basic Info
         this.host = transactionState.getHost();
-        this.ipAddress = transactionState.getIpAddress();
+        this.ip = transactionState.getIp();
         this.scheme = transactionState.getScheme();
+        this.protocol = transactionState.getProtocol();
         this.pathAndQuery = transactionState.getPathAndQuery();
         this.requestMethod = transactionState.getRequestMethod();
         this.statusCode = transactionState.getStatusCode();
@@ -131,12 +134,12 @@ public class TransactionState {
         this.host = host;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
+    public String getIp() {
+        return ip;
     }
 
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public String getScheme() {
@@ -145,6 +148,14 @@ public class TransactionState {
 
     public void setScheme(String scheme) {
         this.scheme = scheme;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public String getPathAndQuery() {
@@ -295,7 +306,7 @@ public class TransactionState {
     public String toString() {
         return "TransactionState{" + '\n' +
                 "  host='" + host + '\'' + '\n' +
-                "  ipAddress='" + ipAddress + '\'' + '\n' +
+                "  ip='" + ip + '\'' + '\n' +
                 "  scheme='" + scheme + '\'' + '\n' +
                 "  pathAndQuery='" + pathAndQuery + '\'' + '\n' +
                 "  requestMethod='" + requestMethod + '\'' + '\n' +

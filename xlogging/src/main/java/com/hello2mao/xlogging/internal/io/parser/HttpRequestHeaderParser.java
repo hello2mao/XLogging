@@ -1,8 +1,10 @@
 package com.hello2mao.xlogging.internal.io.parser;
 
-
 import com.hello2mao.xlogging.internal.io.CharBuffer;
 
+/**
+ * Http Request Header Parser
+ */
 public class HttpRequestHeaderParser extends HttpHeaderParser {
 
     public HttpRequestHeaderParser(AbstractParser parser) {
@@ -18,11 +20,11 @@ public class HttpRequestHeaderParser extends HttpHeaderParser {
     @Override
     protected AbstractParser nextParserAfterEndOfHeader() {
         AbstractParser parser;
-        if (isChunkedTransferEncoding()) { // chunked编码传输解析body
+        if (isChunkedTransferEncoding()) { // chunked request body
             parser = new HttpChunkSizeParser(this);
-        } else if ((isContentLengthSet()) && (getContentLength() > 0)) { // 常规body解析
+        } else if ((isContentLengthSet()) && (getContentLength() > 0)) { // normal request body
             parser = new HttpBodyParser(this, getContentLength());
-        } else { // 没有请求内容
+        } else { // no request body
             getHandler().finishedMessage(getCharactersInMessage());
             parser = getHandler().getInitialParser();
         }

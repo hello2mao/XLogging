@@ -50,7 +50,7 @@ public class TransactionsCache {
         TransactionState currentTransactionState = monitoredSocket.dequeueTransactionState();
         if (currentTransactionState != null) {
             transactionState.setHost(currentTransactionState.getHost());
-            transactionState.setIpAddress(currentTransactionState.getIpAddress());
+            transactionState.setIp(currentTransactionState.getIp());
             transactionState.setScheme(currentTransactionState.getScheme());
             transactionState.setPathAndQuery(currentTransactionState.getPathAndQuery());
             transactionState.setRequestMethod(currentTransactionState.getRequestMethod());

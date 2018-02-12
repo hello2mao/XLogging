@@ -7,7 +7,13 @@ import java.net.InetSocketAddress;
 
 public class URLUtil {
 
-    public static String getIpAddress(InetSocketAddress inetSocketAddress) {
+    /**
+     * get IP
+     *
+     * @param inetSocketAddress InetSocketAddress
+     * @return String
+     */
+    public static String getIp(InetSocketAddress inetSocketAddress) {
         if (inetSocketAddress == null) {
             return "";
         }
@@ -22,7 +28,7 @@ public class URLUtil {
         return "";
     }
 
-    public static String getIpAddress(InetAddress inetAddress) {
+    public static String getIp(InetAddress inetAddress) {
         if (inetAddress == null) {
             return "";
         }
@@ -37,6 +43,12 @@ public class URLUtil {
         return "";
     }
 
+    /**
+     * get host
+     *
+     * @param inetSocketAddress InetSocketAddress
+     * @return String
+     */
     public static String getHost(InetSocketAddress inetSocketAddress) {
         if (inetSocketAddress == null) {
             return "";

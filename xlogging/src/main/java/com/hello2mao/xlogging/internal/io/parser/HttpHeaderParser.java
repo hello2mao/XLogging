@@ -1,11 +1,11 @@
 package com.hello2mao.xlogging.internal.io.parser;
 
-
 import com.hello2mao.xlogging.internal.io.CharBuffer;
 
 /**
- * Http Header parser
- * 会有相应的request和response parser完善其功能
+ * Http Header Parser:
+ * (1)HttpRequestHeaderParser
+ * (2)HttpResponseHeaderParser
  */
 public abstract class HttpHeaderParser extends AbstractParser {
 
@@ -24,7 +24,7 @@ public abstract class HttpHeaderParser extends AbstractParser {
 
     @Override
     public boolean parse(CharBuffer charBuffer) {
-        // header与body以\r\n分开，buffer.charArray[0] == '\r'则到达header结尾
+        // \r\n between header and body，buffer.charArray[0] == '\r' means reaching one line end
         if (buffer.length == 0 || (buffer.length == 1 && buffer.charArray[0] == '\r')) {
             log.debug("Run parse in HttpHeaderParser: parsedEndOfHeader");
             return parsedEndOfHeader = true;
@@ -39,19 +39,20 @@ public abstract class HttpHeaderParser extends AbstractParser {
             String value = split[1].trim();
             log.debug("Run parse in HttpHeaderParser: " + charBuffer);
             HttpParserHandler handler = getHandler();
-            if (!isContentLengthSet && key.equalsIgnoreCase("content-length")) {
+            if (!isContentLengthSet && key.equalsIgnoreCase("Content-Length")) {
                 int contentLength = Integer.parseInt(value);
                 if (contentLength < 0) {
                     return false;
                 }
                 isContentLengthSet = true;
                 parsedContentLength = contentLength;
-            } else if (key.equalsIgnoreCase("transfer-encoding")) {
-                // head 中有Transfer-Encoding: chunked
+            } else if (key.equalsIgnoreCase("Transfer-Encoding")) {
+                // Transfer-Encoding in header: chunked
                 chunkedTransferEncoding = value.equalsIgnoreCase("chunked");
             } else if (!hasParsedHost && key.equalsIgnoreCase("host")) {
                 hasParsedHost = true;
                 handler.hostNameFound(value);
+                log.debug("Collect host=" + value);
             }
         } catch (NumberFormatException e) {
             parsedSuccess = false;

@@ -63,7 +63,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     private ParsingInputStream parsingInputStream;
     private ParsingOutputStream parsingOutputStream;
     private final Queue<TransactionState> queue;
-    private String ipAddress;
+    private String ip;
     private String host;
     private long tcpConnectStartTime;
     private long tcpConnectEndTime;
@@ -109,7 +109,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         }
         this.queue = new LinkedList<>();
         this.delegate = socketImpl;
-        this.ipAddress = "";
+        this.ip = "";
         this.host = "";
         this.tcpConnectStartTime = -1L;
         this.tcpConnectEndTime = -1L;
@@ -117,7 +117,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     /**
-     * 从delegate同步address/fd/localport/port
+     * sync address/fd/localport/port from delegate
      */
     private void syncFromDelegate() {
         try {
@@ -132,7 +132,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
 
     /**
-     * 同步address/fd/localport/port到delegate
+     * sync address/fd/localport/port to delegate
      */
     private void syncToDelegate() {
         try {
@@ -149,7 +149,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         try {
             return invoke(index, params);
         } catch (IOException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         } catch (RuntimeException e) {
@@ -170,7 +170,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     }
 
     /**
-     * 通过反射调用代理的方法
+     * invoke by reflect
      *
      * @param index index
      * @param params params
@@ -208,7 +208,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
         transactionState.setHost(host);
-        transactionState.setIpAddress(ipAddress);
+        transactionState.setIp(ip);
         transactionState.setTcpConnectStartTime(tcpConnectStartTime);
         transactionState.setTcpConnectEndTime(tcpConnectEndTime);
         transactionState.setScheme("http");
@@ -245,7 +245,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         Harvest.addHttpTransactionDataAndError(transactionState, exception);
     }
 
-    /* 以下是对SocketImpl的override */
+    /* Below is Override SocketImpl */
 
     @Override
     protected void create(boolean stream) throws IOException {
@@ -261,6 +261,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
      */
     @Override
     protected void connect(String host, int port) throws IOException {
+        // FIXME:
         log.warning("Unexpected MonitoredSocketImplV2: connect-1");
         invokeThrowsIOException(CONNECT_STRING_INT_IDX, new Object[] { host, port});
     }
@@ -274,6 +275,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
      */
     @Override
     protected void connect(InetAddress inetAddress, int port) throws IOException {
+        // FIXME:
         log.warning("Unexpected MonitoredSocketImplV2: connect-2");
         invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
     }
@@ -293,13 +295,17 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
                 // inetSocketAddress="/42.120.226.92:80" HttpClient
                 InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
                 // 42.120.226.92
-                this.ipAddress = URLUtil.getIpAddress(inetSocketAddress);
+                this.ip = URLUtil.getIp(inetSocketAddress);
+                log.debug("Collect ip=" + ip);
                 // ip.taobao.com
                 this.host = URLUtil.getHost(inetSocketAddress);
+                log.debug("Collect host=" + ip);
             }
             this.tcpConnectStartTime = System.currentTimeMillis();
             invokeThrowsIOException(CONNECT_SOCKET_ADDRESS_IDX, new Object[] { socketAddress, timeout});
             this.tcpConnectEndTime = System.currentTimeMillis();
+            log.debug("Collect tcpConnectTime="
+                    + (tcpConnectEndTime - tcpConnectStartTime) + "ms");
             if (port == 443 ) {
                 TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
             }
@@ -326,6 +332,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected OutputStream getOutputStream() throws IOException {
+        // wrap origin OutputStream
         this.parsingOutputStream = IOInstrument.instrumentOutputStream(this,
                 (OutputStream) invokeThrowsIOException(GET_OUTPUT_STREAM_IDX, new Object[0]),
                 parsingOutputStream);
@@ -334,6 +341,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
 
     @Override
     protected InputStream getInputStream() throws IOException {
+        // wrap origin InputStream
         this.parsingInputStream = IOInstrument.instrumentInputStream(this,
                 (InputStream) invokeThrowsIOException(GET_INPUT_STREAM_IDX, new Object[0]),
                 parsingInputStream);
@@ -403,7 +411,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             delegate.setOption(optID, value);
             syncFromDelegate();
         } catch (SocketException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }
@@ -415,7 +423,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             syncToDelegate();
             return delegate.getOption(optID);
         } catch (SocketException e) {
-            // record error
+            // Collect error
             error(e);
             throw e;
         }

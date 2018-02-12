@@ -31,10 +31,12 @@ public class IOInstrument {
             @Override
             public void streamComplete(StreamEvent streamEvent) {
                 // do nothing for parsingOutputStream
+                log.debug("ParsingOutputStream streamComplete");
             }
 
             @Override
             public void streamError(StreamEvent streamEvent) {
+                log.debug("ParsingOutputStream streamError");
                 Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
                         streamEvent.getException());
             }
@@ -59,11 +61,13 @@ public class IOInstrument {
         newParsingInputStream.addStreamListener(new StreamListener() {
             @Override
             public void streamComplete(StreamEvent streamEvent) {
+                log.debug("ParsingInputStream streamComplete");
                 Harvest.addHttpTransactionData(streamEvent.getTransactionState());
             }
 
             @Override
             public void streamError(StreamEvent streamEvent) {
+                log.debug("ParsingInputStream streamError");
                 Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
                         streamEvent.getException());
             }

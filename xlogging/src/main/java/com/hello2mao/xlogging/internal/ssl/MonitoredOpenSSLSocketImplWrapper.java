@@ -41,7 +41,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     @Override
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
-        transactionState.setIpAddress(URLUtil.getIpAddress(getInetAddress()));
+        transactionState.setIp(URLUtil.getIp(getInetAddress()));
         transactionState.setSslHandshakeStartTime(sslHandshakeStartTime);
         transactionState.setSslHandshakeEndTime(sslHandshakeEndTime);
         transactionState.setScheme("https");

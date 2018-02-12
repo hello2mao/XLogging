@@ -31,14 +31,15 @@ public abstract class AbstractParser {
     }
 
     /**
-     * 对缓存的buffer进行解析
-     * @param charBuffer charBuffer
+     * parse CharBuffer
+     *
+     * @param charBuffer CharBuffer
      * @return boolean
      */
     public abstract boolean parse(CharBuffer charBuffer);
 
     /**
-     * 把单个字节加入缓存buffer进行parser
+     * add one byte to CharBuffer
      *
      * @param oneByte the next byte of data from the stream.
      *             The value byte is an <code>int</code> in the range <code>0</code> to <code>255</code>.
@@ -46,7 +47,7 @@ public abstract class AbstractParser {
      * @return boolean
      */
     public boolean add(int oneByte) {
-        if (oneByte == -1) { // -1表示流结束了
+        if (oneByte == -1) { // -1 means reachedEOF
             log.warning("AbstractParser: add oneByte reachedEOF");
             reachedEOF();
             return true;
@@ -54,17 +55,17 @@ public abstract class AbstractParser {
         this.charactersInMessage += 1;
         char character = (char) oneByte;
         AbstractParser parser;
-        if (character == '\n') { // 遇到换行符就进行解析，会调用相应parser，即一行一解析
-            if (parse(buffer)) { // 对缓冲的buffer进行解析
-                // 解析成功，则获取下个parser
+        if (character == '\n') { // parse one line when get '\n'
+            if (parse(buffer)) { // parse buffer
+                // parse success, set next parser
                 parser = nextParserAfterSuccessfulParse();
             } else {
-                // 解析失败，则设为Noop
+                // parse fail, set noop
                 parser = NoopLineParser.DEFAULT;
             }
-        } else if (buffer.length < maxBufferSize) { // 不是换行符，且buffer大小在max内，则缓存在buffer
+        } else if (buffer.length < maxBufferSize) {
             int targetLength = buffer.length + 1;
-            // buffer空间不够，则double空间大小
+            // not enough buffer, then double size
             if (targetLength > buffer.charArray.length) {
                 final char[] dest = new char[Math.max(buffer.charArray.length << 1, targetLength)];
                 System.arraycopy(buffer.charArray, 0, dest, 0, buffer.length);
@@ -73,7 +74,7 @@ public abstract class AbstractParser {
             buffer.charArray[buffer.length] = character;
             buffer.length = targetLength;
             parser = this;
-        } else { // buffer满
+        } else { // up to maxBufferSize
             parser = nextParserAfterBufferFull();
         }
         Assert.assertNotNull(parser);
@@ -84,7 +85,7 @@ public abstract class AbstractParser {
     }
 
     /**
-     * 把内容块加入缓存buffer进行parser
+     * add buffer to CharBuffer
      *
      * @param buffer byte[]
      * @param offset int

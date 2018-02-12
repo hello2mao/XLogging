@@ -28,8 +28,7 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     private TransactionState transactionState;
     private StreamListenerManager streamListenerManager;
 
-    public ParsingOutputStream(MonitoredSocket monitoredSocket,
-                               OutputStream outputStream) {
+    public ParsingOutputStream(MonitoredSocket monitoredSocket, OutputStream outputStream) {
         this.monitoredSocket = monitoredSocket;
         this.outputStream = outputStream;
         this.requestParser = getInitialParser();
@@ -37,80 +36,8 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     @Override
-    public void write(int oneByte) throws IOException {
-        try {
-            outputStream.write(oneByte);
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-        try {
-            requestParser.add(oneByte);
-        } catch (ThreadDeath threadDeath) {
-            throw  threadDeath;
-        } catch (Throwable e) {
-            // 不抛异常，而是把解析器设为Noop，从而减少由于XLogging自身的解析异常对APP的影响
-            this.requestParser = NoopLineParser.DEFAULT;
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void write(@NonNull byte[] buffer) throws IOException {
-        try {
-            outputStream.write(buffer);
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-        addBytesToParser(buffer, 0, buffer.length);
-    }
-
-    @Override
-    public void write(@NonNull byte[] buffer, int offset, int byteCount) throws IOException {
-        try {
-            outputStream.write(buffer, offset, byteCount);
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-        addBytesToParser(buffer, offset, byteCount);
-    }
-
-    @Override
-    public void flush() throws IOException {
-        try {
-            outputStream.flush();
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    private void addBytesToParser(byte[] buffer, int offset, int byteCount) {
-        try {
-            requestParser.add(buffer, offset, byteCount);
-        } catch (ThreadDeath e) {
-            throw e;
-        } catch (Throwable e) {
-            // 不抛异常，而是把解析器设为Noop，从而减少由于XLogging自身的解析异常对APP的影响
-            this.requestParser = NoopLineParser.DEFAULT;
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public AbstractParser getInitialParser() {
+        // Initial parser is HttpRequestLineParser
         return new HttpRequestLineParser(this);
     }
 
@@ -125,11 +52,12 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     @Override
-    public void requestLineFound(String requestMethod, String pathAndQuery) {
+    public void requestLineFound(String requestMethod, String pathAndQuery, String protocol) {
         TransactionState transactionState = getTransactionState();
         transactionState.setRequestStartTime(System.currentTimeMillis());
         transactionState.setRequestMethod(requestMethod);
         transactionState.setPathAndQuery(pathAndQuery);
+        transactionState.setProtocol(protocol);
         if ("CONNECT".toUpperCase().equals(requestMethod)) {
             transactionState.setScheme("https");
         }
@@ -151,6 +79,13 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
         // ignore
     }
 
+    /**
+     * Finish OutputStream
+     * (1)no request body
+     * (2)normal request body
+     *
+     * @param charactersInMessage int
+     */
     @Override
     public void finishedMessage(int charactersInMessage) {
         TransactionState transactionState = getTransactionState();
@@ -158,11 +93,20 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
         transactionState.setRequestEndTime(System.currentTimeMillis());
     }
 
+    /**
+     * Finish OutputStream
+     * (1)chunked request body
+     *
+     * @param charactersInMessage int
+     * @param currentTimeStamp long
+     */
     @Override
     public void finishedMessage(int charactersInMessage, long currentTimeStamp) {
+        // FIXME:currentTimeStamp?
         finishedMessage(charactersInMessage);
     }
 
+    @Override
     public TransactionState getTransactionState() {
         if (transactionState == null) {
             this.transactionState = monitoredSocket.createTransactionState();
@@ -195,6 +139,90 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     @Override
     public void removeStreamListener(StreamListener streamListener) {
         streamListenerManager.removeStreamListener(streamListener);
+    }
+
+    private void addBytesToParser(byte[] buffer, int offset, int byteCount) {
+        try {
+            // add to request parser
+            requestParser.add(buffer, offset, byteCount);
+        } catch (ThreadDeath e) {
+            throw e;
+        } catch (Throwable e) {
+            // Disable XLogging since error.
+            this.requestParser = NoopLineParser.DEFAULT;
+            e.printStackTrace();
+        }
+    }
+
+    /* Below is Override OutputStream */
+
+    @Override
+    public void write(int oneByte) throws IOException {
+        try {
+            outputStream.write(oneByte);
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+        try {
+            // add to request parser
+            requestParser.add(oneByte);
+        } catch (ThreadDeath threadDeath) {
+            throw  threadDeath;
+        } catch (Throwable e) {
+            // Disable XLogging since error.
+            this.requestParser = NoopLineParser.DEFAULT;
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void write(@NonNull byte[] buffer) throws IOException {
+        try {
+            outputStream.write(buffer);
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+        // add to request parser
+        addBytesToParser(buffer, 0, buffer.length);
+    }
+
+    @Override
+    public void write(@NonNull byte[] buffer, int offset, int byteCount) throws IOException {
+        try {
+            outputStream.write(buffer, offset, byteCount);
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+        // add to request parser
+        addBytesToParser(buffer, offset, byteCount);
+    }
+
+    @Override
+    public void flush() throws IOException {
+        try {
+            outputStream.flush();
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
     }
 }
 

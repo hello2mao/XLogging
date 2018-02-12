@@ -171,7 +171,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     }
 
     @Override
-    public void requestLineFound(String statusCode, String pathAndQuery) {
+    public void requestLineFound(String statusCode, String pathAndQuery, String protocol) {
         // ignore
     }
 
