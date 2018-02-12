@@ -1,7 +1,7 @@
 package com.hello2mao.xlogging.internal;
 
 /**
- * 记录HTTP(S)事务中所有数据的类
+ * record transaction state
  */
 public class TransactionState {
 

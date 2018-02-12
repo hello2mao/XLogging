@@ -149,6 +149,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         try {
             return invoke(index, params);
         } catch (IOException e) {
+            // record error
             error(e);
             throw e;
         } catch (RuntimeException e) {
@@ -251,18 +252,39 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         invokeThrowsIOException(CREATE_IDX, new Object[] { stream });
     }
 
+    /**
+     * connect-1
+     *
+     * @param host String
+     * @param port int
+     * @throws IOException IOException
+     */
     @Override
     protected void connect(String host, int port) throws IOException {
         log.warning("Unexpected MonitoredSocketImplV2: connect-1");
         invokeThrowsIOException(CONNECT_STRING_INT_IDX, new Object[] { host, port});
     }
 
+    /**
+     * connect-2
+     *
+     * @param inetAddress InetAddress
+     * @param port int
+     * @throws IOException IOException
+     */
     @Override
     protected void connect(InetAddress inetAddress, int port) throws IOException {
         log.warning("Unexpected MonitoredSocketImplV2: connect-2");
         invokeThrowsIOException(CONNECT_INET_ADDRESS_IDX, new Object[] { inetAddress, port});
     }
 
+    /**
+     * connect-3
+     *
+     * @param socketAddress SocketAddress
+     * @param timeout int
+     * @throws IOException IOException
+     */
     @Override
     protected void connect(SocketAddress socketAddress, int timeout) throws IOException {
         try {
@@ -381,6 +403,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             delegate.setOption(optID, value);
             syncFromDelegate();
         } catch (SocketException e) {
+            // record error
             error(e);
             throw e;
         }
@@ -392,6 +415,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             syncToDelegate();
             return delegate.getOption(optID);
         } catch (SocketException e) {
+            // record error
             error(e);
             throw e;
         }

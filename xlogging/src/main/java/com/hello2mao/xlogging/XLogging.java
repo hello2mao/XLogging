@@ -51,7 +51,8 @@ public class XLogging {
         if (tcpInstalled && sslInstalled) {
             log.info("XLogging install success!");
         } else {
-            log.error("XLogging install failed!");
+            log.error("XLogging install failed: tcpInstalled=" + tcpInstalled
+                    + ", sslInstalled=" + sslInstalled);
         }
     }
 }
