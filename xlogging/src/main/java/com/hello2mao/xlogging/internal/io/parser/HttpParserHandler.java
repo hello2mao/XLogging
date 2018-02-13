@@ -12,7 +12,7 @@ public interface HttpParserHandler {
 
     void requestLineFound(String requestMethod, String pathAndQuery, String protocol);
 
-    void hostNameFound(String host);
+    void hostFound(String host);
 
     void statusLineFound(int statusCode);
 

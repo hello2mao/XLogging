@@ -18,6 +18,9 @@ import com.hello2mao.xlogging.internal.log.XLogManager;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Wrap OutputStream
+ */
 public class ParsingOutputStream extends OutputStream implements HttpParserHandler,
         StreamListenerSource {
 
@@ -65,18 +68,18 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
     }
 
     @Override
-    public void hostNameFound(String host) {
+    public void hostFound(String host) {
         getTransactionState().setHost(host);
     }
 
     @Override
     public void statusLineFound(int statusCode) {
-        // ignore
+        // ignore for request
     }
 
     @Override
     public void appendBody(String body) {
-        // ignore
+        // ignore for request
     }
 
     /**

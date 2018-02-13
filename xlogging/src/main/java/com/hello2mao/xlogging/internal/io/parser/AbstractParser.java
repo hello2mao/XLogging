@@ -42,8 +42,9 @@ public abstract class AbstractParser {
      * add one byte to CharBuffer
      *
      * @param oneByte the next byte of data from the stream.
-     *             The value byte is an <code>int</code> in the range <code>0</code> to <code>255</code>.
-     *             Or <code>-1</code> if the end of the stream is reached.
+     *                The value byte is an <code>int</code> in the range <code>0</code>
+     *                to <code>255</code>.
+     *                Or <code>-1</code> if the end of the stream is reached.
      * @return boolean
      */
     public boolean add(int oneByte) {

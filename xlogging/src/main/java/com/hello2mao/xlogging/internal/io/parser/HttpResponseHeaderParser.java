@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.internal.io.parser;
 
-
 import com.hello2mao.xlogging.internal.io.CharBuffer;
 
 /**
@@ -38,7 +37,7 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
     }
 
     /**
-     * 到达header尾部后用此parser解析
+     * finish parse http header
      *
      * @return parser
      */

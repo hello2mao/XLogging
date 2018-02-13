@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.internal.io.parser;
 
-
 import com.hello2mao.xlogging.internal.io.CharBuffer;
 
 public class NoopLineParser extends AbstractParser {

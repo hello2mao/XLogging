@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.internal.io;
 
-
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -23,6 +22,9 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Wrap InputStream
+ */
 public class ParsingInputStream extends InputStream implements HttpParserHandler, StreamListenerSource {
 
     private static final XLog log = XLogManager.getAgentLog();
@@ -43,119 +45,6 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     }
 
     @Override
-    public int available() throws IOException {
-        try {
-            return inputStream.available();
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            try {
-                responseParser.close();
-            } catch (ThreadDeath threadDeath) {
-                throw  threadDeath;
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-            inputStream.close();
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    @Override
-    public void mark(int readlimit) {
-        inputStream.mark(readlimit);
-    }
-
-    @Override
-    public boolean markSupported() {
-        return inputStream.markSupported();
-    }
-
-    @Override
-    public int read() throws IOException {
-        int read;
-        try {
-            read = inputStream.read();
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-        try {
-            responseParser.add(read);
-        } catch (ThreadDeath threadDeath) {
-            throw threadDeath;
-        } catch (Throwable t) {
-            this.responseParser = NoopLineParser.DEFAULT;
-            t.printStackTrace();
-        }
-        return read;
-    }
-
-    @Override
-    public int read(@NonNull byte[] buffer) throws IOException {
-        try {
-            int read = inputStream.read(buffer);
-            addBufferToParser(buffer, 0, read);
-            return read;
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    @Override
-    public int read(@NonNull byte[] buffer, int offset, int length) throws IOException {
-        int read;
-        try {
-            read = inputStream.read(buffer, offset, length);
-            addBufferToParser(buffer, offset, read);
-            return read;
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    @Override
-    public synchronized void reset() throws IOException {
-        try {
-            inputStream.reset();
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    @Override
-    public long skip(long byteCount) throws IOException {
-        try {
-            return inputStream.skip(byteCount);
-        } catch (IOException e) {
-            notifyStreamError(e);
-            throw e;
-        }
-    }
-
-    private void addBufferToParser(byte[] buffer, int offset, int read) {
-        try {
-            responseParser.add(buffer, offset, read);
-        } catch (ThreadDeath e) {
-            throw e;
-        } catch (Throwable t) {
-            responseParser = NoopLineParser.DEFAULT;
-            t.printStackTrace();
-        }
-    }
-
-    @Override
     public AbstractParser getInitialParser() {
         return new HttpStatusLineParser(this);
     }
@@ -172,12 +61,12 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
 
     @Override
     public void requestLineFound(String statusCode, String pathAndQuery, String protocol) {
-        // ignore
+        // ignore for response
     }
 
     @Override
-    public void hostNameFound(String host) {
-        // ignore
+    public void hostFound(String host) {
+        // ignore for response
     }
 
     @Override
@@ -285,5 +174,132 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     @Override
     public void removeStreamListener(StreamListener streamListener) {
         streamListenerManager.removeStreamListener(streamListener);
+    }
+
+    private void addBufferToParser(byte[] buffer, int offset, int read) {
+        try {
+            responseParser.add(buffer, offset, read);
+        } catch (ThreadDeath e) {
+            throw e;
+        } catch (Throwable t) {
+            // Disable XLogging since error.
+            responseParser = NoopLineParser.DEFAULT;
+            t.printStackTrace();
+        }
+    }
+
+    /* Below is Override InputStream */
+
+    @Override
+    public int available() throws IOException {
+        try {
+            return inputStream.available();
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            try {
+                responseParser.close();
+            } catch (ThreadDeath threadDeath) {
+                throw  threadDeath;
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+            inputStream.close();
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void mark(int readlimit) {
+        inputStream.mark(readlimit);
+    }
+
+    @Override
+    public boolean markSupported() {
+        return inputStream.markSupported();
+    }
+
+    @Override
+    public int read() throws IOException {
+        int read;
+        try {
+            read = inputStream.read();
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+        try {
+            // add to response parser
+            responseParser.add(read);
+        } catch (ThreadDeath threadDeath) {
+            throw threadDeath;
+        } catch (Throwable t) {
+            // Disable XLogging since error.
+            this.responseParser = NoopLineParser.DEFAULT;
+            t.printStackTrace();
+        }
+        return read;
+    }
+
+    @Override
+    public int read(@NonNull byte[] buffer) throws IOException {
+        try {
+            int read = inputStream.read(buffer);
+            // add to response parser
+            addBufferToParser(buffer, 0, read);
+            return read;
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public int read(@NonNull byte[] buffer, int offset, int length) throws IOException {
+        int read;
+        try {
+            read = inputStream.read(buffer, offset, length);
+            // add to response parser
+            addBufferToParser(buffer, offset, read);
+            return read;
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        try {
+            inputStream.reset();
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public long skip(long byteCount) throws IOException {
+        try {
+            return inputStream.skip(byteCount);
+        } catch (IOException e) {
+            // Collect error
+            notifyStreamError(e);
+            throw e;
+        }
     }
 }

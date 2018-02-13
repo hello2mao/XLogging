@@ -49,9 +49,9 @@ public abstract class HttpHeaderParser extends AbstractParser {
             } else if (key.equalsIgnoreCase("Transfer-Encoding")) {
                 // Transfer-Encoding in header: chunked
                 chunkedTransferEncoding = value.equalsIgnoreCase("chunked");
-            } else if (!hasParsedHost && key.equalsIgnoreCase("host")) {
+            } else if (!hasParsedHost && key.equalsIgnoreCase("Host")) {
                 hasParsedHost = true;
-                handler.hostNameFound(value);
+                handler.hostFound(value);
                 log.debug("Collect host=" + value);
             }
         } catch (NumberFormatException e) {
@@ -66,12 +66,12 @@ public abstract class HttpHeaderParser extends AbstractParser {
     @Override
     public AbstractParser nextParserAfterSuccessfulParse() {
         if (parsedEndOfHeader) {
-            // 解析玩HTTP头，则nextParser
+            // finish parse http header
             return nextParserAfterEndOfHeader();
         } else {
             buffer.length = 0;
         }
-        // 没有解析玩HTTP头，则继续解析
+        // continue to parse http header
         return this;
     }
 

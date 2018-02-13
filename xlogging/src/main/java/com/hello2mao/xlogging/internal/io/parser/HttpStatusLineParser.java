@@ -4,7 +4,7 @@ package com.hello2mao.xlogging.internal.io.parser;
 import com.hello2mao.xlogging.internal.io.CharBuffer;
 
 /**
- * Http status line parser
+ * Http Status Line Parser
  *
  * e.g.
  * HTTP/1.1 200 OK
