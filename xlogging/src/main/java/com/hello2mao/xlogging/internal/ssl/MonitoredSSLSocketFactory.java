@@ -48,6 +48,18 @@ public class MonitoredSSLSocketFactory extends SSLSocketFactory {
         }
     }
 
+    /* Below is Override SSLSocketFactory */
+
+    /**
+     * createSocket-1
+     *
+     * @param socket Socket
+     * @param host String
+     * @param port int
+     * @param autoClose boolean
+     * @return Socket
+     * @throws IOException IOException
+     */
     @Override
     public Socket createSocket(Socket socket, String host, int port, boolean autoClose)
             throws IOException {

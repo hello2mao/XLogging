@@ -26,7 +26,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String RES_SCHEME = "http";
+    public static final String RES_SCHEME = "https";
     public static final String RES_HOST = "image.baidu.com";
     public static final String RES_PATH = "/channel/listjson";
     public static final String RES_QUERY = "?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
@@ -47,14 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // 安装带回调的XLogging
-//        XLogging.install(new XLoggingCallback() {
-//            @Override
-//            public void handle(TransactionData transactionData) {
-//                System.out.println(transactionData.toString());
-//            }
-//        });
-        // 安装默认的XLogging
+        // 安装XLogging
         XLogging.install();
 
         // 默认使用URLConnection

@@ -41,7 +41,13 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     @Override
     public TransactionState createTransactionState() {
         TransactionState transactionState = new TransactionState();
-        transactionState.setIp(URLUtil.getIp(getInetAddress()));
+        String ip = URLUtil.getIp(getInetAddress());
+        log.debug("Collect ip=" + ip);
+        transactionState.setIp(ip);
+        log.debug("Collect port=" + getPort());
+        transactionState.setPort(getPort());
+        log.debug("Collect host=" + getInetAddress().getHostName());
+        transactionState.setHost(getInetAddress().getHostName());
         transactionState.setSslHandshakeStartTime(sslHandshakeStartTime);
         transactionState.setSslHandshakeEndTime(sslHandshakeEndTime);
         transactionState.setScheme("https");
@@ -78,6 +84,8 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         Harvest.addHttpTransactionData(transactionState);
     }
 
+    /* Below is Override OpenSSLSocketImplWrapper */
+
     @Override
     public void startHandshake() throws IOException {
         try {
@@ -100,6 +108,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         try {
             super.close();
         } catch (IOException e) {
+            // Collect error
             error(e);
             throw e;
         }
@@ -114,9 +123,11 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         try {
             inputStream = super.getInputStream();
         } catch (IOException e) {
+            // Collect error
             error(e);
             throw e;
         }
+        // wrap origin InputStream
         this.parsingInputStream = IOInstrument.instrumentInputStream(this,
                 inputStream, parsingInputStream);
         if (parsingInputStream != null) {
@@ -131,9 +142,11 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         try {
             outputStream = super.getOutputStream();
         } catch (IOException e) {
+            // Collect error
             error(e);
             throw e;
         }
+        // wrap origin OutputStream
         this.parsingOutputStream = IOInstrument.instrumentOutputStream(this,
                 outputStream, parsingOutputStream);
         return parsingOutputStream;
