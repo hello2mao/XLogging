@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String RES_SCHEME = "http";
     public static final String RES_HOST = "image.baidu.com";
     public static final String RES_PATH = "/channel/listjson";
-    public static final String RES_QUERY = "?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
+//    public static final String RES_QUERY = "?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
+    public static final String RES_QUERY = "?pn=0&rn=30&tag1=周杰伦&tag2=全部&ftags=周杰伦&ie=utf8";
     public static final String RES_URL = RES_SCHEME + "://" + RES_HOST + RES_PATH + RES_QUERY;
 
     @BindView(R.id.iv_pic)
