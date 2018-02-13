@@ -12,11 +12,4 @@ public class Harvest {
     public static void addHttpTransactionData(TransactionState transactionState) {
         XLogging.getCallback().handle(transactionState.toTransactionData());
     }
-
-    public static void addHttpTransactionDataAndError(TransactionState transactionState,
-                                              Exception exception) {
-        transactionState.setException(exception.getMessage());
-        XLogging.getCallback().handle(transactionState.toTransactionData());
-    }
-
 }

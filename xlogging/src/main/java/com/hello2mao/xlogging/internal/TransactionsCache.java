@@ -52,9 +52,12 @@ public class TransactionsCache {
             transactionState.setHost(currentTransactionState.getHost());
             transactionState.setIp(currentTransactionState.getIp());
             transactionState.setScheme(currentTransactionState.getScheme());
+            transactionState.setProtocol(currentTransactionState.getProtocol());
+            transactionState.setPort(currentTransactionState.getPort());
             transactionState.setPathAndQuery(currentTransactionState.getPathAndQuery());
             transactionState.setRequestMethod(currentTransactionState.getRequestMethod());
             transactionState.setBytesSent(currentTransactionState.getBytesSent());
+            transactionState.setRequestStartTime(currentTransactionState.getRequestStartTime());
             transactionState.setRequestEndTime(currentTransactionState.getRequestEndTime());
         }
     }

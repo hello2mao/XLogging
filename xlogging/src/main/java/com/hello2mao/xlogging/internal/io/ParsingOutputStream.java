@@ -65,6 +65,7 @@ public class ParsingOutputStream extends OutputStream implements HttpParserHandl
             transactionState.setScheme("https");
         }
         monitoredSocket.enqueueTransactionState(transactionState);
+        log.debug("Enqueue new TransactionState");
     }
 
     @Override

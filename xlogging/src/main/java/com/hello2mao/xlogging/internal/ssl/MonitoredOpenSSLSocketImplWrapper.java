@@ -74,7 +74,8 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
         } else {
             transactionState = createTransactionState();
         }
-        Harvest.addHttpTransactionDataAndError(transactionState, exception);
+        transactionState.setException(exception.getMessage());
+        Harvest.addHttpTransactionData(transactionState);
     }
 
     @Override

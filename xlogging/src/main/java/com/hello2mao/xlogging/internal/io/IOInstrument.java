@@ -1,6 +1,7 @@
 package com.hello2mao.xlogging.internal.io;
 
 import com.hello2mao.xlogging.internal.MonitoredSocket;
+import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.harvest.Harvest;
 import com.hello2mao.xlogging.internal.listener.StreamEvent;
 import com.hello2mao.xlogging.internal.listener.StreamListener;
@@ -37,8 +38,9 @@ public class IOInstrument {
             @Override
             public void streamError(StreamEvent streamEvent) {
                 log.debug("ParsingOutputStream streamError");
-                Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
-                        streamEvent.getException());
+                TransactionState transactionState = streamEvent.getTransactionState();
+                transactionState.setException(streamEvent.getException().getMessage());
+                Harvest.addHttpTransactionData(transactionState);
             }
         });
         log.debug("Unsafe instrument OutputStream for " +  monitoredSocket.getName() + " success!");
@@ -68,8 +70,9 @@ public class IOInstrument {
             @Override
             public void streamError(StreamEvent streamEvent) {
                 log.debug("ParsingInputStream streamError");
-                Harvest.addHttpTransactionDataAndError(streamEvent.getTransactionState(),
-                        streamEvent.getException());
+                TransactionState transactionState = streamEvent.getTransactionState();
+                transactionState.setException(streamEvent.getException().getMessage());
+                Harvest.addHttpTransactionData(transactionState);
             }
         });
         log.debug("Unsafe instrument InputStream for " +  monitoredSocket.getName() + " success!");

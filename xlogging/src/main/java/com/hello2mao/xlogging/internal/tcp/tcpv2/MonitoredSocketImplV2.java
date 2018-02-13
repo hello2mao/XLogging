@@ -243,7 +243,8 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         } else {
             transactionState = createTransactionState();
         }
-        Harvest.addHttpTransactionDataAndError(transactionState, exception);
+        transactionState.setException(exception.getMessage());
+        Harvest.addHttpTransactionData(transactionState);
     }
 
     /* Below is Override SocketImpl */

@@ -1,5 +1,7 @@
 package com.hello2mao.xlogging;
 
+import android.text.TextUtils;
+
 public class TransactionData {
 
     // Basic Info
@@ -154,21 +156,33 @@ public class TransactionData {
 
     @Override
     public String toString() {
-        return "host: " + host + "\n" +
-                "ip: " + ip + "\n" +
-                "scheme: " + scheme + "\n" +
-                "protocol: " + protocol + "\n" +
-                "port: " + port + "\n" +
-                "pathAndQuery: " + pathAndQuery + "\n" +
-                "requestMethod: " + requestMethod + "\n" +
-                "statusCode: " + statusCode + "\n" +
-                "bytesSent: " + bytesSent + " bytes\n" +
-                "bytesReceived: " + bytesReceived + " bytes\n" +
-                "tcpConnectTime: " + tcpConnectTime + " ms\n" +
-                "sslHandshakeTime: " + sslHandshakeTime + " ms\n" +
-                "requestTime: " + requestTime + " ms\n" +
-                "responseTime: " + responseTime + " ms\n" +
-                "exception: " + exception + "\n" +
-                "socketReuse: " + socketReuse;
+        StringBuilder sb = new StringBuilder();
+        sb.append("host:             ").append(host).append("\n");
+        sb.append("ip:               ").append(ip).append("\n");
+        sb.append("scheme:           ").append(scheme).append("\n");
+        sb.append("protocol:         ").append(protocol).append("\n");
+        sb.append("port:             ").append(port).append("\n");
+        sb.append("pathAndQuery:     ").append(pathAndQuery).append("\n");
+        sb.append("requestMethod:    ").append(requestMethod).append("\n");
+        sb.append("statusCode:       ").append(statusCode).append("\n");
+        sb.append("bytesSent:        ").append(bytesSent).append(" bytes\n");
+        sb.append("bytesReceived:    ").append(bytesReceived).append(" bytes\n");
+        if (tcpConnectTime != -1L) {
+            sb.append("tcpConnectTime:   ").append(tcpConnectTime).append(" ms\n");
+        }
+        if (sslHandshakeTime != -1L) {
+            sb.append("sslHandshakeTime: ").append(sslHandshakeTime).append(" ms\n");
+        }
+        if (requestTime != -1L) {
+            sb.append("requestTime:      ").append(requestTime).append(" ms\n");
+        }
+        if (responseTime != -1L) {
+            sb.append("responseTime:     ").append(responseTime).append(" ms\n");
+        }
+        if (!TextUtils.isEmpty(exception)) {
+            sb.append("exception:        ").append(exception).append("\n");
+        }
+        sb.append("socketReuse:      ").append(socketReuse);
+        return sb.toString();
     }
 }
