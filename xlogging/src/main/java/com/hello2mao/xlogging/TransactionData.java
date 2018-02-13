@@ -162,12 +162,12 @@ public class TransactionData {
                 "pathAndQuery: " + pathAndQuery + "\n" +
                 "requestMethod: " + requestMethod + "\n" +
                 "statusCode: " + statusCode + "\n" +
-                "bytesSent: " + bytesSent + "\n" +
-                "bytesReceived: " + bytesReceived + "\n" +
-                "tcpConnectTime: " + tcpConnectTime + "\n" +
-                "sslHandshakeTime: " + sslHandshakeTime + "\n" +
-                "requestTime: " + requestTime + "\n" +
-                "responseTime: " + responseTime + "\n" +
+                "bytesSent: " + bytesSent + " bytes\n" +
+                "bytesReceived: " + bytesReceived + " bytes\n" +
+                "tcpConnectTime: " + tcpConnectTime + " ms\n" +
+                "sslHandshakeTime: " + sslHandshakeTime + " ms\n" +
+                "requestTime: " + requestTime + " ms\n" +
+                "responseTime: " + responseTime + " ms\n" +
                 "exception: " + exception + "\n" +
                 "socketReuse: " + socketReuse;
     }

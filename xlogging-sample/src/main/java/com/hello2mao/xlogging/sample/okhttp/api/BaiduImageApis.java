@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.sample.okhttp.api;
 
-
 import com.hello2mao.xlogging.sample.MainActivity;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 

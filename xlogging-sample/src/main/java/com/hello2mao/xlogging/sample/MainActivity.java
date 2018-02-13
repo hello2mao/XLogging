@@ -8,9 +8,7 @@ import android.widget.RadioButton;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.hello2mao.xlogging.TransactionData;
 import com.hello2mao.xlogging.XLogging;
-import com.hello2mao.xlogging.XLoggingCallback;
 import com.hello2mao.xlogging.sample.bean.BaiduImageBean;
 import com.hello2mao.xlogging.sample.httpclient.HttpClientUtil;
 import com.hello2mao.xlogging.sample.okhttp.OkHttpUtil;
@@ -31,8 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String RES_SCHEME = "http";
     public static final String RES_HOST = "image.baidu.com";
     public static final String RES_PATH = "/channel/listjson";
-//    public static final String RES_QUERY = "?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
-    public static final String RES_QUERY = "?pn=0&rn=30&tag1=周杰伦&tag2=全部&ftags=周杰伦&ie=utf8";
+    public static final String RES_QUERY = "?pn=0&rn=30&tag1=美女&tag2=全部&ftags=校花&ie=utf8";
     public static final String RES_URL = RES_SCHEME + "://" + RES_HOST + RES_PATH + RES_QUERY;
 
     @BindView(R.id.iv_pic)
@@ -51,12 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
 
         // 安装带回调的XLogging
-        XLogging.install(new XLoggingCallback() {
-            @Override
-            public void handle(TransactionData transactionData) {
-                System.out.println(transactionData.toString());
-            }
-        });
+//        XLogging.install(new XLoggingCallback() {
+//            @Override
+//            public void handle(TransactionData transactionData) {
+//                System.out.println(transactionData.toString());
+//            }
+//        });
+        // 安装默认的XLogging
+        XLogging.install();
 
         // 默认使用URLConnection
         showPic();
