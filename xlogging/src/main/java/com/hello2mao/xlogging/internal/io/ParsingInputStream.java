@@ -72,7 +72,8 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     @Override
     public void statusLineFound(int statusCode) {
         TransactionState currentTransactionState;
-        if (readCount >= 1) { // tcp连接复用
+        if (readCount >= 1) { // tcp reuse
+            // More basic info will be copied to newTransactionState in finishedMessage
             TransactionState newTransactionState = new TransactionState();
             this.transactionState = newTransactionState;
             currentTransactionState = newTransactionState;
@@ -87,6 +88,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     @Override
     public void appendBody(String body) {
         if (getTransactionState().getStatusCode() >= 400) {
+            // FIXME:Collect error body
             log.debug("status code >= 400, body: " + body);
         }
     }
@@ -104,6 +106,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
         readCount++;
         if (readCount > 1) {
             transactionState.setSocketReuse(true);
+            // copy basic info
             TransactionsCache.setTransactionState(monitoredSocket, transactionState);
         }
         transactionState.setBytesReceived(bytesReceived);
@@ -127,7 +130,7 @@ public class ParsingInputStream extends InputStream implements HttpParserHandler
     @Override
     public TransactionState getTransactionState() {
         if (transactionState == null) {
-            // FIXME:为啥需要“拷贝”一个？
+            // FIXME: why new one?
             transactionState = new TransactionState(monitoredSocket.dequeueTransactionState());
         }
         return transactionState;

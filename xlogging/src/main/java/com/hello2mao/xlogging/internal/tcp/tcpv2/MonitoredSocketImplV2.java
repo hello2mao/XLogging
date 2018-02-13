@@ -209,6 +209,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
         TransactionState transactionState = new TransactionState();
         transactionState.setHost(host);
         transactionState.setIp(ip);
+        transactionState.setPort(port);
         transactionState.setTcpConnectStartTime(tcpConnectStartTime);
         transactionState.setTcpConnectEndTime(tcpConnectEndTime);
         transactionState.setScheme("http");

@@ -40,7 +40,7 @@ public class TransactionsCache {
     }
 
     /**
-     * 拷贝部分指标
+     * copy basic info
      *
      * @param monitoredSocket MonitoredSocket
      * @param transactionState TransactionState

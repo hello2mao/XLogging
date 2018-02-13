@@ -43,22 +43,22 @@ public class HttpResponseHeaderParser extends HttpHeaderParser {
      */
     protected AbstractParser nextParserAfterEndOfHeader() {
         AbstractParser parser;
-        if (notAllowedToHaveMessageBody()) {
+        if (notAllowedToHaveMessageBody()) { // no response body
             getHandler().finishedMessage(getCharactersInMessage());
             parser = getHandler().getInitialParser();
-        } else if (isChunkedTransferEncoding()) {
+        } else if (isChunkedTransferEncoding()) { // chunked body
             parser = new HttpChunkSizeParser(this);
-        } else if (isContentLengthSet()) {
+        } else if (isContentLengthSet()) { // normal body
             if (getContentLength() > 0) {
                 parser = new HttpBodyParser(this, getContentLength());
             } else {
                 getHandler().finishedMessage(getCharactersInMessage());
                 parser = getHandler().getInitialParser();
             }
-        } else if (getHandler().getParsedRequestMethod().equals("CONNECT")) {
+        } else if (getHandler().getParsedRequestMethod().equals("CONNECT")) { // CONNECT
             getHandler().finishedMessage(getCharactersInMessage());
             parser= getHandler().getInitialParser();
-        } else {
+        } else { // FIXME:?
             parser = new HttpEOFBodyParser(this);
         }
         return parser;

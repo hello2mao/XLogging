@@ -55,4 +55,8 @@ public class XLogging {
                     + ", sslInstalled=" + sslInstalled);
         }
     }
+
+    public static XLoggingCallback getCallback() {
+        return XLogging.callback;
+    }
 }

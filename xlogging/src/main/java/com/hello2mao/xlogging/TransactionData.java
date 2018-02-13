@@ -3,45 +3,172 @@ package com.hello2mao.xlogging;
 public class TransactionData {
 
     // Basic Info
-    private String url;
-    private String ipAddress;
+    private String host;
+    private String ip;
+    private String scheme;
+    private String protocol;
+    private int port;
+    private String pathAndQuery;
     private String requestMethod;
     private int statusCode;
     private long bytesSent;
     private long bytesReceived;
-    private String serverIP;
 
-    // Time
-    private long dnsStartTime;
-    private long dnsElapse;
-    private long tcpStartTime;
-    private long tcpElapse;
-    private long sslStartTime;
-    private long sslElapse;
-    private long requestStartTime;
-    private long requestElapse;
-    private long firstPackageElapse;
-    private long responseStartTime;
-    private long responseElapse;
+    // Timing
+    private long tcpConnectTime;
+    private long sslHandshakeTime;
+    private long requestTime;
+    private long responseTime;
 
-    // AssistData
-    private String query;
+    // Optional
     private String exception;
     private boolean socketReuse;
-    private int port;
 
-    public TransactionData() {
-        this.dnsStartTime = -1;
-        this.dnsElapse = -1;
-        this.tcpStartTime = -1;
-        this.tcpElapse = -1;
-        this.sslStartTime = -1;
-        this.sslElapse = -1;
-        this.requestStartTime = -1;
-        this.requestElapse = -1;
-        this.firstPackageElapse = -1;
-        this.responseStartTime = -1;
-        this.responseElapse = -1;
-        this.socketReuse = false;
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getPathAndQuery() {
+        return pathAndQuery;
+    }
+
+    public void setPathAndQuery(String pathAndQuery) {
+        this.pathAndQuery = pathAndQuery;
+    }
+
+    public String getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(String requestMethod) {
+        this.requestMethod = requestMethod;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public long getBytesSent() {
+        return bytesSent;
+    }
+
+    public void setBytesSent(long bytesSent) {
+        this.bytesSent = bytesSent;
+    }
+
+    public long getBytesReceived() {
+        return bytesReceived;
+    }
+
+    public void setBytesReceived(long bytesReceived) {
+        this.bytesReceived = bytesReceived;
+    }
+
+    public long getTcpConnectTime() {
+        return tcpConnectTime;
+    }
+
+    public void setTcpConnectTime(long tcpConnectTime) {
+        this.tcpConnectTime = tcpConnectTime;
+    }
+
+    public long getSslHandshakeTime() {
+        return sslHandshakeTime;
+    }
+
+    public void setSslHandshakeTime(long sslHandshakeTime) {
+        this.sslHandshakeTime = sslHandshakeTime;
+    }
+
+    public long getRequestTime() {
+        return requestTime;
+    }
+
+    public void setRequestTime(long requestTime) {
+        this.requestTime = requestTime;
+    }
+
+    public long getResponseTime() {
+        return responseTime;
+    }
+
+    public void setResponseTime(long responseTime) {
+        this.responseTime = responseTime;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
+    public boolean isSocketReuse() {
+        return socketReuse;
+    }
+
+    public void setSocketReuse(boolean socketReuse) {
+        this.socketReuse = socketReuse;
+    }
+
+    @Override
+    public String toString() {
+        return "host: " + host + "\n" +
+                "ip: " + ip + "\n" +
+                "scheme: " + scheme + "\n" +
+                "protocol: " + protocol + "\n" +
+                "port: " + port + "\n" +
+                "pathAndQuery: " + pathAndQuery + "\n" +
+                "requestMethod: " + requestMethod + "\n" +
+                "statusCode: " + statusCode + "\n" +
+                "bytesSent: " + bytesSent + "\n" +
+                "bytesReceived: " + bytesReceived + "\n" +
+                "tcpConnectTime: " + tcpConnectTime + "\n" +
+                "sslHandshakeTime: " + sslHandshakeTime + "\n" +
+                "requestTime: " + requestTime + "\n" +
+                "responseTime: " + responseTime + "\n" +
+                "exception: " + exception + "\n" +
+                "socketReuse: " + socketReuse;
     }
 }

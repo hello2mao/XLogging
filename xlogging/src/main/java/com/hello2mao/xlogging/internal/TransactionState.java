@@ -1,5 +1,7 @@
 package com.hello2mao.xlogging.internal;
 
+import com.hello2mao.xlogging.TransactionData;
+
 /**
  * record transaction state
  */
@@ -10,6 +12,7 @@ public class TransactionState {
     private String ip;
     private String scheme;
     private String protocol;
+    private int port;
     private String pathAndQuery;
     private String requestMethod;
     private int statusCode;
@@ -44,7 +47,7 @@ public class TransactionState {
     private State state;
 
     /**
-     * HTTP(S)事务的状态
+     * HTTP(S) transaction state
      */
     private enum State {
         READY,
@@ -58,6 +61,7 @@ public class TransactionState {
         this.ip = "";
         this.scheme = "";
         this.protocol = "";
+        this.port = -1;
         this.pathAndQuery = "";
         this.requestMethod = "";
         this.statusCode = -1;
@@ -88,6 +92,7 @@ public class TransactionState {
         this.ip = transactionState.getIp();
         this.scheme = transactionState.getScheme();
         this.protocol = transactionState.getProtocol();
+        this.port = transactionState.getPort();
         this.pathAndQuery = transactionState.getPathAndQuery();
         this.requestMethod = transactionState.getRequestMethod();
         this.statusCode = transactionState.getStatusCode();
@@ -109,6 +114,27 @@ public class TransactionState {
         this.socketReuse = transactionState.isSocketReuse();
         // Other
         this.state = transactionState.getState();
+    }
+
+    public TransactionData toTransactionData() {
+        TransactionData transactionData = new TransactionData();
+        transactionData.setHost(host);
+        transactionData.setIp(ip);
+        transactionData.setScheme(scheme);
+        transactionData.setProtocol(protocol);
+        transactionData.setPort(port);
+        transactionData.setPathAndQuery(pathAndQuery);
+        transactionData.setRequestMethod(requestMethod);
+        transactionData.setStatusCode(statusCode);
+        transactionData.setBytesSent(bytesSent);
+        transactionData.setBytesReceived(bytesReceived);
+        transactionData.setTcpConnectTime(tcpConnectEndTime - tcpConnectStartTime);
+        transactionData.setSslHandshakeTime(sslHandshakeEndTime - sslHandshakeStartTime);
+        transactionData.setRequestTime(requestEndTime - requestStartTime);
+        transactionData.setResponseTime(responseEndTime - responseStartTime);
+        transactionData.setException(exception);
+        transactionData.setSocketReuse(socketReuse);
+        return transactionData;
     }
 
     public void endTransaction() {
@@ -156,6 +182,14 @@ public class TransactionState {
 
     public void setProtocol(String protocol) {
         this.protocol = protocol;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getPathAndQuery() {
@@ -300,32 +334,5 @@ public class TransactionState {
 
     public void setState(State state) {
         this.state = state;
-    }
-
-    @Override
-    public String toString() {
-        return "TransactionState{" + '\n' +
-                "  host='" + host + '\'' + '\n' +
-                "  ip='" + ip + '\'' + '\n' +
-                "  scheme='" + scheme + '\'' + '\n' +
-                "  pathAndQuery='" + pathAndQuery + '\'' + '\n' +
-                "  requestMethod='" + requestMethod + '\'' + '\n' +
-                "  statusCode=" + statusCode + '\n' +
-                "  bytesSent=" + bytesSent + '\n' +
-                "  bytesReceived=" + bytesReceived + '\n' +
-//                "  dnsLookupStartTime=" + dnsLookupStartTime + '\n' +
-//                "  dnsLookupEndTime=" + dnsLookupEndTime + '\n' +
-                "  tcpConnectStartTime=" + tcpConnectStartTime + '\n' +
-                "  tcpConnectEndTime=" + tcpConnectEndTime + '\n' +
-                "  sslHandshakeStartTime=" + sslHandshakeStartTime + '\n' +
-                "  sslHandshakeEndTime=" + sslHandshakeEndTime + '\n' +
-                "  requestStartTime=" + requestStartTime + '\n' +
-                "  requestEndTime=" + requestEndTime + '\n' +
-                "  responseStartTime=" + responseStartTime + '\n' +
-                "  responseEndTime=" + responseEndTime + '\n' +
-                "  exception='" + exception + '\'' + '\n' +
-                "  socketReuse=" + socketReuse + '\n' +
-                "  state=" + state + '\n' +
-                '}';
     }
 }
