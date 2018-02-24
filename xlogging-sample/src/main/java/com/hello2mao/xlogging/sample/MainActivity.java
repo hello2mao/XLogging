@@ -47,10 +47,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // 安装XLogging
+        // Install XLogging
         XLogging.install();
 
-        // 默认使用URLConnection
+        // default using URLConnection
         showPic();
     }
 
@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BaiduImageBean baiduImageBean) {
-        // 主线程更新UI，使用Eventbus
         Glide.with(getApplicationContext())
                 .load(baiduImageBean.getData().get(new Random().nextInt(30)).getImage_url())
                 .crossFade()

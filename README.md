@@ -1,73 +1,59 @@
 XLogging
 =========================
 ![](https://img.shields.io/badge/build-parsing-brightgreen.svg)
-![](https://img.shields.io/badge/release-v1.1.0-blue.svg)
+![](https://img.shields.io/badge/release-v2.0.0-blue.svg)
 ![](https://img.shields.io/badge/license-Apache%202-red.svg)
 
 XLogging is an enhanced network performance monitor SDK for Android URLConnection/OkHttp/HttpClient.
-
-Feature
--------------
-TODO
-
 
 Quick Start
 -------------
 Gradle:
 ```
-compile 'com.hello2mao:xlogging:1.1.0'
+compile 'com.hello2mao:xlogging:2.0.0'
 ```
 Usage:
+``` java
+XLogging.install();
+
 ```
-OkHttpClient.Builder builder = new OkHttpClient.Builder();
-OkHttpClient okHttpClient = XLogging.install(builder.build(), XLogging.Level.BODY);
-
-或者
-
-OkHttpClient client = new OkHttpClient();
-client = XLogging.install(client, XLogging.Level.BODY);
-
+Or you can add a callback to get specific data:
+``` java
+XLogging.install(new XLoggingCallback() {
+            @Override
+            public void handle(TransactionData transactionData) {
+                System.out.println(transactionData.getBytesSent());
+            }
+        });
 ```
 
 Example
 -------------
-Level.BODY
 
 ```
-    DNS lookup: hostname=image.baidu.com results=[image.baidu.com/112.80.248.122] dnsTime=8ms
-    TCP connect: socket=image.baidu.com/112.80.248.122:80 connectTime=10ms
-    --> GET http://image.baidu.com/channel/listjson?pn=0&rn=3&tag1=%E7%BE%8E%E5%A5%B3&tag2=%E5%85%A8%E9%83%A8&ftags=%E6%A0%A1%E8%8A%B1&ie=utf8 http/1.1
-    Host: image.baidu.com
-    User-Agent: okhttp/3.6.0
-    Connection: Keep-Alive
-    Accept-Encoding: gzip
-    ==> END GET
-    
-    <-- 200 OK (63ms, 5789-byte body)
-    Vary: Accept-Encoding
-    Set-Cookie: BAIDUID=F388A9E0BF460F3D334FC962498CFD82:FG=1; expires=Fri, 15-Jun-18 05:41:15 GMT; max-age=31536000; path=/; domain=.baidu.com; version=1
-    X-Bd-Id: 18117792609767620757
-    Access-Control-Allow-Credentials: true
-    Connection: keep-alive
-    Content-Type: text/html
-    P3p: CP=" OTI DSP COR IVA OUR IND COM "
-    X-Bd-Ul: bef17eea90d82f4457acb3bb4d6b0991
-    Date: Thu, 15 Jun 2017 05:41:15 GMT
-    Tracecode: 24759133060915721482061513
-    X-Bd-Oc: 0
-    Server: Apache
-    Transfer-Encoding: chunked
-    Content-Encoding: gzip
-    Access-Control-Allow-Origin: https://m.baidu.com,https://www.baidu.com,http://m.baidu.com,http://www.baidu.com
-    
-    {"tag1":"美女","tag2":"全部","totalNum":16870,"start_index"   :0,"return_number" :3,"data":[]}
-    ==> END HTTP
+I/XLogging: <<<<<<<<XLogging Begin<<<<<<<<
+            host:             image.baidu.com
+            ip:               112.80.248.122
+            scheme:           https
+            protocol:         HTTP/1.1
+            port:             443
+            pathAndQuery:     /channel/listjson?pn=0&rn=30&tag1=%E7%BE%8E%E5%A5%B3&tag2=%E5%85%A8%E9%83%A8&ftags=%E6%A0%A1%E8%8A%B1&ie=utf8
+            requestMethod:    GET
+            statusCode:       200
+            bytesSent:        277 bytes
+            bytesReceived:    10285 bytes
+            tcpConnectTime:   6 ms
+            sslHandshakeTime: 21 ms
+            requestTime:      1 ms
+            responseTime:     68 ms
+            socketReuse:      false
+            =========XLogging End==========
 ```
 
 License
 -------------
 
-    Copyright (C) 2017 hello2mao.
+    Copyright (C) 2018 hello2mao.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

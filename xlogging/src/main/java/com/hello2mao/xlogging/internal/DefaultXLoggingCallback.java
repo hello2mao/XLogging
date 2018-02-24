@@ -17,6 +17,6 @@ public class DefaultXLoggingCallback implements XLoggingCallback {
         // TODO: need opt
         log.info("<<<<<<<<XLogging Begin<<<<<<<<\n"
                 + transactionData.toString() + "\n"
-                + "==========XLogging End==========\n");
+                + "=========XLogging End==========\n");
     }
 }
