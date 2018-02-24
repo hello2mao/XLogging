@@ -8,16 +8,16 @@ XLogging is an enhanced network performance monitor SDK for Android URLConnectio
 
 Quick Start
 -------------
-Gradle:
+**Gradle:**
 ```
 compile 'com.hello2mao:xlogging:2.0.0'
 ```
-Usage:
+**Usage:**
 ``` java
 XLogging.install();
 
 ```
-Or you can add a callback to get specific data:
+**Or you can add a callback to get specific data:**
 ``` java
 XLogging.install(new XLoggingCallback() {
             @Override
@@ -27,7 +27,7 @@ XLogging.install(new XLoggingCallback() {
         });
 ```
 
-Example
+Example log
 -------------
 
 ```
