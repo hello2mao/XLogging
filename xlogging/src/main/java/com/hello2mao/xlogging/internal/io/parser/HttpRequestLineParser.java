@@ -16,7 +16,7 @@ public class HttpRequestLineParser extends AbstractParser {
 
     /**
      * request head demo：
-     * GET /channel/listjson?pn=0&rn=3&tag1=%E7%BE%8E%E5%A5%B3&tag2=%E5%85%A8%E9%83%A8&ftags=%E6%A0%A1%E8%8A%B1&ie=utf8 HTTP/1.1
+     * GET /channel/listjson?pn=0 HTTP/1.1
      * Host: image.baidu.com
      * Connection: Keep-Alive
      * Accept-Encoding: gzip

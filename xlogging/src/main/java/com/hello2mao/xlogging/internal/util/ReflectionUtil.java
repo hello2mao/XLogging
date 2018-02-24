@@ -8,8 +8,8 @@ public class ReflectionUtil {
     /**
      * getFieldFromClass
      *
-     * @param clazz Class<?>
-     * @param fieldClazz Class<?>
+     * @param clazz Class
+     * @param fieldClazz Class
      * @return Field
      * @throws Exception Exception
      */
