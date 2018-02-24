@@ -34,7 +34,7 @@ public class XLogging {
 
         // Init internal log util
         XLog xlog = new AndroidXLog();
-        xlog.setLevel(XLog.DEBUG);
+        xlog.setLevel(XLog.INFO);
         XLogManager.setAgentLog(xlog);
 
         // Install tcp monitor
