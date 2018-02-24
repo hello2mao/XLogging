@@ -10,7 +10,7 @@ Quick Start
 -------------
 **Gradle:**
 ```
-compile 'com.hello2mao:xlogging:2.0.0'
+compile 'com.hello2mao:xlogging:2.0.1'
 ```
 **Usage:**
 ``` java
