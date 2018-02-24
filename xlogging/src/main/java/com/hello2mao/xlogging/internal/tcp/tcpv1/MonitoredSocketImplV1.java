@@ -4,6 +4,7 @@ import com.hello2mao.xlogging.internal.MonitoredSocket;
 import com.hello2mao.xlogging.internal.TcpData;
 import com.hello2mao.xlogging.internal.TransactionState;
 import com.hello2mao.xlogging.internal.TransactionsCache;
+import com.hello2mao.xlogging.internal.harvest.Harvest;
 import com.hello2mao.xlogging.internal.io.IOInstrument;
 import com.hello2mao.xlogging.internal.io.ParsingInputStream;
 import com.hello2mao.xlogging.internal.io.ParsingOutputStream;
@@ -68,9 +69,16 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         return MonitoredSocketImplV1.class.getSimpleName();
     }
 
-    private void error(Exception e) {
+    private void error(Exception exception) {
         // TODO
-        e.printStackTrace();
+        TransactionState transactionState;
+        if (parsingInputStream != null) {
+            transactionState = parsingInputStream.getTransactionState();
+        } else {
+            transactionState = createTransactionState();
+        }
+        transactionState.setException(exception.getMessage());
+        Harvest.addHttpTransactionData(transactionState);
     }
 
     /* Below is Override PlainSocketImpl */
@@ -147,7 +155,7 @@ public class MonitoredSocketImplV1 extends PlainSocketImpl implements MonitoredS
         log.debug("Collect tcpConnectTime="
                 + (tcpConnectEndTime - tcpConnectStartTime) + "ms");
         if (port == 443 ) {
-            TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
+            TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectEndTime));
         }
     }
 

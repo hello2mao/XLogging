@@ -74,6 +74,7 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
     }
 
     public void error(Exception exception) {
+        // TODO:
         TransactionState transactionState;
         if (parsingInputStream != null) {
             transactionState = parsingInputStream.getTransactionState();
@@ -96,6 +97,8 @@ public class MonitoredOpenSSLSocketImplWrapper extends OpenSSLSocketImplWrapper
             super.startHandshake();
             if (firstCallHandshake) {
                 this.sslHandshakeEndTime = System.currentTimeMillis();
+                log.debug("Collect sslHandshakeTime=" + (sslHandshakeEndTime - sslHandshakeStartTime) + "ms");
+                firstCallHandshake = false;
             }
         } catch (IOException e) {
             error(e);

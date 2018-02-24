@@ -309,7 +309,7 @@ public class MonitoredSocketImplV2 extends SocketImpl implements MonitoredSocket
             log.debug("Collect tcpConnectTime="
                     + (tcpConnectEndTime - tcpConnectStartTime) + "ms");
             if (port == 443 ) {
-                TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectStartTime));
+                TransactionsCache.addTcpData(fd, new TcpData(tcpConnectStartTime, tcpConnectEndTime));
             }
         } catch (IOException e) {
             e.printStackTrace();

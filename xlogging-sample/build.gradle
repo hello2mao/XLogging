@@ -34,7 +34,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile project(':xlogging')
-//    compile 'com.hello2mao:xlogging:2.0.1'
+//    compile 'com.hello2mao:xlogging:2.0.2'
 
     //rx
     compile 'io.reactivex:rxjava:1.2.3'

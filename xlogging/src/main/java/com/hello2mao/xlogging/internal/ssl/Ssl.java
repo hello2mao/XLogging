@@ -1,6 +1,5 @@
 package com.hello2mao.xlogging.internal.ssl;
 
-
 import com.hello2mao.xlogging.internal.log.XLog;
 import com.hello2mao.xlogging.internal.log.XLogManager;
 
