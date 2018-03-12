@@ -10,7 +10,7 @@ Quick Start
 -------------
 **Gradle:**
 ```
-compile 'com.hello2mao:xlogging:2.0.2'
+compile 'com.hello2mao:xlogging:2.0.3'
 ```
 **Usage:**
 ``` java
@@ -45,6 +45,7 @@ I/XLogging: <<<<<<<<XLogging Begin<<<<<<<<
             tcpConnectTime:   6 ms
             sslHandshakeTime: 21 ms
             requestTime:      1 ms
+            firstPackageTime: 55 ms
             responseTime:     68 ms
             socketReuse:      false
             =========XLogging End==========

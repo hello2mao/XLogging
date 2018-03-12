@@ -19,8 +19,9 @@ public class TransactionData {
     // Timing
     private long tcpConnectTime;
     private long sslHandshakeTime;
-    private long requestTime;
-    private long responseTime;
+    private long requestTime; // requestEndTime - requestStartTime
+    private long firstPackageTime; // responseStartTime - requestEndTime
+    private long responseTime; // responseEndTime - requestEndTime
 
     // Optional
     private String exception;
@@ -130,6 +131,14 @@ public class TransactionData {
         this.requestTime = requestTime;
     }
 
+    public long getFirstPackageTime() {
+        return firstPackageTime;
+    }
+
+    public void setFirstPackageTime(long firstPackageTime) {
+        this.firstPackageTime = firstPackageTime;
+    }
+
     public long getResponseTime() {
         return responseTime;
     }
@@ -175,6 +184,9 @@ public class TransactionData {
         }
         if (requestTime != -1L) {
             sb.append("requestTime:      ").append(requestTime).append(" ms\n");
+        }
+        if (firstPackageTime != -1L) {
+            sb.append("firstPackageTime: ").append(firstPackageTime).append(" ms\n");
         }
         if (responseTime != -1L) {
             sb.append("responseTime:     ").append(responseTime).append(" ms\n");

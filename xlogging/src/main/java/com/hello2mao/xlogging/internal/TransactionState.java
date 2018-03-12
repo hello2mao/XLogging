@@ -128,25 +128,30 @@ public class TransactionState {
         transactionData.setStatusCode(statusCode);
         transactionData.setBytesSent(bytesSent);
         transactionData.setBytesReceived(bytesReceived);
-        if ((tcpConnectEndTime != -1L) || (tcpConnectStartTime != -1L)) {
+        if ((tcpConnectEndTime != -1L) && (tcpConnectStartTime != -1L)) {
             transactionData.setTcpConnectTime(tcpConnectEndTime - tcpConnectStartTime);
         } else {
             transactionData.setTcpConnectTime(-1L);
         }
-        if ((sslHandshakeEndTime != -1L) || (sslHandshakeStartTime != -1L)) {
+        if ((sslHandshakeEndTime != -1L) && (sslHandshakeStartTime != -1L)) {
             transactionData.setSslHandshakeTime(sslHandshakeEndTime - sslHandshakeStartTime);
         } else {
             transactionData.setSslHandshakeTime(-1L);
         }
-        if ((requestEndTime != -1L) || (requestStartTime != -1L)) {
+        if ((requestEndTime != -1L) && (requestStartTime != -1L)) {
             transactionData.setRequestTime(requestEndTime - requestStartTime);
         } else {
             transactionData.setRequestTime(-1L);
         }
-        if ((responseEndTime != -1L) || (responseStartTime != -1L)) {
-            transactionData.setResponseTime(responseEndTime - responseStartTime);
+        if ((responseEndTime != -1L) && (requestEndTime != -1L)) {
+            transactionData.setResponseTime(responseEndTime - requestEndTime);
         } else {
             transactionData.setResponseTime(-1L);
+        }
+        if ((responseStartTime != -1L) && (requestEndTime != -1L)) {
+            transactionData.setFirstPackageTime(responseStartTime - requestEndTime);
+        } else {
+            transactionData.setFirstPackageTime(-1L);
         }
         transactionData.setException(exception);
         transactionData.setSocketReuse(socketReuse);
