@@ -1,7 +1,7 @@
 XLogging
 =========================
 ![](https://img.shields.io/badge/build-parsing-brightgreen.svg)
-![](https://img.shields.io/badge/release-v2.0.2-blue.svg)
+![](https://img.shields.io/badge/release-v2.0.3-blue.svg)
 ![](https://img.shields.io/badge/license-Apache%202-red.svg)
 
 XLogging is an enhanced network performance monitor SDK for Android.
